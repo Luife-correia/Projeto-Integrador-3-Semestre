@@ -1,15 +1,17 @@
 package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.Usuario;
-import com.gamebox.app.Repository.UserRepository;
+import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class UserService {
+public class UsuarioService {
 
-    private final UserRepository userRepository;
+    private final UsuarioRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UsuarioService(UsuarioRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -25,12 +27,15 @@ public class UserService {
                                 ("Usuario não encontrado!"));
     }
 
+    /**
+     * ********** CRUD **********
+     */
+
     public Usuario salvar(Usuario usuario) {
 
         if (userRepository.existsByEmail(usuario.getEmail())) {
             throw new RuntimeException("E-mail já cadastrado.");
         }
-
 
         return userRepository.save(usuario);
     }
@@ -41,5 +46,7 @@ public class UserService {
          userRepository.deleteById(id);
     }
 
-
+    public List<Usuario> listartodos(){
+        return userRepository.findAll();
+    }
 }
