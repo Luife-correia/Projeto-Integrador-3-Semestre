@@ -40,13 +40,25 @@ public class UsuarioService {
         return userRepository.save(usuario);
     }
 
-    public void deletar(Long id){
+    public void deletar(Long id) {
 
         buscarUser(id);
-         userRepository.deleteById(id);
+        userRepository.deleteById(id);
     }
 
-    public List<Usuario> listartodos(){
+    public List<Usuario> listartodos() {
         return userRepository.findAll();
     }
+
+    public Usuario buscarUsuario(Long id) {
+        buscarUser(id);
+        return buscarUser(id);
+    }
+
+    public Usuario atualizar(Usuario usuario) {
+        buscarUser(usuario.getId());
+        return userRepository.save(usuario);
+    }
+
+    // ========= FALTA O METODO DE ATIVAR OU DESATIVAR A CONTA =========
 }

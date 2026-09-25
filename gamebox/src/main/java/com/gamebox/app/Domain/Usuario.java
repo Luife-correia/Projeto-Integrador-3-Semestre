@@ -4,6 +4,7 @@ import com.gamebox.app.Enum.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Date;
@@ -19,7 +20,7 @@ public class Usuario {
     private Long id;
 
     @Column(nullable = false)
-    @Min(value = 5, message = "O nome deve ter pelo menos 2 caracteres")
+    @Size(min = 5, message = "O nome deve ter pelo menos 5 caracteres")
     private String nome;
 
     @NotNull
@@ -28,7 +29,7 @@ public class Usuario {
     private String email;
 
     @NotNull
-    @Min(value = 6, message = "A senha deve ter pelo menos 6 caracteres")
+    @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
     private String senhaHash;
 
     private String fotoPerfil;
@@ -45,6 +46,9 @@ public class Usuario {
     /**
      ********** Constructor **********
      */
+
+    public Usuario() {
+    }
 
     public Usuario(
             Long id,
