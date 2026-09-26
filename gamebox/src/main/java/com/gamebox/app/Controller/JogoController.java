@@ -2,6 +2,7 @@ package com.gamebox.app.Controller;
 
 import com.gamebox.app.Domain.Jogo;
 import com.gamebox.app.Service.JogoService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class JogoController {
     }
 
     @PostMapping
-    public Jogo criar(@RequestBody Jogo jogo) {
+    public Jogo criar(@RequestBody @Valid Jogo jogo) {
         return jogoService.salvar(jogo);
     }
 
@@ -33,7 +34,7 @@ public class JogoController {
 
 
     @PutMapping("/{id}")
-    public Jogo atualizar(@PathVariable Long id, @RequestBody Jogo jogo){
+    public Jogo atualizar(@PathVariable Long id, @RequestBody @Valid Jogo jogo){
         return jogoService.atualizar(id,jogo);
     }
 

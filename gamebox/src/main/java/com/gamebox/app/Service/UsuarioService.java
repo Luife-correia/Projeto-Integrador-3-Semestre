@@ -27,16 +27,28 @@ public class UsuarioService {
                                 ("Usuario não encontrado!"));
     }
 
+    public void vetificarEmail(Usuario usuario) {
+        if (userRepository.existsByEmail(usuario.getEmail())) {
+            throw new RuntimeException("E-mail já cadastrado.");
+        }
+    }
+
+    private void verificarEmailAtualizacao(Usuario usuario) {
+        Usuario usuarioExistente = buscarUser(usuario.getId());
+
+        if (!usuarioExistente.getEmail().equals(usuario.getEmail())
+                && userRepository.existsByEmail(usuario.getEmail())) {
+            throw new RuntimeException("E-mail já cadastrado.");
+        }
+    }
+
     /**
      * ********** CRUD **********
      */
 
     public Usuario salvar(Usuario usuario) {
 
-        if (userRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("E-mail já cadastrado.");
-        }
-
+        vetificarEmail(usuario);
         return userRepository.save(usuario);
     }
 
@@ -57,6 +69,7 @@ public class UsuarioService {
 
     public Usuario atualizar(Usuario usuario) {
         buscarUser(usuario.getId());
+        verificarEmailAtualizacao(usuario);
         return userRepository.save(usuario);
     }
 
