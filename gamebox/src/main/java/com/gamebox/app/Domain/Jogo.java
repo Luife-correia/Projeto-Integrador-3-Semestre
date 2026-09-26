@@ -2,8 +2,10 @@ package com.gamebox.app.Domain;
 
 
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +34,7 @@ public class Jogo {
     private String desenvolvedora;
 
     @Column(nullable = false)
-    private Date dataLancamento;
+    private LocalDate dataLancamento;
 
     @Column(nullable = false)
     private String sinopse;
@@ -40,7 +42,7 @@ public class Jogo {
     public Jogo() {
     }
 
-    public Jogo(String nome, String capa, List<String> plataformas, List<String> generos, String desenvolvedora, Date dataLancamento, String sinopse) {
+        public Jogo(String nome, String capa, List<String> plataformas, List<String> generos, String desenvolvedora, LocalDate dataLancamento, String sinopse) {
         this.nome = nome;
         this.capa = capa;
         this.plataformas = plataformas;
@@ -94,11 +96,11 @@ public class Jogo {
         this.desenvolvedora = desenvolvedora;
     }
 
-    public Date getDataLancamento() {
+    public LocalDate getDataLancamento() {
         return dataLancamento;
     }
 
-    public void setDataLancamento(Date dataLancamento) {
+    public void setDataLancamento(LocalDate dataLancamento) {
         this.dataLancamento = dataLancamento;
     }
 
