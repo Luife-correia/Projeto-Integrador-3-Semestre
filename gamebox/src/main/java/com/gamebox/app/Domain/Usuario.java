@@ -7,13 +7,12 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Table(name = "Usuarios")
 @Entity
 public class Usuario {
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,14 +38,11 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private Date dataCriacao;
+    private LocalDate dataCriacao;
 
     private boolean ativo;
 
-    /**
-     ********** Constructor **********
-     */
-
+    // Construtor
     public Usuario() {
     }
 
@@ -64,7 +60,6 @@ public class Usuario {
         this.email = email;
         this.senhaHash = senhaHash;
         this.role = role;
-        this.dataCriacao = dataCriacao;
         this.ativo = ativo;
     }
 
@@ -121,10 +116,10 @@ public class Usuario {
         this.role = role;
     }
 
-    public Date getDataCriacao() {
+    public LocalDate getDataCriacao() {
         return dataCriacao;
     }
-    public void setDataCriacao(Date dataCriacao) {
+    public void setDataCriacao(LocalDate dataCriacao) {
         this.dataCriacao = dataCriacao;
     }
 
