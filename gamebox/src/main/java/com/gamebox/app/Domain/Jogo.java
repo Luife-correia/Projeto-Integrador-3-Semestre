@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Table(name = "Jogo")
+@Table(name = "Jogos")
 @Entity
 public class Jogo {
 
