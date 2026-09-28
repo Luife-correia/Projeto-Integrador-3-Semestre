@@ -22,4 +22,48 @@ public class BibliotecaJogo {
     private Float nota;
 
     private int HorasJogadas;
+
+
+    public BibliotecaJogo(Long id, Usuario usuario, Jogo jogo, Float nota, int horasJogadas) {
+        this.id = id;
+        this.usuario = usuario;
+        this.jogo = jogo;
+    }
+
+    public BibliotecaJogo (){}
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Jogo getJogo() {
+        return jogo;
+    }
+    public void setJogo(Jogo jogo) {
+        this.jogo = jogo;
+    }
+
+    public Float getNota() {
+        return nota;
+    }
+    public void setNota(Float nota) {
+        this.nota = nota;
+    }
+
+    public int getHorasJogadas() {
+        return HorasJogadas;
+    }
+    public void setHorasJogadas(int horasJogadas) {
+        HorasJogadas = horasJogadas;
+    }
 }

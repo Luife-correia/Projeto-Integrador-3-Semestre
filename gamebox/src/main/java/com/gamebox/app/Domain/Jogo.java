@@ -40,6 +40,10 @@ public class Jogo {
     @JoinColumn(name = "bibliotecaJogos_id")
     private BibliotecaJogo bibliotecaJogo;
 
+    @OneToMany
+    @JoinColumn(name = "avaliacao_id")
+    private Avaliacao avaliacao;
+
     public Jogo() {
     }
 
