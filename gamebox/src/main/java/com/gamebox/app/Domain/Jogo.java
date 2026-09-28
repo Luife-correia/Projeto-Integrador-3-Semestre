@@ -36,6 +36,10 @@ public class Jogo {
     @Column(nullable = false)
     private String sinopse;
 
+    @ManyToOne
+    @JoinColumn(name = "bibliotecaJogos_id")
+    private BibliotecaJogo bibliotecaJogo;
+
     public Jogo() {
     }
 

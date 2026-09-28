@@ -42,6 +42,11 @@ public class Usuario {
 
     private boolean ativo;
 
+    @OneToMany
+    @JoinColumn(name = "bibliotecaJogos_id")
+    private BibliotecaJogo bibliotecaJogo;
+
+
     // Construtor
     public Usuario() {
     }
