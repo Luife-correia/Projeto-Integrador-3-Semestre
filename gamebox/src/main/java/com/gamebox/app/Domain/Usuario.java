@@ -47,9 +47,15 @@ public class Usuario {
     private BibliotecaJogo bibliotecaJogo;
 
     @OneToMany
+    @JoinColumn(name = "curtida_id", nullable = false)
+    private Curtida curtida;
+
+    @OneToMany
     @JoinColumn(name = "avaliacao_id")
     private Avaliacao avaliacao;
 
+
+    // Construtor
     public Usuario() {
     }
 
@@ -69,6 +75,10 @@ public class Usuario {
         this.role = role;
         this.ativo = ativo;
     }
+
+    /**
+     ********** GET E SET  **********
+     */
 
     public Long getId() {
         return id;
