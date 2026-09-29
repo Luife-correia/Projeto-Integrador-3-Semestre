@@ -25,7 +25,8 @@ public class Avaliacao {
     private LocalDate dataCriacao;
 
 
-   public Avaliacao(){}
+    public Avaliacao() {
+    }
 
     public Avaliacao(Long id, Usuario usuario, Jogo jogo, int nota, LocalDate dataCriacao) {
         this.id = id;
@@ -38,6 +39,7 @@ public class Avaliacao {
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -45,6 +47,7 @@ public class Avaliacao {
     public Usuario getUsuario() {
         return usuario;
     }
+
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
@@ -52,6 +55,7 @@ public class Avaliacao {
     public Jogo getJogo() {
         return jogo;
     }
+
     public void setJogo(Jogo jogo) {
         this.jogo = jogo;
     }
@@ -59,6 +63,7 @@ public class Avaliacao {
     public int getNota() {
         return nota;
     }
+
     public void setNota(int nota) {
         this.nota = nota;
     }
@@ -66,6 +71,7 @@ public class Avaliacao {
     public LocalDate getDataCriacao() {
         return dataCriacao;
     }
+
     public void setDataCriacao(LocalDate dataCriacao) {
         this.dataCriacao = dataCriacao;
     }
