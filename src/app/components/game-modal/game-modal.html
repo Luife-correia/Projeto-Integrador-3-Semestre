@@ -1,0 +1,56 @@
+        <div class="modal-backdrop" (click)="cancelar()">
+        <form class="modal" role="dialog" aria-modal="true" (ngSubmit)="salvar()" (click)="$event.stopPropagation()">
+
+            <header class="modal-header">
+                @if (game) {
+                    <h2>Editar jogo</h2>
+                } @else {
+                    <h2>Novo jogo</h2>
+                }
+            <button type="button" class="modal-close" aria-label="Fechar" (click)="cancelar()">✕</button>
+            </header>
+
+            <div class="modal-body">
+            <div class="campo">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" name="nome" placeholder="Ex.: God of War" [(ngModel)]="nome">
+            </div>
+
+            <div class="campo">
+                <label for="desenvolvedora">Desenvolvedora</label>
+                <input type="text" id="desenvolvedora" name="desenvolvedora" [(ngModel)]="desenvolvedora">
+            </div>
+
+            <div class="campo">
+                <label for="dataLancamento">Data de lançamento</label>
+                <input type="date" id="dataLancamento" name="dataLancamento" [(ngModel)]="dataLancamento">
+            </div>
+
+            <div class="campo">
+                <label for="generos">Gêneros (separados por vírgula)</label>
+                <input type="text" id="generos" name="generos" placeholder="RPG, Aventura" [(ngModel)]="generos">
+            </div>
+
+            <div class="campo">
+                <label for="plataformas">Plataformas (separadas por vírgula)</label>
+                <input type="text" id="plataformas" name="plataformas" placeholder="PlayStation 2, PC" [(ngModel)]="plataformas">
+            </div>
+
+            <div class="campo">
+                <label for="capa">URL da capa</label>
+                <input type="text" id="capa" name="capa" [(ngModel)]="capa">
+            </div>
+
+            <div class="campo">
+                <label for="sinopse">Sinopse</label>
+                <textarea id="sinopse" name="sinopse" rows="4" [(ngModel)]="sinopse"></textarea>
+            </div>
+            </div>
+
+            <footer class="modal-footer">
+            <button type="button" class="button-secondary" (click)="cancelar()">Cancelar</button>
+            <button type="submit" class="button-primary" [disabled]="!nome.trim()">Salvar</button>
+            </footer>
+
+        </form>
+        </div>

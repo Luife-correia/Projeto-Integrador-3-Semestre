@@ -1,0 +1,62 @@
+<div class="page-wrap page-enter">
+
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Administração</span>
+      <h1 class="section-title">Gerenciar jogos</h1>
+    </div>
+    <span class="catalog-count">{{games.length}} Jogos cadastrados</span>
+    <button type="button" class="button-primary" (click)="abrirNovo()">+ Novo jogo</button>
+  </div>
+
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Capa</th>
+          <th>Nome</th>
+          <th class="col-hide-mobile">Desenvolvedora</th>
+          <th>Ano</th>
+          <th class="col-hide-mobile">Plataformas</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (game of games; track game.id) {
+          <tr>
+            <td><img class="admin-thumb" [src]="game.capa" [alt]="'Capa de ' + game.nome"></td>
+            <td>{{ game.nome }}</td>
+            <td class="col-hide-mobile">{{game.desenvolvedora}}</td>
+            <td>{{ game.dataLancamento.slice(0, 4) }}</td>
+            <td class="col-hide-mobile">{{game.plataformas.join(', ')}}</td>
+            <td>
+              <div class="admin-actions">
+                <button type="button" class="button-secondary" (click)="abrirEdicao(game)">Editar</button>
+                <button type="button" class="button-danger" (click)="excluirGame(game)">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6">Nenhum jogo cadastrado.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+@if (modalAberto) {
+  <app-game-modal
+    [game]="gameEditando"
+    (save)="salvarGame()"
+    (closed)="fecharModal()" />
+}
+
+@if (gameExcluindo; as game) {
+  <app-confirm-modal
+    title="Excluir jogo"
+    [message]="'Tem certeza que deseja excluir ' + game.nome + '?'"
+    (confirmed)="excluirConfimarcao()"
+    (canceled)="excluirCancelar()" />
+}
