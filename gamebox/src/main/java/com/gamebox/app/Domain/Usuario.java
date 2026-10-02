@@ -40,8 +40,6 @@ public class Usuario {
 
     private LocalDate dataCriacao;
 
-    private boolean ativo;
-
     @OneToMany
     @JoinColumn(name = "bibliotecaJogos_id")
     private BibliotecaJogo bibliotecaJogo;
@@ -61,15 +59,13 @@ public class Usuario {
             String email,
             String senhaHash,
             Role role,
-            Date dataCriacao,
-            boolean ativo
+            Date dataCriacao
     ) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senhaHash = senhaHash;
         this.role = role;
-        this.ativo = ativo;
     }
 
     /**
@@ -132,10 +128,4 @@ public class Usuario {
         this.dataCriacao = dataCriacao;
     }
 
-    public boolean isAtivo() {
-        return ativo;
-    }
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
 }

@@ -27,7 +27,7 @@ public class UsuarioService {
                                 ("Usuario não encontrado!"));
     }
 
-    public void vetificarEmail(Usuario usuario) {
+    private void vetificarEmail(Usuario usuario) {
         if (userRepository.existsByEmail(usuario.getEmail())) {
             throw new RuntimeException("E-mail já cadastrado.");
         }
@@ -63,7 +63,6 @@ public class UsuarioService {
     }
 
     public Usuario buscarUsuario(Long id) {
-        buscarUser(id);
         return buscarUser(id);
     }
 
@@ -73,5 +72,20 @@ public class UsuarioService {
         return userRepository.save(usuario);
     }
 
-    // ========= FALTA O METODO DE ATIVAR OU DESATIVAR A CONTA =========
+    public Usuario login(Usuario usuario) {
+
+        return userRepository.findByEmailAndSenhaHash(
+                        usuario.getEmail(),
+                        usuario.getSenhaHash())
+                .orElseThrow(() ->
+                        new RuntimeException
+                                ("Email ou senha invalidos")
+                );
+
+
+    }
 }
+
+
+
+

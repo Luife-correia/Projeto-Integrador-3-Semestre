@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Usuarios")
+@RequestMapping("/usuarios")
 public class UsuarioController {
 
 
@@ -62,6 +62,16 @@ public class UsuarioController {
         usuario.setId(id);
         Usuario resposta =
                 usuarioService.atualizar(usuario);
+        return ResponseEntity.ok(resposta);
+    }
+
+    // falta inplemantar a segurança
+    @PostMapping("/login")
+    public ResponseEntity<Usuario> login(@RequestBody @Valid Usuario usuario) {
+
+        Usuario resposta =
+                usuarioService.login(usuario);
+
         return ResponseEntity.ok(resposta);
     }
 }
