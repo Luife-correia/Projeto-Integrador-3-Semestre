@@ -20,7 +20,10 @@ public class Avaliacao {
     @JoinColumn(name = "jogo_id")
     private Jogo jogo;
 
+    @Column(nullable = false)
     private int nota;
+
+    private String comentario;
 
     private LocalDate dataCriacao;
 
@@ -28,11 +31,11 @@ public class Avaliacao {
     public Avaliacao() {
     }
 
-    public Avaliacao(Long id, Usuario usuario, Jogo jogo, int nota, LocalDate dataCriacao) {
-        this.id = id;
+    public Avaliacao(Usuario usuario, Jogo jogo, int nota, String comentario, LocalDate dataCriacao) {
         this.usuario = usuario;
         this.jogo = jogo;
         this.nota = nota;
+        this.comentario = comentario;
         this.dataCriacao = dataCriacao;
     }
 
@@ -66,6 +69,14 @@ public class Avaliacao {
 
     public void setNota(int nota) {
         this.nota = nota;
+    }
+
+    public String getComentario() {
+        return comentario;
+    }
+
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
     }
 
     public LocalDate getDataCriacao() {

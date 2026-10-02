@@ -47,10 +47,6 @@ public class Usuario {
     private BibliotecaJogo bibliotecaJogo;
 
     @OneToMany
-    @JoinColumn(name = "curtida_id", nullable = false)
-    private Curtida curtida;
-
-    @OneToMany
     @JoinColumn(name = "avaliacao_id")
     private Avaliacao avaliacao;
 
