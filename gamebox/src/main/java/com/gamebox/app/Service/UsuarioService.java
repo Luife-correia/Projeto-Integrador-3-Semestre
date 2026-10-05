@@ -16,10 +16,7 @@ public class UsuarioService {
     }
 
 
-    /**
-     * ********** Métodos auxiliares **********
-     */
-
+    //Método auxiliar
     private Usuario buscarUser(Long id) {
         return userRepository.findById(id).
                 orElseThrow(() ->
@@ -27,12 +24,14 @@ public class UsuarioService {
                                 ("Usuario não encontrado!"));
     }
 
+    //Método auxiliar
     private void vetificarEmail(Usuario usuario) {
         if (userRepository.existsByEmail(usuario.getEmail())) {
             throw new RuntimeException("E-mail já cadastrado.");
         }
     }
 
+    //Método auxiliar
     private void verificarEmailAtualizacao(Usuario usuario) {
         Usuario usuarioExistente = buscarUser(usuario.getId());
 
@@ -41,10 +40,6 @@ public class UsuarioService {
             throw new RuntimeException("E-mail já cadastrado.");
         }
     }
-
-    /**
-     * ********** CRUD **********
-     */
 
     public Usuario salvar(Usuario usuario) {
 

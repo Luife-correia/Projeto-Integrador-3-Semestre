@@ -19,15 +19,12 @@ public class BibliotecaJogo {
     @JoinColumn(name = "jogo_id", nullable = false)
     private Jogo jogo;
 
-    private Float nota;
-
     private int HorasJogadas;
 
-    public BibliotecaJogo(Long id, Usuario usuario, Jogo jogo, Float nota, int horasJogadas) {
+    public BibliotecaJogo(Long id, Usuario usuario, Jogo jogo, int horasJogadas) {
         this.id = id;
         this.usuario = usuario;
         this.jogo = jogo;
-        this.nota = nota;
         this.HorasJogadas = horasJogadas;
     }
 
@@ -52,13 +49,6 @@ public class BibliotecaJogo {
     }
     public void setJogo(Jogo jogo) {
         this.jogo = jogo;
-    }
-
-    public Float getNota() {
-        return nota;
-    }
-    public void setNota(Float nota) {
-        this.nota = nota;
     }
 
     public int getHorasJogadas() {

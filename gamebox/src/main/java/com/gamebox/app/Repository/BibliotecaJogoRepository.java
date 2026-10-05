@@ -4,4 +4,6 @@ import com.gamebox.app.Domain.BibliotecaJogo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BibliotecaJogoRepository extends JpaRepository<BibliotecaJogo,Long> {
+
+   boolean existsByUsuarioIdAndJogoId(Long usuarioId, Long jogoId);
 }
