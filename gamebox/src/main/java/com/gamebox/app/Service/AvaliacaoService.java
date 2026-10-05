@@ -17,7 +17,7 @@ public class AvaliacaoService {
 
     //criar avaliação
     //atualizar
-    //deletar avaliação user que criou
+    //deletar avaliação (user que criou)
     //listar avaliações de um jogo
     //deletar avaliação (admin)
 
