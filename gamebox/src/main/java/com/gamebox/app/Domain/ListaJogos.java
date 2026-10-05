@@ -14,7 +14,7 @@ public class ListaJogos {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "jogo_id", nullable = false)
     private Jogo jogo;
 

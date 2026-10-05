@@ -3,12 +3,12 @@ package com.gamebox.app.Domain;
 import com.gamebox.app.Enum.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "Usuarios")
 @Entity
@@ -22,12 +22,12 @@ public class Usuario {
     @Size(min = 5, message = "O nome deve ter pelo menos 5 caracteres")
     private String nome;
 
-    @NotNull
+    @NotBlank
     @Email
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @NotNull
+    @NotBlank
     @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
     private String senhaHash;
 
@@ -40,13 +40,11 @@ public class Usuario {
 
     private LocalDate dataCriacao;
 
-    @OneToMany
-    @JoinColumn(name = "bibliotecaJogos_id")
-    private BibliotecaJogo bibliotecaJogo;
+    @OneToMany(mappedBy = "usuario")
+    private List<BibliotecaJogo> bibliotecas = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "avaliacao_id")
-    private Avaliacao avaliacao;
+    @OneToMany(mappedBy = "usuario")
+    private List<Avaliacao> avaliacoes = new ArrayList<>();
 
 
     // Construtor
@@ -59,13 +57,14 @@ public class Usuario {
             String email,
             String senhaHash,
             Role role,
-            Date dataCriacao
+            LocalDate dataCriacao
     ) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senhaHash = senhaHash;
         this.role = role;
+        this.dataCriacao = dataCriacao;
     }
 
     /**

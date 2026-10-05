@@ -2,7 +2,9 @@ package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.Avaliacao;
 import com.gamebox.app.Repository.AvaliacaoRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AvaliacaoService {
 
     private final AvaliacaoRepository avaliacaoRepository;
