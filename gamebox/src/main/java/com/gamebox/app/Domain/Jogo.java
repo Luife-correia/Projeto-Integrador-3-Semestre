@@ -2,6 +2,8 @@ package com.gamebox.app.Domain;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,10 +38,20 @@ public class Jogo {
     @Column(nullable = false)
     private String sinopse;
 
+    @Column(nullable = false)
+    @OneToMany
+    private double nota = 0.0;
+
     public Jogo() {
     }
 
-        public Jogo(String nome, String capa, List<String> plataformas, List<String> generos, String desenvolvedora, LocalDate dataLancamento, String sinopse) {
+    public Jogo(String nome, String capa, List<String> plataformas, List<String> generos,
+                String desenvolvedora, LocalDate dataLancamento, String sinopse) {
+        this(nome, capa, plataformas, generos, desenvolvedora, dataLancamento, sinopse, 0.0);
+    }
+
+    public Jogo(String nome, String capa, List<String> plataformas, List<String> generos,
+                String desenvolvedora, LocalDate dataLancamento, String sinopse, double nota) {
         this.nome = nome;
         this.capa = capa;
         this.plataformas = plataformas;
@@ -47,6 +59,7 @@ public class Jogo {
         this.desenvolvedora = desenvolvedora;
         this.dataLancamento = dataLancamento;
         this.sinopse = sinopse;
+        this.nota = nota;
     }
 
     public Long getId() {
@@ -107,5 +120,13 @@ public class Jogo {
 
     public void setSinopse(String sinopse) {
         this.sinopse = sinopse;
+    }
+
+    public double getNota() {
+        return nota;
+    }
+
+    public void setNota(double nota) {
+        this.nota = nota;
     }
 }

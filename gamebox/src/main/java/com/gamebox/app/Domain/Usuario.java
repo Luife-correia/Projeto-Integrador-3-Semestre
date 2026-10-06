@@ -67,10 +67,6 @@ public class Usuario {
         this.dataCriacao = dataCriacao;
     }
 
-    /**
-     ********** GET E SET  **********
-     */
-
     public Long getId() {
         return id;
     }

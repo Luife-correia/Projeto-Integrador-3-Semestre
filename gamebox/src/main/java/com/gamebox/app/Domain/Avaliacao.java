@@ -35,7 +35,13 @@ public class Avaliacao {
     public Avaliacao() {
     }
 
-    public Avaliacao(Usuario usuario, Jogo jogo, int notaEmMeiasEstrelas, String comentario, LocalDate dataCriacao) {
+    public Avaliacao(
+            Usuario usuario,
+            Jogo jogo,
+            int notaEmMeiasEstrelas,
+            String comentario,
+            LocalDate dataCriacao
+    ) {
         this.usuario = usuario;
         this.jogo = jogo;
         this.notaEmMeiasEstrelas = notaEmMeiasEstrelas;
