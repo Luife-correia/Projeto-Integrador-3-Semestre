@@ -40,12 +40,11 @@ public class Usuario {
 
     private LocalDate dataCriacao;
 
-    @OneToMany(mappedBy = "usuario")
-    private List<BibliotecaJogo> bibliotecas = new ArrayList<>();
+    private List<Jogo> biblioteca = new ArrayList<>();
 
-    @OneToMany(mappedBy = "usuario")
-    private List<Avaliacao> avaliacoes = new ArrayList<>();
-
+    @OneToMany
+    @JoinColumn(name = "avaliacao_id")
+    private Avaliacao avaliacao;
 
     // Construtor
     public Usuario() {
