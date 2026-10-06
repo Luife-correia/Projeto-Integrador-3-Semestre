@@ -31,6 +31,9 @@ public class Avaliacao {
 
     private LocalDate dataCriacao;
 
+    @ManyToOne
+    @JoinColumn(name = "jogo_id")
+    private Jogo jogoRelacionado;
 
     public Avaliacao() {
     }
