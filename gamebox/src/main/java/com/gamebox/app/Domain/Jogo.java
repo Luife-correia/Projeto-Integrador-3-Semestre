@@ -38,10 +38,6 @@ public class Jogo {
     @Column(nullable = false)
     private String sinopse;
 
-    @OneToMany
-    @JoinColumn(name = "avaliacao_id")
-    private Avaliacao avaliacao;
-
     private double nota = 0.0;
 
     public Jogo() {

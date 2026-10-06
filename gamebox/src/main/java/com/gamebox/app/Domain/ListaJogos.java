@@ -1,5 +1,6 @@
 package com.gamebox.app.Domain;
 
+import com.gamebox.app.Enum.StatusListaJogos;
 import jakarta.persistence.*;
 
 @Table(name = "ListasJogos")
@@ -24,16 +25,21 @@ public class ListaJogos {
     @Column(nullable = false)
     private Boolean publica;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusListaJogos status;
 
     public ListaJogos() {
     }
 
-    public ListaJogos(Long id, Usuario usuario, Jogo jogo, String nome, Boolean publica) {
+    public ListaJogos(Long id, Usuario usuario, Jogo jogo, String nome, Boolean publica,
+                      StatusListaJogos status) {
         this.id = id;
         this.usuario = usuario;
         this.jogo = jogo;
         this.nome = nome;
         this.publica = publica;
+        this.status = status;
     }
 
     public Long getId() {
@@ -70,5 +76,13 @@ public class ListaJogos {
 
     public void setPublica(Boolean publica) {
         this.publica = publica;
+    }
+
+    public StatusListaJogos getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusListaJogos status) {
+        this.status = status;
     }
 }
