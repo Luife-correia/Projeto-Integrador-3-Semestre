@@ -38,6 +38,8 @@ public class Jogo {
     @Column(nullable = false)
     private String sinopse;
 
+    @DecimalMin(value = "0.0", message = "A nota deve ser no mínimo 0")
+    @DecimalMax(value = "5.0", message = "A nota deve ser no máximo 5")
     private double nota = 0.0;
 
     public Jogo() {
