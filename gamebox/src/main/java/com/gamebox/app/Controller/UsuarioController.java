@@ -1,11 +1,11 @@
 package com.gamebox.app.Controller;
 
 import com.gamebox.app.Domain.Usuario;
+import com.gamebox.app.Dto.request.RequestUserLogin;
+import com.gamebox.app.Dto.response.UserLoginResponse;
 import com.gamebox.app.Service.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -67,9 +67,11 @@ public class UsuarioController {
 
     // falta inplemantar a segurança
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestBody @Valid Usuario usuario) {
-
-        Usuario resposta =
+    public ResponseEntity<UserLoginResponse> login(
+            @RequestBody @Valid RequestUserLogin usuario
+    ) {
+        UserLoginResponse
+                resposta =
                 usuarioService.login(usuario);
 
         return ResponseEntity.ok(resposta);

@@ -40,8 +40,6 @@ public class Usuario {
 
     private LocalDate dataCriacao;
 
-    @OneToMany(mappedBy = "usuario")
-    private List<BibliotecaJogo> bibliotecas = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario")
     private List<Avaliacao> avaliacoes = new ArrayList<>();

@@ -1,6 +1,8 @@
 package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.Usuario;
+import com.gamebox.app.Dto.request.RequestUserLogin;
+import com.gamebox.app.Dto.response.UserLoginResponse;
 import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -67,17 +69,19 @@ public class UsuarioService {
         return userRepository.save(usuario);
     }
 
-    public Usuario login(Usuario usuario) {
+    public UserLoginResponse login(RequestUserLogin request) {
 
-        return userRepository.findByEmailAndSenhaHash(
-                        usuario.getEmail(),
-                        usuario.getSenhaHash())
-                .orElseThrow(() ->
-                        new RuntimeException
-                                ("Email ou senha invalidos")
-                );
+        Usuario usuario = userRepository.findByEmailAndSenhaHash(
+                request.email(),
+                request.senha()
+        ).orElseThrow(() -> new RuntimeException("Credenciais inválidas."));
 
-
+        return new UserLoginResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getRole()
+        );
     }
 }
 
