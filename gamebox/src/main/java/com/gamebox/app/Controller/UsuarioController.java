@@ -1,9 +1,8 @@
 package com.gamebox.app.Controller;
 
-import com.gamebox.app.Domain.Usuario;
-import com.gamebox.app.Dto.request.RequestUserAtualizacao;
-import com.gamebox.app.Dto.request.RequestUserCadastro;
-import com.gamebox.app.Dto.request.RequestUserLogin;
+import com.gamebox.app.Dto.request.UserAtualizacaoRequest;
+import com.gamebox.app.Dto.request.UserCadastroRequest;
+import com.gamebox.app.Dto.request.UserLoginRequest;
 import com.gamebox.app.Dto.response.UserResponse;
 import com.gamebox.app.Dto.response.UserLoginResponse;
 import com.gamebox.app.Service.UsuarioService;
@@ -26,7 +25,7 @@ public class UsuarioController {
     // @PreAuthorize("hasAnyRole('USER')")
     @PostMapping
     public ResponseEntity<UserResponse> salvar(
-            @RequestBody @Valid RequestUserCadastro request
+            @RequestBody @Valid UserCadastroRequest request
     ) {
 
         UserResponse resposta =
@@ -58,7 +57,7 @@ public class UsuarioController {
     @PutMapping("/{id}/Me")
     public ResponseEntity<UserResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody @Valid RequestUserAtualizacao request
+            @RequestBody @Valid UserAtualizacaoRequest request
     ) {
         UserResponse resposta =
                 usuarioService.atualizar(id, request);
@@ -68,7 +67,7 @@ public class UsuarioController {
     // falta inplemantar a segurança
     @PostMapping("/login")
     public ResponseEntity<UserLoginResponse> login(
-            @RequestBody @Valid RequestUserLogin usuario
+            @RequestBody @Valid UserLoginRequest usuario
     ) {
         UserLoginResponse
                 resposta =

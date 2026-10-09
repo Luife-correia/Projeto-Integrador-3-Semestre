@@ -4,7 +4,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record RequestUserLogin(
+public record UserCadastroRequest(
+        @NotBlank
+        @Size(min = 5, message = "O nome deve ter pelo menos 5 caracteres")
+        String nome,
 
         @NotBlank
         @Email
@@ -12,6 +15,9 @@ public record RequestUserLogin(
 
         @NotBlank
         @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
-        String senha
+        String senha,
+
+        String fotoPerfil,
+        String bio
 ) {
 }
