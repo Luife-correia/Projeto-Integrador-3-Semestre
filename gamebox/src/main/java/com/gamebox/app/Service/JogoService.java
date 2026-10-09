@@ -46,7 +46,6 @@ public class JogoService {
         jogoAtual.setDesenvolvedora(jogoAtualizado.getDesenvolvedora());
         jogoAtual.setDataLancamento(jogoAtualizado.getDataLancamento());
         jogoAtual.setSinopse(jogoAtualizado.getSinopse());
-        jogoAtual.setNota(jogoAtualizado.getNota());
 
         return jogoRepository.save(jogoAtual);
     }

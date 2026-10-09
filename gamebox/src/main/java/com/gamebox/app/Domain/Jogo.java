@@ -2,10 +2,10 @@ package com.gamebox.app.Domain;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "Jogos")
@@ -17,6 +17,7 @@ public class Jogo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(nullable = false)
     private String nome;
 
@@ -24,10 +25,10 @@ public class Jogo {
     private String capa;
 
     @ElementCollection
-    private List<String> plataformas;
+    private List<String> plataformas = new ArrayList<>();
 
     @ElementCollection
-    private List<String> generos;
+    private List<String> generos = new ArrayList<>();
 
     @Column(nullable = false)
     private String desenvolvedora;
@@ -38,18 +39,14 @@ public class Jogo {
     @Column(nullable = false)
     private String sinopse;
 
-    private double nota = 0.0;
+    @Column(nullable = false)
+    private double notaTotal;
 
     public Jogo() {
     }
 
     public Jogo(String nome, String capa, List<String> plataformas, List<String> generos,
                 String desenvolvedora, LocalDate dataLancamento, String sinopse) {
-        this(nome, capa, plataformas, generos, desenvolvedora, dataLancamento, sinopse, 0.0);
-    }
-
-    public Jogo(String nome, String capa, List<String> plataformas, List<String> generos,
-                String desenvolvedora, LocalDate dataLancamento, String sinopse, double nota) {
         this.nome = nome;
         this.capa = capa;
         this.plataformas = plataformas;
@@ -57,7 +54,6 @@ public class Jogo {
         this.desenvolvedora = desenvolvedora;
         this.dataLancamento = dataLancamento;
         this.sinopse = sinopse;
-        this.nota = nota;
     }
 
     public Long getId() {
@@ -120,11 +116,16 @@ public class Jogo {
         this.sinopse = sinopse;
     }
 
-    public double getNota() {
-        return nota;
+    public double getNotaTotal() {
+        return notaTotal;
     }
 
-    public void setNota(double nota) {
-        this.nota = nota;
+    public void atualizarNota(int somaTotalAvaliacoes, long totalAvaliacoes){
+        if (totalAvaliacoes <= 0){
+            this.notaTotal = 0.0;
+            return;
+        }
+        this.notaTotal = ((double)somaTotalAvaliacoes / totalAvaliacoes) /2;
     }
+
 }
