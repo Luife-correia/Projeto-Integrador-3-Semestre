@@ -1,7 +1,10 @@
 package com.gamebox.app.Controller;
 
 import com.gamebox.app.Domain.Usuario;
+import com.gamebox.app.Dto.request.RequestUserAtualizacao;
+import com.gamebox.app.Dto.request.RequestUserCadastro;
 import com.gamebox.app.Dto.request.RequestUserLogin;
+import com.gamebox.app.Dto.response.UserResponse;
 import com.gamebox.app.Dto.response.UserLoginResponse;
 import com.gamebox.app.Service.UsuarioService;
 import jakarta.validation.Valid;
@@ -14,7 +17,6 @@ import java.util.List;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-
     private final UsuarioService usuarioService;
 
     public UsuarioController(UsuarioService usuarioService) {
@@ -23,12 +25,12 @@ public class UsuarioController {
 
     // @PreAuthorize("hasAnyRole('USER')")
     @PostMapping
-    public ResponseEntity<Usuario> salvar(
-            @RequestBody @Valid Usuario usuario
+    public ResponseEntity<UserResponse> salvar(
+            @RequestBody @Valid RequestUserCadastro request
     ) {
 
-        Usuario resposta =
-                usuarioService.salvar(usuario);
+        UserResponse resposta =
+                usuarioService.salvar(request);
 
         return ResponseEntity.ok(resposta);
     }
@@ -42,26 +44,24 @@ public class UsuarioController {
 
     // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<Usuario>> listarTodos() {
+    public ResponseEntity<List<UserResponse>> listarTodos() {
         return ResponseEntity.ok(usuarioService.listartodos());
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarUsuario(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> buscarUsuario(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarUsuario(id));
     }
 
     // @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}/Me")
-    public ResponseEntity<Usuario> atualizar(
+    public ResponseEntity<UserResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody @Valid
-            Usuario usuario
+            @RequestBody @Valid RequestUserAtualizacao request
     ) {
-        usuario.setId(id);
-        Usuario resposta =
-                usuarioService.atualizar(usuario);
+        UserResponse resposta =
+                usuarioService.atualizar(id, request);
         return ResponseEntity.ok(resposta);
     }
 

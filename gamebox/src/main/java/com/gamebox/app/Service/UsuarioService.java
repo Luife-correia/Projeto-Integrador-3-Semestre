@@ -1,12 +1,18 @@
 package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.Usuario;
+import com.gamebox.app.Dto.request.RequestUserAtualizacao;
+import com.gamebox.app.Dto.request.RequestUserCadastro;
 import com.gamebox.app.Dto.request.RequestUserLogin;
+import com.gamebox.app.Dto.response.UserResponse;
 import com.gamebox.app.Dto.response.UserLoginResponse;
+import com.gamebox.app.Enum.Role;
 import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -43,10 +49,19 @@ public class UsuarioService {
         }
     }
 
-    public Usuario salvar(Usuario usuario) {
+    public UserResponse salvar(RequestUserCadastro request) {
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(request.nome());
+        usuario.setEmail(request.email());
+        usuario.setSenhaHash(request.senha());
+        usuario.setFotoPerfil(request.fotoPerfil());
+        usuario.setBio(request.bio());
+        usuario.setRole(Role.USER);
+        usuario.setDataCriacao(LocalDate.now());
 
         vetificarEmail(usuario);
-        return userRepository.save(usuario);
+        return toResponse(userRepository.save(usuario));
     }
 
     public void deletar(Long id) {
@@ -55,18 +70,34 @@ public class UsuarioService {
         userRepository.deleteById(id);
     }
 
-    public List<Usuario> listartodos() {
-        return userRepository.findAll();
+    public List<UserResponse> listartodos() {
+        return userRepository.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Usuario buscarUsuario(Long id) {
-        return buscarUser(id);
+    public UserResponse buscarUsuario(Long id) {
+        return toResponse(buscarUser(id));
     }
 
-    public Usuario atualizar(Usuario usuario) {
-        buscarUser(usuario.getId());
-        verificarEmailAtualizacao(usuario);
-        return userRepository.save(usuario);
+    public UserResponse atualizar(Long id, RequestUserAtualizacao request) {
+        Usuario usuario = buscarUser(id);
+
+        if (!usuario.getEmail().equals(request.email())
+                && userRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("E-mail já cadastrado.");
+        }
+
+        usuario.setNome(request.nome());
+        usuario.setEmail(request.email());
+        usuario.setFotoPerfil(request.fotoPerfil());
+        usuario.setBio(request.bio());
+
+        if (request.senha() != null && !request.senha().isBlank()) {
+            usuario.setSenhaHash(request.senha());
+        }
+
+        return toResponse(userRepository.save(usuario));
     }
 
     public UserLoginResponse login(RequestUserLogin request) {
@@ -83,8 +114,19 @@ public class UsuarioService {
                 usuario.getRole()
         );
     }
-}
 
+    private UserResponse toResponse(Usuario usuario) {
+        return new UserResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getFotoPerfil(),
+                usuario.getBio(),
+                usuario.getRole(),
+                usuario.getDataCriacao()
+        );
+    }
+}
 
 
 
