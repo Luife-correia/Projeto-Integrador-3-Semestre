@@ -27,7 +27,7 @@ public class ListaJogosService {
     }
 
 
-    public ListaJogosResponse salvar(ListaJogosRequest request) {
+    public ListaJogosResponse criarLista(ListaJogosRequest request) {
 
         ListaJogos listaJogos = new ListaJogos();
 
@@ -61,7 +61,7 @@ public class ListaJogosService {
         listaJogosRepository.deleteById(id);
     }
 
-    public ListaJogosResponse atualizar(ListaJogosRequest request) {
+    public ListaJogosResponse atualizar(ListaJogosRequest request, Long id) {
 
         ListaJogos listaJogos = new ListaJogos();
 
@@ -89,6 +89,7 @@ public class ListaJogosService {
                         getStatus()
         );
     }
+
 
     /**
      * Metodos faltantes:

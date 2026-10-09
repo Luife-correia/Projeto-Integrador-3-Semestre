@@ -1,6 +1,6 @@
 package com.gamebox.app.Controller;
 
-import com.gamebox.app.Domain.ListaJogos;
+
 import com.gamebox.app.Dto.request.ListaJogosRequest;
 import com.gamebox.app.Dto.response.ListaJogosResponse;
 import com.gamebox.app.Service.ListaJogosService;
@@ -24,7 +24,7 @@ public class ListaJogosController {
             @RequestBody @Valid ListaJogosRequest request
     ) {
         ListaJogosResponse resposta =
-                listaJogosService.salvar(request);
+                listaJogosService.criarLista(request);
 
         return ResponseEntity.ok(resposta);
     }
@@ -37,12 +37,13 @@ public class ListaJogosController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
+    @PutMapping("/{id}/")
     public ResponseEntity<ListaJogosResponse> atualizar(
+            @PathVariable Long id,
             @RequestBody @Valid ListaJogosRequest request
     ) {
         ListaJogosResponse resposta =
-                listaJogosService.atualizar(request);
+                listaJogosService.atualizar(request,id);
 
         return ResponseEntity.ok(resposta);
     }
