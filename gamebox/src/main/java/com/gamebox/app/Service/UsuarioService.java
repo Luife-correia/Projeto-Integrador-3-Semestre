@@ -1,9 +1,9 @@
 package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.Usuario;
-import com.gamebox.app.Dto.request.RequestUserAtualizacao;
-import com.gamebox.app.Dto.request.RequestUserCadastro;
-import com.gamebox.app.Dto.request.RequestUserLogin;
+import com.gamebox.app.Dto.request.UserAtualizacaoRequest;
+import com.gamebox.app.Dto.request.UserCadastroRequest;
+import com.gamebox.app.Dto.request.UserLoginRequest;
 import com.gamebox.app.Dto.response.UserResponse;
 import com.gamebox.app.Dto.response.UserLoginResponse;
 import com.gamebox.app.Enum.Role;
@@ -49,16 +49,30 @@ public class UsuarioService {
         }
     }
 
-    public UserResponse salvar(RequestUserCadastro request) {
+    public UserResponse salvar(UserCadastroRequest request) {
 
         Usuario usuario = new Usuario();
-        usuario.setNome(request.nome());
-        usuario.setEmail(request.email());
-        usuario.setSenhaHash(request.senha());
-        usuario.setFotoPerfil(request.fotoPerfil());
-        usuario.setBio(request.bio());
-        usuario.setRole(Role.USER);
-        usuario.setDataCriacao(LocalDate.now());
+
+        usuario.setNome
+                (request.nome());
+
+        usuario.setEmail
+                (request.email());
+
+        usuario.setSenhaHash
+                (request.senha());
+
+        usuario.setFotoPerfil
+                (request.fotoPerfil());
+
+        usuario.setBio
+                (request.bio());
+
+        usuario.setRole
+                (Role.USER);
+
+        usuario.setDataCriacao
+                (LocalDate.now());
 
         vetificarEmail(usuario);
         return toResponse(userRepository.save(usuario));
@@ -80,7 +94,7 @@ public class UsuarioService {
         return toResponse(buscarUser(id));
     }
 
-    public UserResponse atualizar(Long id, RequestUserAtualizacao request) {
+    public UserResponse atualizar(Long id, UserAtualizacaoRequest request) {
         Usuario usuario = buscarUser(id);
 
         if (!usuario.getEmail().equals(request.email())
@@ -100,7 +114,7 @@ public class UsuarioService {
         return toResponse(userRepository.save(usuario));
     }
 
-    public UserLoginResponse login(RequestUserLogin request) {
+    public UserLoginResponse login(UserLoginRequest request) {
 
         Usuario usuario = userRepository.findByEmailAndSenhaHash(
                 request.email(),

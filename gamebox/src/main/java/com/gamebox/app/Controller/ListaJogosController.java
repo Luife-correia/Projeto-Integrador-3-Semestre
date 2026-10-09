@@ -1,6 +1,8 @@
 package com.gamebox.app.Controller;
 
 import com.gamebox.app.Domain.ListaJogos;
+import com.gamebox.app.Dto.request.ListaJogosRequest;
+import com.gamebox.app.Dto.response.ListaJogosResponse;
 import com.gamebox.app.Service.ListaJogosService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +20,11 @@ public class ListaJogosController {
 
 
     @PostMapping
-    public ResponseEntity<ListaJogos> salvar(
-            @RequestBody @Valid ListaJogos listaJogos
+    public ResponseEntity<ListaJogosResponse> salvar(
+            @RequestBody @Valid ListaJogosRequest request
     ) {
-        ListaJogos resposta =
-                listaJogosService.salvar(listaJogos);
+        ListaJogosResponse resposta =
+                listaJogosService.salvar(request);
 
         return ResponseEntity.ok(resposta);
     }
@@ -36,11 +38,11 @@ public class ListaJogosController {
     }
 
     @PutMapping
-    public ResponseEntity<ListaJogos> atualizar(
-            @RequestBody @Valid ListaJogos listaJogos
+    public ResponseEntity<ListaJogosResponse> atualizar(
+            @RequestBody @Valid ListaJogosRequest request
     ) {
-        ListaJogos resposta =
-                listaJogosService.atualizar(listaJogos);
+        ListaJogosResponse resposta =
+                listaJogosService.atualizar(request);
 
         return ResponseEntity.ok(resposta);
     }
