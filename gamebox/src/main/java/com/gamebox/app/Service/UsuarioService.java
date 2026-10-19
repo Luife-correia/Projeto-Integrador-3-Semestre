@@ -8,6 +8,7 @@ import com.gamebox.app.Dto.response.UserResponse;
 import com.gamebox.app.Dto.response.UserLoginResponse;
 import com.gamebox.app.Enum.Role;
 import com.gamebox.app.Repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository userRepository) {
+    public UsuarioService(UsuarioRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -49,6 +52,20 @@ public class UsuarioService {
         }
     }
 
+
+    //Método auxiliar
+    private UserResponse toResponse(Usuario usuario) {
+        return new UserResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getFotoPerfil(),
+                usuario.getBio(),
+                usuario.getRole(),
+                usuario.getDataCriacao()
+        );
+    }
+
     public UserResponse salvar(UserCadastroRequest request) {
 
         Usuario usuario = new Usuario();
@@ -59,8 +76,9 @@ public class UsuarioService {
         usuario.setEmail
                 (request.email());
 
+        // Criando a senha a deixando ela oculta
         usuario.setSenhaHash
-                (request.senha());
+                (passwordEncoder.encode(request.senha()));
 
         usuario.setFotoPerfil
                 (request.fotoPerfil());
@@ -108,7 +126,7 @@ public class UsuarioService {
         usuario.setBio(request.bio());
 
         if (request.senha() != null && !request.senha().isBlank()) {
-            usuario.setSenhaHash(request.senha());
+            usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
         }
 
         return toResponse(userRepository.save(usuario));
@@ -129,17 +147,6 @@ public class UsuarioService {
         );
     }
 
-    private UserResponse toResponse(Usuario usuario) {
-        return new UserResponse(
-                usuario.getId(),
-                usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getFotoPerfil(),
-                usuario.getBio(),
-                usuario.getRole(),
-                usuario.getDataCriacao()
-        );
-    }
 }
 
 

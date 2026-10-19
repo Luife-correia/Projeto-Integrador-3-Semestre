@@ -18,5 +18,6 @@ public record UserAtualizacaoRequest(
 
         String fotoPerfil,
         String bio
+
 ) {
 }
