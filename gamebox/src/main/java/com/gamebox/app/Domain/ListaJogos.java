@@ -3,8 +3,11 @@ package com.gamebox.app.Domain;
 import com.gamebox.app.Enum.StatusListaJogos;
 import jakarta.persistence.*;
 
-@Table(name = "ListasJogos")
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
+@Table(name = "ListasJogos")
 public class ListaJogos {
 
     @Id
@@ -16,8 +19,12 @@ public class ListaJogos {
     private Usuario usuario;
 
     @ManyToMany
-    @JoinColumn(name = "jogo_id", nullable = false)
-    private Jogo jogo;
+    @JoinTable(
+            name = "listas_jogos_jogos",
+            joinColumns = @JoinColumn(name = "lista_id"),
+            inverseJoinColumns = @JoinColumn(name = "jogo_id")
+    )
+    private List<Jogo> jogos = new ArrayList<>();
 
     @Column(nullable = false)
     private String nome;
@@ -32,11 +39,15 @@ public class ListaJogos {
     public ListaJogos() {
     }
 
-    public ListaJogos(Long id, Usuario usuario, Jogo jogo, String nome, Boolean publica,
-                      StatusListaJogos status) {
-        this.id = id;
+    public ListaJogos(
+            Usuario usuario,
+            List<Jogo> jogos,
+            String nome,
+            Boolean publica,
+            StatusListaJogos status
+    ) {
         this.usuario = usuario;
-        this.jogo = jogo;
+        this.jogos = jogos;
         this.nome = nome;
         this.publica = publica;
         this.status = status;
@@ -54,12 +65,12 @@ public class ListaJogos {
         this.usuario = usuario;
     }
 
-    public Jogo getJogo() {
-        return jogo;
+    public List<Jogo> getJogos() {
+        return jogos;
     }
 
-    public void setJogo(Jogo jogo) {
-        this.jogo = jogo;
+    public void setJogos(List<Jogo> jogos) {
+        this.jogos = jogos;
     }
 
     public String getNome() {
