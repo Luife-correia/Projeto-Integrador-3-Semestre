@@ -3,8 +3,6 @@ package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.ListaJogos;
 
-import com.gamebox.app.Dto.request.ListaJogosRequest;
-import com.gamebox.app.Dto.response.ListaJogosResponse;
 import com.gamebox.app.Repository.ListaJogosRepository;
 import org.springframework.stereotype.Service;
 
@@ -27,33 +25,8 @@ public class ListaJogosService {
     }
 
 
-    public ListaJogosResponse criarLista(ListaJogosRequest request) {
-
-        ListaJogos listaJogos = new ListaJogos();
-
-        listaJogos.setNome
-                (request.nome());
-
-        listaJogos.setPublica
-                (request.publica());
-
-        listaJogos.setStatus
-                (request.status());
-
-        listaJogos.getUsuario()
-                .setId(request.jogoId());
-
-        return new ListaJogosResponse(
-                listaJogosRepository.save
-                        (listaJogos).getId(),
-                null,
-                listaJogos.
-                        getNome(),
-                listaJogos.
-                        getPublica(),
-                listaJogos.
-                        getStatus()
-        );
+    public ListaJogos criarLista(ListaJogos listaJogos) {
+      return listaJogosRepository.save(listaJogos);
     }
 
     public void deletar(Long id) {
@@ -61,40 +34,29 @@ public class ListaJogosService {
         listaJogosRepository.deleteById(id);
     }
 
-    public ListaJogosResponse atualizar(ListaJogosRequest request, Long id) {
+    public ListaJogos atualizar(ListaJogos listaJogos, Long id) {
 
-        ListaJogos listaJogos = new ListaJogos();
+       ListaJogos listaAtual = buscarListaJogos(id);
 
         listaJogos.setNome
-                (request.nome());
+                (listaAtual.getNome());
 
         listaJogos.setPublica
-                (request.publica());
+                (listaAtual.getPublica());
 
         listaJogos.setStatus
-                (request.status());
+                (listaAtual.getStatus());
 
         listaJogos.getUsuario()
-                .setId(request.jogoId());
+                .setId(listaAtual.getId());
 
-        return new ListaJogosResponse(
-                listaJogosRepository.save
-                        (listaJogos).getId(),
-                null,
-                listaJogos.
-                        getNome(),
-                listaJogos.
-                        getPublica(),
-                listaJogos.
-                        getStatus()
-        );
+        return listaJogosRepository.save(listaJogos);
     }
 
 
     /**
      * Metodos faltantes:
-     * ☐ Adicionar jogo à lista
-     * ☐ Remover jogo da lista
+
      * ☐ Listar listas públicas de um usuário
      */
 }

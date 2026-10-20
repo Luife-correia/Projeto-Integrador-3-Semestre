@@ -134,10 +134,17 @@ public class UsuarioService {
 
     public UserLoginResponse login(UserLoginRequest request) {
 
-        Usuario usuario = userRepository.findByEmailAndSenhaHash(
-                request.email(),
-                request.senha()
-        ).orElseThrow(() -> new RuntimeException("Credenciais inválidas."));
+         Usuario usuario = userRepository.findByEmail(request.email())
+                .orElseThrow(() ->
+                        new RuntimeException("Credenciais inválidas."));
+
+
+        if (!passwordEncoder.matches(
+                request.senha(),
+                usuario.getSenhaHash())) {
+
+            throw new RuntimeException("Credenciais inválidas.");
+        }
 
         return new UserLoginResponse(
                 usuario.getId(),
