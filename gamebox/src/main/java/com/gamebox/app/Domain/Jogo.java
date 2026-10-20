@@ -1,5 +1,5 @@
-package com.gamebox.app.Domain;
 
+package com.gamebox.app.Domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -8,10 +8,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name = "Jogos")
 @Entity
+@Table(name = "Jogos")
 public class Jogo {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,14 +38,24 @@ public class Jogo {
     @Column(nullable = false)
     private String sinopse;
 
+    @ManyToMany(mappedBy = "jogos")
+    private List<ListaJogos> listas = new ArrayList<>();
+
     @Column(nullable = false)
     private double notaTotal;
 
     public Jogo() {
     }
 
-    public Jogo(String nome, String capa, List<String> plataformas, List<String> generos,
-                String desenvolvedora, LocalDate dataLancamento, String sinopse) {
+    public Jogo(
+            String nome,
+            String capa,
+            List<String> plataformas,
+            List<String> generos,
+            String desenvolvedora,
+            LocalDate dataLancamento,
+            String sinopse
+    ) {
         this.nome = nome;
         this.capa = capa;
         this.plataformas = plataformas;
@@ -116,16 +125,28 @@ public class Jogo {
         this.sinopse = sinopse;
     }
 
+    public List<ListaJogos> getListas() {
+        return listas;
+    }
+
+    public void setListas(List<ListaJogos> listas) {
+        this.listas = listas;
+    }
+
     public double getNotaTotal() {
         return notaTotal;
     }
 
-    public void atualizarNota(int somaTotalAvaliacoes, long totalAvaliacoes){
-        if (totalAvaliacoes <= 0){
+    public void atualizarNota(
+            int somaTotalAvaliacoes,
+            long totalAvaliacoes
+    ) {
+        if (totalAvaliacoes <= 0) {
             this.notaTotal = 0.0;
             return;
         }
-        this.notaTotal = ((double)somaTotalAvaliacoes / totalAvaliacoes) /2;
-    }
 
+        this.notaTotal =
+                ((double) somaTotalAvaliacoes / totalAvaliacoes) / 2;
+    }
 }
