@@ -23,9 +23,4 @@ public class AvaliacaoService {
     //listar avaliações de um jogo
     //deletar avaliação (admin)
 
-
-
-
-
-
 }

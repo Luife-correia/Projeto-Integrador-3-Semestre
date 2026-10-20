@@ -26,7 +26,6 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     //Método auxiliar
     private Usuario buscarUser(Long id) {
         return userRepository.findById(id).
