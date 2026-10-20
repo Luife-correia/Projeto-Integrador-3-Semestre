@@ -45,11 +45,11 @@ public class ListaJogosService {
         listaJogos.setPublica
                 (listaAtual.getPublica());
 
-        listaJogos.setStatus
-                (listaAtual.getStatus());
+        listaJogos.setPrincipal
+                (listaAtual.isPrincipal());
 
-        listaJogos.getUsuario()
-                .setId(listaAtual.getId());
+        listaJogos.setUsuario
+                (listaAtual.getUsuario());
 
         return listaJogosRepository.save(listaJogos);
     }

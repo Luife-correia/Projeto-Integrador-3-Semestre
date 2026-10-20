@@ -1,6 +1,5 @@
 package com.gamebox.app.Domain;
 
-import com.gamebox.app.Enum.StatusListaJogos;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -32,9 +31,9 @@ public class ListaJogos {
     @Column(nullable = false)
     private Boolean publica;
 
-    @Enumerated(EnumType.STRING)
+    // Diferencia a biblioteca fixa do usuário das listas personalizadas.
     @Column(nullable = false)
-    private StatusListaJogos status;
+    private boolean principal;
 
     public ListaJogos() {
     }
@@ -44,13 +43,13 @@ public class ListaJogos {
             List<Jogo> jogos,
             String nome,
             Boolean publica,
-            StatusListaJogos status
+            boolean principal
     ) {
         this.usuario = usuario;
         this.jogos = jogos;
         this.nome = nome;
         this.publica = publica;
-        this.status = status;
+        this.principal = principal;
     }
 
     public Long getId() {
@@ -89,11 +88,11 @@ public class ListaJogos {
         this.publica = publica;
     }
 
-    public StatusListaJogos getStatus() {
-        return status;
+    public boolean isPrincipal() {
+        return principal;
     }
 
-    public void setStatus(StatusListaJogos status) {
-        this.status = status;
+    public void setPrincipal(boolean principal) {
+        this.principal = principal;
     }
 }

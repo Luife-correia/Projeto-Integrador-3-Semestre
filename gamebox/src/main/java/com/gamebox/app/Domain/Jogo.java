@@ -41,6 +41,10 @@ public class Jogo {
     @ManyToMany(mappedBy = "jogos")
     private List<ListaJogos> listas = new ArrayList<>();
 
+    // Mantém os status deste jogo para cada usuário que o possui na biblioteca.
+    @OneToMany(mappedBy = "jogo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioJogo> statusPorUsuario = new ArrayList<>();
+
     @Column(nullable = false)
     private double notaTotal;
 
@@ -131,6 +135,14 @@ public class Jogo {
 
     public void setListas(List<ListaJogos> listas) {
         this.listas = listas;
+    }
+
+    public List<UsuarioJogo> getStatusPorUsuario() {
+        return statusPorUsuario;
+    }
+
+    public void setStatusPorUsuario(List<UsuarioJogo> statusPorUsuario) {
+        this.statusPorUsuario = statusPorUsuario;
     }
 
     public double getNotaTotal() {

@@ -40,9 +40,12 @@ public class Usuario {
 
     private LocalDate dataCriacao;
 
-    @OneToMany
-    @JoinColumn(name = "listaJogos_id", nullable = false)
-    private List<ListaJogos> listaJogos;
+    @OneToMany(mappedBy = "usuario")
+    private List<ListaJogos> listaJogos = new ArrayList<>();
+
+    // Um registro por jogo do usuário, contendo o status individual.
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsuarioJogo> statusDosJogos = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario")
     private List<Avaliacao> avaliacoes = new ArrayList<>();
@@ -121,6 +124,22 @@ public class Usuario {
     }
     public void setDataCriacao(LocalDate dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public List<ListaJogos> getListaJogos() {
+        return listaJogos;
+    }
+
+    public void setListaJogos(List<ListaJogos> listaJogos) {
+        this.listaJogos = listaJogos;
+    }
+
+    public List<UsuarioJogo> getStatusDosJogos() {
+        return statusDosJogos;
+    }
+
+    public void setStatusDosJogos(List<UsuarioJogo> statusDosJogos) {
+        this.statusDosJogos = statusDosJogos;
     }
 
 }

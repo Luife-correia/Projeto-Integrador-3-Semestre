@@ -1,10 +1,7 @@
 package com.gamebox.app.Domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -33,7 +30,7 @@ public class Avaliacao {
     @Size(min = 10, message = "O comentário deve ter no mínimo 10 caracteres")
     private String comentario;
 
-    @NotBlank
+    @NotNull
     private LocalDate dataCriacao;
 
     public Avaliacao() {
