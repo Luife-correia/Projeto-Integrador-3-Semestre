@@ -40,6 +40,9 @@ public class Usuario {
 
     private LocalDate dataCriacao;
 
+    @OneToMany
+    @JoinColumn(name = "listaJogos_id", nullable = false)
+    private List<ListaJogos> listaJogos;
 
     @OneToMany(mappedBy = "usuario")
     private List<Avaliacao> avaliacoes = new ArrayList<>();

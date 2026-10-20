@@ -29,11 +29,13 @@ public class JogoService {
         jogoRepository.deleteById(id);
     }
 
-    public List<Jogo> listarTodos(String nome){
-        if (nome == null || nome.isBlank()){
+    public List<Jogo>listarTodos(String nome){
+        if (nome.isBlank()){
             return jogoRepository.findAll();
         }
-        return jogoRepository.findByNomeContainingIgnoreCase(nome);
+
+        return jogoRepository.
+                findByNomeContainingIgnoreCase(nome);
     }
 
     public Jogo atualizar(Long id, Jogo jogoAtualizado){

@@ -3,6 +3,7 @@ package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.ListaJogos;
 
+import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Repository.ListaJogosRepository;
 import org.springframework.stereotype.Service;
 
