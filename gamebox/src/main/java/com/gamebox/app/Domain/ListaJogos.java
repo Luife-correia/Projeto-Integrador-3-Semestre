@@ -1,6 +1,7 @@
 package com.gamebox.app.Domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class ListaJogos {
     private List<Jogo> jogos = new ArrayList<>();
 
     @Column(nullable = false)
+    @NotBlank
     private String nome;
 
     @Column(nullable = false)

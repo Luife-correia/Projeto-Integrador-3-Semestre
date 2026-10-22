@@ -44,13 +44,15 @@ public class UsuarioController {
     // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<UserResponse>> listarTodos() {
-        return ResponseEntity.ok(usuarioService.listartodos());
+        return ResponseEntity.ok
+                (usuarioService.listartodos());
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> buscarUsuario(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.buscarUsuario(id));
+        return ResponseEntity.ok
+                (usuarioService.buscarUsuario(id));
     }
 
     // @PreAuthorize("hasRole('USER')")
@@ -60,8 +62,11 @@ public class UsuarioController {
             @RequestBody @Valid UserAtualizacaoRequest request
     ) {
         UserResponse resposta =
-                usuarioService.atualizar(id, request);
-        return ResponseEntity.ok(resposta);
+                usuarioService.atualizar
+                        (id, request);
+
+        return ResponseEntity.ok
+                (resposta);
     }
 
     // falta inplemantar a segurança
@@ -73,6 +78,7 @@ public class UsuarioController {
                 resposta =
                 usuarioService.login(usuario);
 
-        return ResponseEntity.ok(resposta);
+        return ResponseEntity.
+                ok(resposta);
     }
 }
