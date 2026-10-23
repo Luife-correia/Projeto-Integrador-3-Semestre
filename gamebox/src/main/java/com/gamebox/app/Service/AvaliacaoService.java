@@ -19,13 +19,20 @@ public class AvaliacaoService {
         return avaliacaoRepository.save(avaliacao);
     }
 
+    //metodo auxilar
     public Avaliacao buscar(Long id){
         return avaliacaoRepository.findById(id).
                 orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
     }
 
-    public List<Avaliacao> listar(){
-        return avaliacaoRepository.findAll();
+    // Busca todas as avaliações de um usuário
+    public List<Avaliacao> buscarPorUsuario(Long usuarioId) {
+        return avaliacaoRepository.findByUsuarioId(usuarioId);
+    }
+
+    // Busca todas as avaliações de um jogo
+    public List<Avaliacao> buscarPorJogo(Long jogoId) {
+        return avaliacaoRepository.findByJogoId(jogoId);
     }
 
     public Avaliacao atualizar(Long id, Avaliacao avaliacaoAtualizada){
