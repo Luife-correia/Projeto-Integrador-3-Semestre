@@ -4,6 +4,8 @@ import com.gamebox.app.Domain.Avaliacao;
 import com.gamebox.app.Repository.AvaliacaoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AvaliacaoService {
 
@@ -22,6 +24,10 @@ public class AvaliacaoService {
                 orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
     }
 
+    public List<Avaliacao> listar(){
+        return avaliacaoRepository.findAll();
+    }
+
     public Avaliacao atualizar(Long id, Avaliacao avaliacaoAtualizada){
         Avaliacao avaliacaoAtual = buscar(id);
 
@@ -36,9 +42,8 @@ public class AvaliacaoService {
         avaliacaoRepository.deleteById(id);
     }
 
-    //atualizar  ok
+    //metodo delete pronto mas falta verificação por role e user
     //deletar avaliação (user que criou)
-    //listar avaliações de um jogo
     //deletar avaliação (admin)
 
 }
