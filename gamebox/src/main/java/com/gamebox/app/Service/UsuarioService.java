@@ -11,7 +11,6 @@ import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,23 +33,6 @@ public class UsuarioService {
                                 ("Usuario não encontrado!"));
     }
 
-    //Método auxiliar
-    private void vetificarEmail(Usuario usuario) {
-        if (userRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("E-mail já cadastrado.");
-        }
-    }
-
-    //Método auxiliar
-    private void verificarEmailAtualizacao(Usuario usuario) {
-        Usuario usuarioExistente = buscarUser(usuario.getId());
-
-        if (!usuarioExistente.getEmail().equals(usuario.getEmail())
-                && userRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("E-mail já cadastrado.");
-        }
-    }
-
 
     //Método auxiliar
     private UserResponse toResponse(Usuario usuario) {
@@ -60,7 +42,6 @@ public class UsuarioService {
                 usuario.getEmail(),
                 usuario.getFotoPerfil(),
                 usuario.getBio(),
-                usuario.getRole(),
                 usuario.getDataCriacao()
         );
     }
@@ -88,11 +69,9 @@ public class UsuarioService {
         usuario.setRole
                 (Role.USER);
 
-        usuario.setDataCriacao
-                (LocalDate.now());
-
-        vetificarEmail(usuario);
-        return toResponse(userRepository.save(usuario));
+        return toResponse(
+                userRepository.save(usuario)
+        );
     }
 
     public void deletar(Long id) {
@@ -114,19 +93,10 @@ public class UsuarioService {
     public UserResponse atualizar(Long id, UserAtualizacaoRequest request) {
         Usuario usuario = buscarUser(id);
 
-        if (!usuario.getEmail().equals(request.email())
-                && userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("E-mail já cadastrado.");
-        }
-
         usuario.setNome(request.nome());
         usuario.setEmail(request.email());
         usuario.setFotoPerfil(request.fotoPerfil());
         usuario.setBio(request.bio());
-
-        if (request.senha() != null && !request.senha().isBlank()) {
-            usuario.setSenhaHash(passwordEncoder.encode(request.senha()));
-        }
 
         return toResponse(userRepository.save(usuario));
     }
@@ -142,14 +112,12 @@ public class UsuarioService {
                 request.senha(),
                 usuario.getSenhaHash())) {
 
-            throw new RuntimeException("Credenciais inválidas.");
         }
 
         return new UserLoginResponse(
                 usuario.getId(),
                 usuario.getNome(),
-                usuario.getEmail(),
-                usuario.getRole()
+                usuario.getEmail()
         );
     }
 

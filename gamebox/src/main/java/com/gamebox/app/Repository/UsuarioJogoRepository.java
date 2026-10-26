@@ -1,8 +1,10 @@
 package com.gamebox.app.Repository;
 
 import com.gamebox.app.Domain.UsuarioJogo;
+import com.gamebox.app.Dto.response.MetricaStatusResponse;
 import com.gamebox.app.Enum.StatusJogos;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,5 +17,17 @@ public interface UsuarioJogoRepository extends JpaRepository<UsuarioJogo, Long> 
     // Permite separar a biblioteca por status.
     List<UsuarioJogo> findByUsuarioIdAndStatus(Long usuarioId, StatusJogos status);
 
+
     List<UsuarioJogo> findByUsuarioIdAndStatusNot(Long usuarioId, StatusJogos status);
+
+
+    @Query("""
+    SELECT new com.gamebox.app.Dto.response.MetricaStatusResponse(
+        uj.status, COUNT(uj)
+    )
+    FROM UsuarioJogo uj
+    GROUP BY uj.status
+""")
+    List<MetricaStatusResponse> buscarMetricasPorStatus(); // busca a quantidade de jogos de cada Status Ex: JOGANDO == 8
+
 }

@@ -29,16 +29,25 @@ public class Usuario {
 
     @NotBlank
     @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
+    @Size(max = 10, message = "A senha deve ter no maximo 10 caracteres")
     private String senhaHash;
 
     private String fotoPerfil;
 
+    @Size(min = 6, message = "A bio deve ter pelo menos 6 caracteres")
+    @Size(max = 100, message = "A bio deve ter no maximo 100 caracteres")
     private String bio;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     private LocalDate dataCriacao;
+
+    @PrePersist
+    public void prePersist() {
+        LocalDate agora = LocalDate.now();
+        this.dataCriacao = agora;
+    }
 
     @OneToMany(mappedBy = "usuario")
     private List<ListaJogos> listaJogos = new ArrayList<>();

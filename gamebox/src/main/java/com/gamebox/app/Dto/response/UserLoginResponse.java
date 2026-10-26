@@ -7,7 +7,7 @@ public record UserLoginResponse
         (
                 Long id,
                 String nome,
-                String email,
-                Role role
+                String email
+
         ) {
 }

@@ -1,7 +1,5 @@
 package com.gamebox.app.Dto.response;
 
-import com.gamebox.app.Enum.Role;
-
 import java.time.LocalDate;
 
 public record UserResponse(
@@ -10,7 +8,6 @@ public record UserResponse(
         String email,
         String fotoPerfil,
         String bio,
-        Role role,
         LocalDate dataCriacao
 ) {
 }
