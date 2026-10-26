@@ -11,6 +11,7 @@ import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,6 +113,8 @@ public class UsuarioService {
                 request.senha(),
                 usuario.getSenhaHash())) {
 
+            throw new RuntimeException
+                    ("Credenciais inválidas.");
         }
 
         return new UserLoginResponse(
