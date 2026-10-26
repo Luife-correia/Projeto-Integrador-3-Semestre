@@ -28,8 +28,6 @@ public class Usuario {
     private String email;
 
     @NotBlank
-    @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
-    @Size(max = 10, message = "A senha deve ter no maximo 10 caracteres")
     private String senhaHash;
 
     private String fotoPerfil;

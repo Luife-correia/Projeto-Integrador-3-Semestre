@@ -1,7 +1,5 @@
 package com.gamebox.app.Dto.response;
 
-import com.gamebox.app.Enum.Role;
-
 public record UserLoginResponse
 
         (

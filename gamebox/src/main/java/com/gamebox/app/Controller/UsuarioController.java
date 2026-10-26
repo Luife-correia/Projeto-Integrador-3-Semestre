@@ -56,7 +56,7 @@ public class UsuarioController {
     }
 
     // @PreAuthorize("hasRole('USER')")
-    @PutMapping("/{id}/Me")
+    @PatchMapping("/{id}/Me")
     public ResponseEntity<UserResponse> atualizar(
             @PathVariable Long id,
             @RequestBody @Valid UserAtualizacaoRequest request
