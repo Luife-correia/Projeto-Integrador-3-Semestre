@@ -30,7 +30,7 @@ public class JogoController {
 
     @GetMapping
     public List<JogoResponse> listarTodos(@RequestParam(required = false) String nome){
-        return jogoService.listarTodos(nome);
+        return jogoService.listarTodosOuBuscarPorNome(nome);
     }
 
 

@@ -43,7 +43,7 @@ public class JogoService {
         jogoRepository.deleteById(id);
     }
 
-    public List<JogoResponse> listarTodos(String nome){
+    public List<JogoResponse> listarTodosOuBuscarPorNome(String nome){
         List<Jogo> jogos;
         if (nome == null || nome.isBlank()){
             jogos = jogoRepository.findAll();

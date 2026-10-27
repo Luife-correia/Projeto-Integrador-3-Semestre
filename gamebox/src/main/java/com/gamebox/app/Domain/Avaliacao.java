@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "avaliacoes")
@@ -31,7 +30,7 @@ public class Avaliacao {
     @Size(min = 10, message = "O comentário deve ter no mínimo 10 caracteres")
     private String comentario;
 
-    private LocalDate dataCriacao; // revisar
+    private LocalDate dataCriacao;
 
     @PrePersist
     public void prePersist() {
