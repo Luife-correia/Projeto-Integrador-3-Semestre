@@ -22,7 +22,7 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // @PreAuthorize("hasAnyRole('USER')")
+
     @PostMapping
     public ResponseEntity<UserResponse> salvar(
             @RequestBody @Valid UserCadastroRequest request
@@ -34,28 +34,26 @@ public class UsuarioController {
         return ResponseEntity.ok(resposta);
     }
 
-    // @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         usuarioService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
+
     @GetMapping
     public ResponseEntity<List<UserResponse>> listarTodos() {
         return ResponseEntity.ok
                 (usuarioService.listartodos());
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> buscarUsuario(@PathVariable Long id) {
         return ResponseEntity.ok
                 (usuarioService.buscarUsuario(id));
     }
 
-    // @PreAuthorize("hasRole('USER')")
     @PatchMapping("/{id}/Me")
     public ResponseEntity<UserResponse> atualizar(
             @PathVariable Long id,
@@ -69,7 +67,6 @@ public class UsuarioController {
                 (resposta);
     }
 
-    // falta inplemantar a segurança
     @PostMapping("/login")
     public ResponseEntity<UserLoginResponse> login(
             @RequestBody @Valid UserLoginRequest usuario

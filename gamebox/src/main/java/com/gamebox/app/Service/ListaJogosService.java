@@ -53,11 +53,4 @@ public class ListaJogosService {
 
         return listaJogosRepository.save(listaJogos);
     }
-
-
-    /**
-     * Metodos faltantes:
-
-     * ☐ Listar listas públicas de um usuário
-     */
 }
