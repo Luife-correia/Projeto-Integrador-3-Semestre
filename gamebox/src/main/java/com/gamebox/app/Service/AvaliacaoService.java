@@ -44,6 +44,15 @@ public class AvaliacaoService {
         Jogo jogo = jogoRepository.findById(request.jogoId())
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
 
+        if (avaliacaoRepository.existsByUsuarioIdAndJogoId(
+                usuario.getId(),
+                jogo.getId()
+        )) {
+            throw new IllegalStateException(
+                    "O usuário já avaliou este jogo."
+            );
+        }
+
         validarStatusParaAvaliar(usuario.getId(), jogo.getId());
 
         Avaliacao avaliacao = new Avaliacao(

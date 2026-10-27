@@ -6,19 +6,25 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "avaliacoes")
+@Table(
+        name = "avaliacoes",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_avaliacao_usuario_jogo",
+                columnNames = {"usuario_id", "jogo_id"}
+        )
+)
 public class Avaliacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "jogo_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "jogo_id", nullable = false)
     private Jogo jogo;
 
     @Column(nullable = false)

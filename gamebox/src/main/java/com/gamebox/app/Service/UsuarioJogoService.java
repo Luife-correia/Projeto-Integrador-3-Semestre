@@ -4,6 +4,7 @@ import com.gamebox.app.Domain.Jogo;
 import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Domain.UsuarioJogo;
 import com.gamebox.app.Enum.StatusJogos;
+import com.gamebox.app.Repository.AvaliacaoRepository;
 import com.gamebox.app.Repository.JogoRepository;
 import com.gamebox.app.Repository.UsuarioJogoRepository;
 import com.gamebox.app.Repository.UsuarioRepository;
@@ -18,15 +19,18 @@ public class UsuarioJogoService {
     private final UsuarioJogoRepository usuarioJogoRepository;
     private final UsuarioRepository usuarioRepository;
     private final JogoRepository jogoRepository;
+    private final AvaliacaoRepository avaliacaoRepository;
 
     public UsuarioJogoService(
             UsuarioJogoRepository usuarioJogoRepository,
             UsuarioRepository usuarioRepository,
-            JogoRepository jogoRepository
+            JogoRepository jogoRepository,
+            AvaliacaoRepository avaliacaoRepository
     ) {
         this.usuarioJogoRepository = usuarioJogoRepository;
         this.usuarioRepository = usuarioRepository;
         this.jogoRepository = jogoRepository;
+        this.avaliacaoRepository = avaliacaoRepository;
     }
 
     @Transactional
@@ -67,6 +71,14 @@ public class UsuarioJogoService {
         UsuarioJogo usuarioJogo = usuarioJogoRepository
                 .findByUsuarioIdAndJogoId(usuarioId, jogoId)
                 .orElseGet(() -> criar(usuarioId, jogoId));
+
+        if (usuarioJogo.getStatus() != StatusJogos.NAO_JOGADO
+                && novoStatus == StatusJogos.NAO_JOGADO
+                && avaliacaoRepository.existsByUsuarioIdAndJogoId(usuarioId, jogoId)) {
+            throw new IllegalStateException(
+                    "Não é possível voltar o jogo para NAO_JOGADO enquanto existir uma avaliação."
+            );
+        }
 
         usuarioJogo.setStatus(novoStatus);
         return usuarioJogoRepository.save(usuarioJogo);
