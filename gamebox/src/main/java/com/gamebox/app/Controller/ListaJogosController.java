@@ -35,7 +35,7 @@ public class ListaJogosController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ListaJogos> atualizar(
             @PathVariable Long id,
             @RequestBody @Valid ListaJogos listaJogos
