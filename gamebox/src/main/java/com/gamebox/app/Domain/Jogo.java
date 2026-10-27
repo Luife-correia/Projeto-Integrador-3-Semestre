@@ -150,7 +150,7 @@ public class Jogo {
     }
 
     public void atualizarNota(
-            int somaTotalAvaliacoes,
+            long somaTotalAvaliacoes,
             long totalAvaliacoes
     ) {
         if (totalAvaliacoes <= 0) {

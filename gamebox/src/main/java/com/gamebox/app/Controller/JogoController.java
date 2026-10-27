@@ -1,6 +1,7 @@
 package com.gamebox.app.Controller;
 
-import com.gamebox.app.Domain.Jogo;
+import com.gamebox.app.Dto.request.JogoRequest;
+import com.gamebox.app.Dto.response.JogoResponse;
 import com.gamebox.app.Service.JogoService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -18,23 +19,23 @@ public class JogoController {
     }
 
     @PostMapping
-    public Jogo criar(@RequestBody @Valid Jogo jogo) {
+    public JogoResponse criar(@RequestBody @Valid JogoRequest jogo) {
         return jogoService.salvar(jogo);
     }
 
     @GetMapping("/{id}")
-    public Jogo buscar(@PathVariable Long id) {
-        return jogoService.buscarJogo(id);
+    public JogoResponse buscar(@PathVariable Long id) {
+        return jogoService.buscarResposta(id);
     }
 
     @GetMapping
-    public List<Jogo> listarTodos(@RequestParam(required = false) String nome){
+    public List<JogoResponse> listarTodos(@RequestParam(required = false) String nome){
         return jogoService.listarTodos(nome);
     }
 
 
     @PutMapping("/{id}")
-    public Jogo atualizar(@PathVariable Long id, @RequestBody @Valid Jogo jogo){
+    public JogoResponse atualizar(@PathVariable Long id, @RequestBody @Valid JogoRequest jogo){
         return jogoService.atualizar(id,jogo);
     }
 

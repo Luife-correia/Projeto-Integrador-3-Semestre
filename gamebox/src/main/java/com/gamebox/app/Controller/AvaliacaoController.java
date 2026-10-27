@@ -1,8 +1,11 @@
 
 package com.gamebox.app.Controller;
 
-import com.gamebox.app.Domain.Avaliacao;
+import com.gamebox.app.Dto.request.AvaliacaoAtualizacaoRequest;
+import com.gamebox.app.Dto.request.AvaliacaoRequest;
+import com.gamebox.app.Dto.response.AvaliacaoResponse;
 import com.gamebox.app.Service.AvaliacaoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,50 +24,59 @@ public class AvaliacaoController {
 
     // Criar uma avaliação
     @PostMapping
-    public ResponseEntity<Avaliacao> salvar(@RequestBody Avaliacao avaliacao) {
-        Avaliacao novaAvaliacao = avaliacaoService.salvar(avaliacao);
+    public ResponseEntity<AvaliacaoResponse> salvar(
+            @RequestBody @Valid AvaliacaoRequest request
+    ) {
+        AvaliacaoResponse novaAvaliacao = avaliacaoService.salvar(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(novaAvaliacao);
     }
 
     // Buscar uma avaliação pelo ID
     @GetMapping("/{id}")
-    public ResponseEntity<Avaliacao> buscar(@PathVariable Long id) {
-        Avaliacao avaliacao = avaliacaoService.buscar(id);
+    public ResponseEntity<AvaliacaoResponse> buscar(@PathVariable Long id) {
+        AvaliacaoResponse avaliacao =
+                avaliacaoService.paraResposta(avaliacaoService.buscar(id));
 
         return ResponseEntity.ok(avaliacao);
     }
 
     // Buscar todas as avaliações de um usuário
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Avaliacao>> buscarPorUsuario(
+    public ResponseEntity<List<AvaliacaoResponse>> buscarPorUsuario(
             @PathVariable Long usuarioId) {
 
-        List<Avaliacao> avaliacoes =
-                avaliacaoService.buscarPorUsuario(usuarioId);
+        List<AvaliacaoResponse> avaliacoes = avaliacaoService
+                .buscarPorUsuario(usuarioId)
+                .stream()
+                .map(avaliacaoService::paraResposta)
+                .toList();
 
         return ResponseEntity.ok(avaliacoes);
     }
 
     // Buscar todas as avaliações de um jogo
     @GetMapping("/jogo/{jogoId}")
-    public ResponseEntity<List<Avaliacao>> buscarPorJogo(
+    public ResponseEntity<List<AvaliacaoResponse>> buscarPorJogo(
             @PathVariable Long jogoId) {
 
-        List<Avaliacao> avaliacoes =
-                avaliacaoService.buscarPorJogo(jogoId);
+        List<AvaliacaoResponse> avaliacoes = avaliacaoService
+                .buscarPorJogo(jogoId)
+                .stream()
+                .map(avaliacaoService::paraResposta)
+                .toList();
 
         return ResponseEntity.ok(avaliacoes);
     }
 
     // Atualizar uma avaliação
     @PutMapping("/{id}")
-    public ResponseEntity<Avaliacao> atualizar(
+    public ResponseEntity<AvaliacaoResponse> atualizar(
             @PathVariable Long id,
-            @RequestBody Avaliacao avaliacaoAtualizada) {
+            @RequestBody @Valid AvaliacaoAtualizacaoRequest request) {
 
-        Avaliacao avaliacao =
-                avaliacaoService.atualizar(id, avaliacaoAtualizada);
+        AvaliacaoResponse avaliacao =
+                avaliacaoService.atualizar(id, request);
 
         return ResponseEntity.ok(avaliacao);
     }

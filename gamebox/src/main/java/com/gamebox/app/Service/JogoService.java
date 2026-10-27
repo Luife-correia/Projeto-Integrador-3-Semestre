@@ -1,6 +1,8 @@
 package com.gamebox.app.Service;
 
 import com.gamebox.app.Domain.Jogo;
+import com.gamebox.app.Dto.request.JogoRequest;
+import com.gamebox.app.Dto.response.JogoResponse;
 import com.gamebox.app.Repository.JogoRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +17,16 @@ public class JogoService {
         this.jogoRepository = jogoRepository;
     }
 
-    public Jogo salvar(Jogo jogo) {
-        return jogoRepository.save(jogo);
+    public JogoResponse salvar(JogoRequest request) {
+        return paraResposta(jogoRepository.save(new Jogo(
+                request.nome(),
+                request.capa(),
+                request.plataformas(),
+                request.generos(),
+                request.desenvolvedora(),
+                request.dataLancamento(),
+                request.sinopse()
+        )));
     }
 
     public Jogo buscarJogo(Long id) {
@@ -24,34 +34,51 @@ public class JogoService {
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado com id: "+id));
     }
 
+    public JogoResponse buscarResposta(Long id) {
+        return paraResposta(buscarJogo(id));
+    }
+
     public void deletar(Long id){
         buscarJogo(id);
         jogoRepository.deleteById(id);
     }
 
-    public List<Jogo>listarTodos(String nome){
-        if (nome.isBlank()){
-            return jogoRepository.findAll();
+    public List<JogoResponse> listarTodos(String nome){
+        List<Jogo> jogos;
+        if (nome == null || nome.isBlank()){
+            jogos = jogoRepository.findAll();
+        } else {
+            jogos = jogoRepository.findByNomeContainingIgnoreCase(nome);
         }
 
-        return jogoRepository.
-                findByNomeContainingIgnoreCase(nome);
+        return jogos.stream().map(this::paraResposta).toList();
     }
 
-    public Jogo atualizar(Long id, Jogo jogoAtualizado){
+    public JogoResponse atualizar(Long id, JogoRequest jogoAtualizado){
         Jogo jogoAtual = buscarJogo(id);
 
-        jogoAtual.setNome(jogoAtualizado.getNome());
-        jogoAtual.setCapa(jogoAtualizado.getCapa());
-        jogoAtual.setPlataformas(jogoAtualizado.getPlataformas());
-        jogoAtual.setGeneros(jogoAtualizado.getGeneros());
-        jogoAtual.setDesenvolvedora(jogoAtualizado.getDesenvolvedora());
-        jogoAtual.setDataLancamento(jogoAtualizado.getDataLancamento());
-        jogoAtual.setSinopse(jogoAtualizado.getSinopse());
+        jogoAtual.setNome(jogoAtualizado.nome());
+        jogoAtual.setCapa(jogoAtualizado.capa());
+        jogoAtual.setPlataformas(jogoAtualizado.plataformas());
+        jogoAtual.setGeneros(jogoAtualizado.generos());
+        jogoAtual.setDesenvolvedora(jogoAtualizado.desenvolvedora());
+        jogoAtual.setDataLancamento(jogoAtualizado.dataLancamento());
+        jogoAtual.setSinopse(jogoAtualizado.sinopse());
 
-        return jogoRepository.save(jogoAtual);
+        return paraResposta(jogoRepository.save(jogoAtual));
     }
 
-
-
+    private JogoResponse paraResposta(Jogo jogo) {
+        return new JogoResponse(
+                jogo.getId(),
+                jogo.getNome(),
+                jogo.getCapa(),
+                jogo.getPlataformas(),
+                jogo.getGeneros(),
+                jogo.getDesenvolvedora(),
+                jogo.getDataLancamento(),
+                jogo.getSinopse(),
+                jogo.getNotaTotal()
+        );
+    }
 }
