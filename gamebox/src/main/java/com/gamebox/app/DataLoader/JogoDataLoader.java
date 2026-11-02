@@ -40,7 +40,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 1. Elden Ring
             Jogo jogo1 = new Jogo(
                     "Elden Ring",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co4x3w.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/library_600x900.jpg",
                     Arrays.asList("PC", "PlayStation 5", "Xbox Series X"),
                     Arrays.asList("RPG", "Action", "Open World"),
                     "FromSoftware",
@@ -52,7 +52,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 2. The Witcher 3: Wild Hunt
             Jogo jogo2 = new Jogo(
                     "The Witcher 3: Wild Hunt",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co1wov.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/library_600x900.jpg",
                     Arrays.asList("PC", "PlayStation 4", "Xbox One", "Nintendo Switch"),
                     Arrays.asList("RPG", "Adventure", "Fantasy"),
                     "CD Projekt Red",
@@ -61,22 +61,22 @@ public class JogoDataLoader implements CommandLineRunner {
             );
             jogoRepository.save(jogo2);
 
-            // 3. Minecraft
+            // 3. Batman: Arkham Knight
             Jogo jogo3 = new Jogo(
-                    "Minecraft",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co49xa.png",
-                    Arrays.asList("PC", "PlayStation", "Xbox", "Nintendo Switch", "Mobile"),
-                    Arrays.asList("Sandbox", "Survival", "Adventure"),
-                    "Mojang Studios",
-                    LocalDate.of(2011, 11, 18),
-                    "Um jogo de mundo aberto focado em exploração, mineração, criação de itens e construção livre com blocos."
+                    "Batman: Arkham Knight",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/208650/library_600x900.jpg",
+                    Arrays.asList("PC", "PlayStation 4", "Xbox One"),
+                    Arrays.asList("Action", "Adventure", "Open World"),
+                    "Rocksteady Studios",
+                    LocalDate.of(2015, 6, 23),
+                    "Batman enfrenta o misterioso Cavaleiro de Arkham e seus aliados para proteger Gotham em uma aventura de ação em mundo aberto."
             );
             jogoRepository.save(jogo3);
 
             // 4. Baldur's Gate 3
             Jogo jogo4 = new Jogo(
                     "Baldur's Gate 3",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/1086940/library_600x900.jpg",
                     Arrays.asList("PC", "PlayStation 5", "Xbox Series X"),
                     Arrays.asList("RPG", "Strategy", "Turn-Based"),
                     "Larian Studios",
@@ -88,7 +88,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 5. Red Dead Redemption 2
             Jogo jogo5 = new Jogo(
                     "Red Dead Redemption 2",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co1qrg.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/1174180/library_600x900.jpg",
                     Arrays.asList("PC", "PlayStation 4", "Xbox One"),
                     Arrays.asList("Action", "Adventure", "Open World"),
                     "Rockstar Games",
@@ -100,7 +100,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 6. God of War Ragnarök
             Jogo jogo6 = new Jogo(
                     "God of War Ragnarök",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co5s5w.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/2322010/library_600x900.jpg",
                     Arrays.asList("PlayStation 4", "PlayStation 5", "PC"),
                     Arrays.asList("Action", "Adventure", "Hack and Slash"),
                     "Santa Monica Studio",
@@ -112,7 +112,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 7. Hollow Knight
             Jogo jogo7 = new Jogo(
                     "Hollow Knight",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co1r2d.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/367520/library_600x900.jpg",
                     Arrays.asList("PC", "Nintendo Switch", "PlayStation 4", "Xbox One"),
                     Arrays.asList("Metroidvania", "Action", "Indie"),
                     "Team Cherry",
@@ -124,7 +124,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 8. Hades
             Jogo jogo8 = new Jogo(
                     "Hades",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co2q1q.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/library_600x900.jpg",
                     Arrays.asList("PC", "Nintendo Switch", "PlayStation", "Xbox"),
                     Arrays.asList("Roguelike", "Action", "Indie"),
                     "Supergiant Games",
@@ -136,7 +136,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 9. Cyberpunk 2077
             Jogo jogo9 = new Jogo(
                     "Cyberpunk 2077",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co2mft.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/library_600x900.jpg",
                     Arrays.asList("PC", "PlayStation 5", "Xbox Series X"),
                     Arrays.asList("RPG", "Action", "Sci-Fi"),
                     "CD Projekt Red",
@@ -148,7 +148,7 @@ public class JogoDataLoader implements CommandLineRunner {
             // 10. Grand Theft Auto V
             Jogo jogo10 = new Jogo(
                     "Grand Theft Auto V",
-                    "https://images.igdb.com/igdb/image/upload/t_cover_big/co2lbd.png",
+                    "https://cdn.cloudflare.steamstatic.com/steam/apps/271590/library_600x900.jpg",
                     Arrays.asList("PC", "PlayStation 4", "Xbox One", "PlayStation 5"),
                     Arrays.asList("Action", "Open World", "Driving"),
                     "Rockstar North",
