@@ -49,7 +49,7 @@
 @if (modalAberto) {
   <app-game-modal
     [game]="gameEditando"
-    (save)="salvarGame()"
+    (save)="salvarGame($event)"
     (closed)="fecharModal()" />
 }
 

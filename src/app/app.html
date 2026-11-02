@@ -1,13 +1,12 @@
 <header class="topbar">
-  <a class="brand" routerLink="/home" aria-label="OrganoStation início">
-    <span class="brand-mark">O<span>.</span></span>
-    <span>organo<span class="brand-light">station</span></span>
+  <a class="brand" routerLink="/home" aria-label="GameBox início">
+    <span class="brand-mark">G<span>.</span></span>
+    <span>game<span class="brand-light">box</span></span>
   </a>
   <nav class="main-nav" aria-label="Navegação principal">
-    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-      >Explorar</a
-    >
+    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Explorar</a>
     <a routerLink="/profile" routerLinkActive="active">Meu perfil</a>
+    <a routerLink="/admin" routerLinkActive="active">Administração</a>
   </nav>
   <a class="profile-chip" routerLink="/profile" aria-label="Abrir perfil de Marina Costa">
     <img
@@ -21,6 +20,6 @@
   <router-outlet />
 </main>
 <footer class="site-footer">
-  <span>ORGANO STATION <span class="footer-dot">•</span> UM DIÁRIO DE JOGOS</span>
+  <span>GAMEBOX <span class="footer-dot">•</span> PLATAFORMA DE JOGOS</span>
   <span>Feito para quem joga com atenção.</span>
 </footer>

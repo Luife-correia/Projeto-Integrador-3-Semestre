@@ -36,7 +36,7 @@ import { MockDataService, LibraryStatus } from '../data/mock-data';
               <div class="library-section-heading"><h3>{{ group.label }}</h3><span>{{ entriesByStatus(group.status).length }} JOGOS</span></div>
               <div class="library-row">
                 @for (entry of entriesByStatus(group.status); track entry.jogoId) {
-                  @if (gameFor(entry.jogoId); as game) { <app-game-card [game]="game" [score]="entry.nota ?? 0" [status]="entry.status" /> }
+                  @if (gameFor(entry.jogoId); as game) { <app-game-card [game]="game" [score]="scoreFor(entry)" [status]="entry.status" /> }
                 }
               </div>
             </section>
@@ -94,6 +94,7 @@ export class ProfilePage {
     { status: 'ABANDONADO', label: 'Deixados para depois' },
   ];
 
+  // Separa os jogos da biblioteca por status para montar as secoes
   protected entriesByStatus(status: LibraryStatus) {
     return this.library().filter((entry) => entry.status === status);
   }
@@ -104,5 +105,18 @@ export class ProfilePage {
 
   protected statusLabel(status: LibraryStatus): string {
     return this.statusGroups.find((group) => group.status === status)?.label ?? 'Na biblioteca';
+  }
+
+  // Mostra a nota que o usuario deu ou a media geral do jogo
+  protected scoreFor(entry: any): number {
+    if (entry.nota !== null && entry.nota !== undefined && entry.nota > 0) {
+      return entry.nota;
+    }
+    const myReview = this.data.reviews.find((r) => r.usuarioId === this.profile.id && r.jogoId === entry.jogoId);
+    if (myReview) {
+      return myReview.nota;
+    }
+    const allReviews = this.data.reviews.filter((r) => r.jogoId === entry.jogoId);
+    return allReviews.length ? allReviews.reduce((sum, r) => sum + r.nota, 0) / allReviews.length : 0;
   }
 }

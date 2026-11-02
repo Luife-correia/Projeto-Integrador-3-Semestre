@@ -6,9 +6,9 @@ import { AdminPage } from './pages/admin-page/admin-page';
 
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'home' },
-	{ path: 'home', component: CatalogPage, title: 'Explorar jogos | OrganoStation' },
-	{ path: 'games/:id', component: GameDetailPage, title: 'Detalhe do jogo | OrganoStation' },
-	{ path: 'profile', component: ProfilePage, title: 'Meu perfil | OrganoStation' },
-	{ path: 'admin', component: AdminPage, title: 'Administração | OrganoStation' },
+	{ path: 'home', component: CatalogPage, title: 'Explorar jogos | GameBox' },
+	{ path: 'games/:id', component: GameDetailPage, title: 'Detalhes do jogo | GameBox' },
+	{ path: 'profile', component: ProfilePage, title: 'Meu perfil | GameBox' },
+	{ path: 'admin', component: AdminPage, title: 'Administração | GameBox' },
 	{ path: '**', redirectTo: 'home' },
 ];

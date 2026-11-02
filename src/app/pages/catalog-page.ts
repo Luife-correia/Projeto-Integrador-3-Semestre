@@ -34,19 +34,19 @@ import { MockDataService } from '../data/mock-data';
           <span class="catalog-count">{{ filteredGames().length }} RESULTADOS</span>
         </div>
         <div class="catalog-controls">
-          <label class="search-box"><span class="visually-hidden">Buscar jogos</span><input class="search-input" type="search" placeholder="Buscar jogo ou desenvolvedora" [(ngModel)]="query" /></label>
-          <select class="filter-select" aria-label="Filtrar por gênero" [(ngModel)]="genre">
+          <label class="search-box"><span class="visually-hidden">Buscar jogos</span><input class="search-input" type="search" placeholder="Buscar jogo ou desenvolvedora" [ngModel]="query()" (ngModelChange)="query.set($event)" /></label>
+          <select class="filter-select" aria-label="Filtrar por gênero" [ngModel]="genre()" (ngModelChange)="genre.set($event)">
             <option value="">Todos os gêneros</option>
             @for (item of genres; track item) { <option [value]="item">{{ item }}</option> }
           </select>
-          <select class="filter-select" aria-label="Filtrar por plataforma" [(ngModel)]="platform">
+          <select class="filter-select" aria-label="Filtrar por plataforma" [ngModel]="platform()" (ngModelChange)="platform.set($event)">
             <option value="">Plataformas</option>
             @for (item of platforms; track item) { <option [value]="item">{{ item }}</option> }
           </select>
         </div>
         <div class="genre-strip" aria-label="Atalhos de gênero">
           @for (item of genres; track item) {
-            <button class="genre-pill" [class.selected]="genre === item" (click)="genre = genre === item ? '' : item">{{ item }}</button>
+            <button class="genre-pill" [class.selected]="genre() === item" (click)="genre.set(genre() === item ? '' : item)">{{ item }}</button>
           }
         </div>
 
@@ -67,20 +67,26 @@ import { MockDataService } from '../data/mock-data';
 })
 export class CatalogPage {
   private readonly data = inject(MockDataService);
-  protected query = '';
-  protected genre = '';
-  protected platform = '';
+  // Guarda o que o usuario digita ou seleciona nos filtros
+  protected query = signal('');
+  protected genre = signal('');
+  protected platform = signal('');
+
+  // Pega os generos e plataformas sem repetir para preencher os menus
   protected readonly genres = [...new Set(this.data.games.flatMap((game) => game.generos))].sort();
   protected readonly platforms = [...new Set(this.data.games.flatMap((game) => game.plataformas))].sort();
+
+  // Atualiza a lista na tela automaticamente quando o usuario pesquisa ou filtra
   protected readonly filteredGames = computed(() => {
-    const query = this.query.trim().toLocaleLowerCase();
+    const query = this.query().trim().toLocaleLowerCase();
     return this.data.games.filter((game) =>
       (!query || `${game.nome} ${game.desenvolvedora}`.toLocaleLowerCase().includes(query)) &&
-      (!this.genre || game.generos.includes(this.genre)) &&
-      (!this.platform || game.plataformas.includes(this.platform)),
+      (!this.genre() || game.generos.includes(this.genre())) &&
+      (!this.platform() || game.plataformas.includes(this.platform())),
     );
   });
 
+  // Calcula a nota media das avaliacoes do jogo
   protected scoreFor(gameId: string): number {
     const reviews = this.data.reviews.filter((review) => review.jogoId === gameId);
     return reviews.length ? reviews.reduce((total, review) => total + review.nota, 0) / reviews.length : 4.2;

@@ -41,8 +41,10 @@ export class GameModal implements OnInit {
       return;
     }
 
+    // Cria um identificador com o nome do jogo para o link (ex: "God of War" vira "god-of-war")
+    const idDoJogo = this.nome.toLowerCase().trim().replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '-');
     const jogo: Game = {
-      id: this.game ? this.game.id : 'jogo-' + Date.now(),
+      id: this.game ? this.game.id : (idDoJogo || 'jogo-' + Date.now()),
       nome: this.nome.trim(),
       desenvolvedora: this.desenvolvedora.trim(),
       dataLancamento: this.dataLancamento,

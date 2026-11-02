@@ -158,10 +158,56 @@ export const MOCK_REVIEWS: Review[] = [
 
 @Injectable({ providedIn: 'root' })
 export class MockDataService {
-  readonly games = MOCK_GAMES;
+  readonly games: Game[] = this.carregarJogos();
   readonly users = MOCK_USERS;
-  readonly reviews = MOCK_REVIEWS;
-  readonly library = signal<LibraryEntry[]>(INITIAL_LIBRARY);
+  readonly reviews: Review[] = this.carregarReviews();
+  readonly library = signal<LibraryEntry[]>(this.carregarLibrary());
+
+  // Carrega os jogos salvos no navegador para nao perder dados ao dar F5
+  private carregarJogos(): Game[] {
+    try {
+      const saved = localStorage.getItem('gamebox_games');
+      return saved ? JSON.parse(saved) : [...MOCK_GAMES];
+    } catch {
+      return [...MOCK_GAMES];
+    }
+  }
+
+  private carregarReviews(): Review[] {
+    try {
+      const saved = localStorage.getItem('gamebox_reviews');
+      return saved ? JSON.parse(saved) : [...MOCK_REVIEWS];
+    } catch {
+      return [...MOCK_REVIEWS];
+    }
+  }
+
+  private carregarLibrary(): LibraryEntry[] {
+    try {
+      const saved = localStorage.getItem('gamebox_library');
+      return saved ? JSON.parse(saved) : [...INITIAL_LIBRARY];
+    } catch {
+      return [...INITIAL_LIBRARY];
+    }
+  }
+
+  public salvarJogos(): void {
+    try {
+      localStorage.setItem('gamebox_games', JSON.stringify(this.games));
+    } catch {}
+  }
+
+  public salvarReviews(): void {
+    try {
+      localStorage.setItem('gamebox_reviews', JSON.stringify(this.reviews));
+    } catch {}
+  }
+
+  public salvarLibrary(): void {
+    try {
+      localStorage.setItem('gamebox_library', JSON.stringify(this.library()));
+    } catch {}
+  }
 
   gameById(id: string | null | undefined): Game {
     return this.games.find((game) => game.id === id) ?? this.games[0];
@@ -175,5 +221,6 @@ export class MockDataService {
       }
       return [...entries, { usuarioId: 1, jogoId: gameId, status, nota: null, horasJogadas: 0 }];
     });
+    this.salvarLibrary();
   }
 }
