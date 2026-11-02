@@ -3,6 +3,7 @@ package com.gamebox.app.Service;
 import com.gamebox.app.Domain.Jogo;
 import com.gamebox.app.Dto.request.JogoRequest;
 import com.gamebox.app.Dto.response.JogoResponse;
+import com.gamebox.app.Exception.RecursoNaoEncontradoException;
 import com.gamebox.app.Repository.JogoRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,10 @@ public class JogoService {
     }
 
     public Jogo buscarJogo(Long id) {
+        // Centraliza a busca para que todos os fluxos usem a mesma resposta 404.
         return jogoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Jogo não encontrado com id: "+id));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Jogo não encontrado com id: " + id));
     }
 
     public JogoResponse buscarResposta(Long id) {

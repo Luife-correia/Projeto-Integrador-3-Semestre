@@ -8,6 +8,8 @@ import com.gamebox.app.Dto.request.AvaliacaoAtualizacaoRequest;
 import com.gamebox.app.Dto.request.AvaliacaoRequest;
 import com.gamebox.app.Dto.response.AvaliacaoResponse;
 import com.gamebox.app.Enum.StatusJogos;
+import com.gamebox.app.Exception.RecursoNaoEncontradoException;
+import com.gamebox.app.Exception.RegraNegocioException;
 import com.gamebox.app.Repository.AvaliacaoRepository;
 import com.gamebox.app.Repository.JogoRepository;
 import com.gamebox.app.Repository.UsuarioJogoRepository;
@@ -39,16 +41,20 @@ public class AvaliacaoService {
 
     @Transactional
     public AvaliacaoResponse salvar(AvaliacaoRequest request) {
+        // A avaliação só pode ser criada para usuários e jogos existentes.
         Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário não encontrado."));
         Jogo jogo = jogoRepository.findById(request.jogoId())
-                .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Jogo não encontrado."));
 
         if (avaliacaoRepository.existsByUsuarioIdAndJogoId(
                 usuario.getId(),
                 jogo.getId()
         )) {
-            throw new IllegalStateException(
+            // Cada usuário pode avaliar um mesmo jogo apenas uma vez.
+            throw new RegraNegocioException(
                     "O usuário já avaliou este jogo."
             );
         }
@@ -71,7 +77,8 @@ public class AvaliacaoService {
     //metodo auxilar
     public Avaliacao buscar(Long id){
         return avaliacaoRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
+                orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Avaliação não encontrada"));
     }
 
     // Busca todas as avaliações de um usuário
@@ -121,21 +128,22 @@ public class AvaliacaoService {
     }
 
     private void validarStatusParaAvaliar(Long usuarioId, Long jogoId) {
+        // Avaliar exige que o jogo esteja na biblioteca e tenha sido jogado.
         UsuarioJogo usuarioJogo = usuarioJogoRepository
                 .findByUsuarioIdAndJogoId(usuarioId, jogoId)
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new RegraNegocioException(
                         "O usuário precisa adicionar o jogo à biblioteca antes de avaliá-lo."
                 ));
 
         if (usuarioJogo.getStatus() == StatusJogos.NAO_JOGADO) {
-            throw new IllegalStateException(
+            throw new RegraNegocioException(
                     "Só é possível avaliar um jogo que já foi jogado."
             );
         }
     }
 
     private void recalcularNota(Jogo jogo) {
-        // Busca os valores atuais e atualiza a média do jogo.
+        // Recalcula a média após criar, editar ou excluir uma avaliação.
         long somaTotalAvaliacoes = avaliacaoRepository
                 .somarNotasPorJogo(jogo.getId());
         long totalAvaliacoes = avaliacaoRepository

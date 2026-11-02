@@ -4,6 +4,8 @@ import com.gamebox.app.Domain.Jogo;
 import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Domain.UsuarioJogo;
 import com.gamebox.app.Enum.StatusJogos;
+import com.gamebox.app.Exception.RecursoNaoEncontradoException;
+import com.gamebox.app.Exception.RegraNegocioException;
 import com.gamebox.app.Repository.AvaliacaoRepository;
 import com.gamebox.app.Repository.JogoRepository;
 import com.gamebox.app.Repository.UsuarioJogoRepository;
@@ -35,6 +37,7 @@ public class UsuarioJogoService {
 
     @Transactional
     public UsuarioJogo criar(Long usuarioId, Long jogoId) {
+        // O vínculo é único; se já existir, a operação permanece idempotente.
         UsuarioJogo existente = usuarioJogoRepository
                 .findByUsuarioIdAndJogoId(usuarioId, jogoId)
                 .orElse(null);
@@ -53,7 +56,7 @@ public class UsuarioJogoService {
     public UsuarioJogo buscar(Long usuarioId, Long jogoId) {
         return usuarioJogoRepository
                 .findByUsuarioIdAndJogoId(usuarioId, jogoId)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Jogo não encontrado na biblioteca do usuário."
                 ));
     }
@@ -64,6 +67,7 @@ public class UsuarioJogoService {
             Long jogoId,
             StatusJogos novoStatus
     ) {
+        // Status nulo não representa uma alteração válida.
         if (novoStatus == null) {
             throw new IllegalArgumentException("O status do jogo é obrigatório.");
         }
@@ -75,7 +79,8 @@ public class UsuarioJogoService {
         if (usuarioJogo.getStatus() != StatusJogos.NAO_JOGADO
                 && novoStatus == StatusJogos.NAO_JOGADO
                 && avaliacaoRepository.existsByUsuarioIdAndJogoId(usuarioId, jogoId)) {
-            throw new IllegalStateException(
+            // Uma avaliação existente impede desfazer o progresso do jogo.
+            throw new RegraNegocioException(
                     "Não é possível voltar o jogo para NAO_JOGADO enquanto existir uma avaliação."
             );
         }
@@ -110,14 +115,14 @@ public class UsuarioJogoService {
 
     private Usuario buscarUsuario(Long usuarioId) {
         return usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Usuário não encontrado com id: " + usuarioId
                 ));
     }
 
     private Jogo buscarJogo(Long jogoId) {
         return jogoRepository.findById(jogoId)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Jogo não encontrado com id: " + jogoId
                 ));
     }

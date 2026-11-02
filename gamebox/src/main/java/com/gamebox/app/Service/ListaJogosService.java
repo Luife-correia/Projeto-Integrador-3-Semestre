@@ -4,6 +4,7 @@ import com.gamebox.app.Domain.ListaJogos;
 import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Dto.request.ListaJogosRequest;
 import com.gamebox.app.Dto.response.ListaJogosResponse;
+import com.gamebox.app.Exception.RecursoNaoEncontradoException;
 import com.gamebox.app.Repository.ListaJogosRepository;
 import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -22,18 +23,19 @@ public class ListaJogosService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Método auxiliar para buscar ListaJogos entidade
+    // Busca a entidade da lista e informa 404 quando ela não existe.
     public ListaJogos buscarListaJogos(Long id) {
         return listaJogosRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Lista de jogos não encontrada!"));
+                        new RecursoNaoEncontradoException("Lista de jogos não encontrada!"));
     }
 
-    // Método auxiliar para buscar Usuário
+    // Valida o proprietário antes de criar ou alterar uma lista.
     private Usuario buscarUsuario(Long usuarioId) {
         return usuarioRepository.findById(usuarioId)
                 .orElseThrow(() ->
-                        new RuntimeException("Usuário não encontrado com id: " + usuarioId));
+                        new RecursoNaoEncontradoException(
+                                "Usuário não encontrado com id: " + usuarioId));
     }
 
     @Transactional
