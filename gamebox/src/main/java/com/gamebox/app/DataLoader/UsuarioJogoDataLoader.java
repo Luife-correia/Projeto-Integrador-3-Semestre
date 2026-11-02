@@ -60,7 +60,7 @@ public class UsuarioJogoDataLoader implements CommandLineRunner {
                 // João já zerou The Witcher 3
                 if (jogos.size() > 1) {
                     UsuarioJogo uj2 = new UsuarioJogo(joao, jogos.get(1));
-                    uj2.setStatus(StatusJogos.JOGADO);
+                    uj2.setStatus(StatusJogos.ZERADO);
                     usuarioJogoRepository.save(uj2);
                 }
 

@@ -1,6 +1,5 @@
 package com.gamebox.app.Dto.response;
 
-import com.gamebox.app.Domain.Jogo;
 import java.util.List;
 
 public record ListaJogosResponse(
@@ -10,5 +9,5 @@ public record ListaJogosResponse(
         boolean principal,
         Long usuarioId,
         String usuarioNome,
-        List<Jogo> jogos
+        List<JogoResponse> jogos
 ) {}

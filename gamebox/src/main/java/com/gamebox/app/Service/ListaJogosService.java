@@ -3,6 +3,7 @@ package com.gamebox.app.Service;
 import com.gamebox.app.Domain.ListaJogos;
 import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Dto.request.ListaJogosRequest;
+import com.gamebox.app.Dto.response.JogoResponse;
 import com.gamebox.app.Dto.response.ListaJogosResponse;
 import com.gamebox.app.Exception.RecursoNaoEncontradoException;
 import com.gamebox.app.Repository.ListaJogosRepository;
@@ -104,7 +105,24 @@ public class ListaJogosService {
                 lista.isPrincipal(),
                 lista.getUsuario() != null ? lista.getUsuario().getId() : null,
                 lista.getUsuario() != null ? lista.getUsuario().getNome() : null,
-                lista.getJogos()
+                lista.getJogos().stream()
+                        .map(this::jogoParaResposta)
+                        .toList()
+        );
+    }
+
+    // Evita expor entidades JPA e serializar relacionamentos em ciclo na resposta.
+    private JogoResponse jogoParaResposta(com.gamebox.app.Domain.Jogo jogo) {
+        return new JogoResponse(
+                jogo.getId(),
+                jogo.getNome(),
+                jogo.getCapa(),
+                jogo.getPlataformas(),
+                jogo.getGeneros(),
+                jogo.getDesenvolvedora(),
+                jogo.getDataLancamento(),
+                jogo.getSinopse(),
+                jogo.getNotaTotal()
         );
     }
 }

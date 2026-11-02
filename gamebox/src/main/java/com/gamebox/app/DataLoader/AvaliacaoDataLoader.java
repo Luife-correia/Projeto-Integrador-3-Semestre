@@ -57,11 +57,13 @@ public class AvaliacaoDataLoader implements CommandLineRunner {
                     Avaliacao av1 = new Avaliacao(
                             joao,
                             jogos.get(0),
-                            20, // 10 estrelas
+                            10, // 5 estrelas
                             "Simplesmente uma obra-prima dos jogos de mundo aberto. Desafiador e recompensador!",
                             LocalDate.now().minusDays(10)
                     );
                     avaliacaoRepository.save(av1);
+                    jogos.get(0).atualizarNota(10, 1);
+                    jogoRepository.save(jogos.get(0));
                 }
 
                 // Avaliação da Maria para Hollow Knight
@@ -69,11 +71,13 @@ public class AvaliacaoDataLoader implements CommandLineRunner {
                     Avaliacao av2 = new Avaliacao(
                             maria,
                             jogos.get(6),
-                            18, // 9 estrelas
+                            9, // 4,5 estrelas
                             "Arte maravilhosa, trilha sonora impecável e desafio na medida certa. Indispensável!",
                             LocalDate.now().minusDays(5)
                     );
                     avaliacaoRepository.save(av2);
+                    jogos.get(6).atualizarNota(9, 1);
+                    jogoRepository.save(jogos.get(6));
                 }
 
                 System.out.println(">>> Avaliações cadastradas com sucesso! Total: " + avaliacaoRepository.count());
