@@ -2,8 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { catchError, combineLatest, concat, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { GameCardComponent } from '../components/game-card';
-import { MockDataService } from '../data/mock-data';
+import { Game, MockDataService } from '../data/mock-data';
+import { Jogo } from '../../model/jogo.model';
+import { JogoService } from '../../services/jogo.service';
+
+type SearchState =
+  | { status: 'loading'; games: Game[] }
+  | { status: 'success'; games: Game[] }
+  | { status: 'error'; games: Game[] };
+
+const initialSearchState: SearchState = { status: 'loading', games: [] };
 
 @Component({
   selector: 'app-catalog-page',
@@ -34,26 +45,35 @@ import { MockDataService } from '../data/mock-data';
           <span class="catalog-count">{{ filteredGames().length }} RESULTADOS</span>
         </div>
         <div class="catalog-controls">
-          <label class="search-box"><span class="visually-hidden">Buscar jogos</span><input class="search-input" type="search" placeholder="Buscar jogo ou desenvolvedora" [ngModel]="query()" (ngModelChange)="query.set($event)" /></label>
+          <label class="search-box"><span class="visually-hidden">Buscar jogos</span><input class="search-input" type="search" placeholder="Buscar jogo pelo nome" [ngModel]="query()" (ngModelChange)="query.set($event)" /></label>
           <select class="filter-select" aria-label="Filtrar por gênero" [ngModel]="genre()" (ngModelChange)="genre.set($event)">
             <option value="">Todos os gêneros</option>
-            @for (item of genres; track item) { <option [value]="item">{{ item }}</option> }
+            @for (item of genres(); track item) { <option [value]="item">{{ item }}</option> }
           </select>
           <select class="filter-select" aria-label="Filtrar por plataforma" [ngModel]="platform()" (ngModelChange)="platform.set($event)">
             <option value="">Plataformas</option>
-            @for (item of platforms; track item) { <option [value]="item">{{ item }}</option> }
+            @for (item of platforms(); track item) { <option [value]="item">{{ item }}</option> }
           </select>
         </div>
         <div class="genre-strip" aria-label="Atalhos de gênero">
-          @for (item of genres; track item) {
+          @for (item of genres(); track item) {
             <button class="genre-pill" [class.selected]="genre() === item" (click)="genre.set(genre() === item ? '' : item)">{{ item }}</button>
           }
         </div>
 
         <div class="feature-layout">
-          <div class="game-grid">
-            @for (game of filteredGames(); track game.id) { <app-game-card [game]="game" [score]="scoreFor(game.id)" /> }
-            @if (filteredGames().length === 0) { <div class="empty-state">Nenhum jogo encontrado. Tente outro termo ou limpe os filtros.</div> }
+          <div class="game-grid" [attr.aria-busy]="isLoading()">
+            @if (isLoading()) {
+              <div class="empty-state" role="status">Buscando jogos...</div>
+            } @else if (hasSearchError()) {
+              <div class="empty-state" role="alert">
+                <p>Não foi possível carregar o catálogo. Verifique se o servidor está disponível.</p>
+                <button class="button-primary" type="button" (click)="retrySearch()">Tentar novamente</button>
+              </div>
+            } @else {
+              @for (game of filteredGames(); track game.id) { <app-game-card [game]="game" [score]="scoreFor(game.id)" /> }
+              @if (filteredGames().length === 0) { <div class="empty-state">Nenhum jogo encontrado. Tente outro termo ou limpe os filtros.</div> }
+            }
           </div>
           <aside class="side-note">
             <span class="side-note-label">NOTA DE CAMPO / 07</span>
@@ -67,28 +87,70 @@ import { MockDataService } from '../data/mock-data';
 })
 export class CatalogPage {
   private readonly data = inject(MockDataService);
-  // Guarda o que o usuario digita ou seleciona nos filtros
+  private readonly jogoService = inject(JogoService);
   protected query = signal('');
   protected genre = signal('');
   protected platform = signal('');
+  private readonly retryCount = signal(0);
 
-  // Pega os generos e plataformas sem repetir para preencher os menus
-  protected readonly genres = [...new Set(this.data.games.flatMap((game) => game.generos))].sort();
-  protected readonly platforms = [...new Set(this.data.games.flatMap((game) => game.plataformas))].sort();
+  private readonly searchState = toSignal(
+    combineLatest([toObservable(this.query), toObservable(this.retryCount)]).pipe(
+      map(([query, retryCount]) => ({ query: query.trim(), retryCount })),
+      debounceTime(300),
+      distinctUntilChanged(
+        (previous, current) =>
+          previous.query === current.query && previous.retryCount === current.retryCount,
+      ),
+      switchMap(({ query }) =>
+        concat(
+          of<SearchState>({ status: 'loading', games: [] }),
+          this.jogoService.listar(query).pipe(
+            map((jogos) => ({ status: 'success' as const, games: jogos.map((jogo) => this.toGame(jogo)) })),
+            catchError((error: unknown) => {
+              console.error('Falha ao buscar jogos na API.', error);
+              return of<SearchState>({ status: 'error', games: [] });
+            }),
+          ),
+        ),
+      ),
+    ),
+    { initialValue: initialSearchState },
+  );
 
-  // Atualiza a lista na tela automaticamente quando o usuario pesquisa ou filtra
+  protected readonly isLoading = computed(() => this.searchState().status === 'loading');
+  protected readonly hasSearchError = computed(() => this.searchState().status === 'error');
+  protected readonly genres = computed(() =>
+    [...new Set([...this.data.games, ...this.searchState().games].flatMap((game) => game.generos))].sort(),
+  );
+  protected readonly platforms = computed(() =>
+    [...new Set([...this.data.games, ...this.searchState().games].flatMap((game) => game.plataformas))].sort(),
+  );
   protected readonly filteredGames = computed(() => {
-    const query = this.query().trim().toLocaleLowerCase();
-    return this.data.games.filter((game) =>
-      (!query || `${game.nome} ${game.desenvolvedora}`.toLocaleLowerCase().includes(query)) &&
+    return this.searchState().games.filter((game) =>
       (!this.genre() || game.generos.includes(this.genre())) &&
       (!this.platform() || game.plataformas.includes(this.platform())),
     );
   });
 
-  // Calcula a nota media das avaliacoes do jogo
+  protected retrySearch(): void {
+    this.retryCount.update((count) => count + 1);
+  }
+
   protected scoreFor(gameId: string): number {
     const reviews = this.data.reviews.filter((review) => review.jogoId === gameId);
     return reviews.length ? reviews.reduce((total, review) => total + review.nota, 0) / reviews.length : 4.2;
+  }
+
+  private toGame(jogo: Jogo): Game {
+    return {
+      id: String(jogo.id),
+      nome: jogo.nome,
+      capa: jogo.capa,
+      plataformas: jogo.plataformas,
+      generos: jogo.generos,
+      desenvolvedora: jogo.desenvolvedora,
+      dataLancamento: jogo.dataLancamento,
+      sinopse: jogo.sinopse,
+    };
   }
 }
