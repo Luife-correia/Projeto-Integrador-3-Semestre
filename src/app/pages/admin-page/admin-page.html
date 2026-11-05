@@ -9,7 +9,15 @@
     <button type="button" class="button-primary" (click)="abrirNovo()">+ Novo jogo</button>
   </div>
 
-  <div class="admin-table-wrap">
+  <div>
+    <button type="button" (click)="abaAtiva = 'games'">Jogos</button>
+    <button type="button" (click)="abaAtiva = 'users'">Usuários</button>
+  </div>
+  @if (abaAtiva === 'games'){
+    <!--Tabela de listagem por jogos-->
+    <input type="search" aria-label="Pesquisar jogos" [(ngModel)]="gameBusca" placeholder="Nome ou desenvolvedora"
+    />
+    <div class="admin-table-wrap">
     <table class="admin-table">
       <thead>
         <tr>
@@ -22,7 +30,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (game of games; track game.id) {
+        @for (game of gamesFiltrados; track game.id) {
           <tr>
             <td><img class="admin-thumb" [src]="game.capa" [alt]="'Capa de ' + game.nome"></td>
             <td>{{ game.nome }}</td>
@@ -38,12 +46,46 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="6">Nenhum jogo cadastrado.</td>
+            <td colspan="6">Nenhum jogo encontrado</td>
           </tr>
         }
       </tbody>
     </table>
   </div>
+  }@else {
+    <!--Tabela de listagem por usuarios-->
+    <input type="search" aria-label="Pesquisar usuários" [(ngModel)]="userBusca" placeholder="Nome ou email"/>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Acesso</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        @for(user of usersFiltrados; track user.id){
+          <tr>
+            <td>{{user.nome}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.role === 'ADMIN' ? 'Administrador' : 'Usuário'}}</td>
+            <td>{{user.ativo ? 'Ativa' : 'Desativada'}}</td>
+            <td>
+              <!--botao para mudar a role de usuario para administrador-->
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">Nenhum usuário encontrado</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
 </div>
 
 @if (modalAberto) {

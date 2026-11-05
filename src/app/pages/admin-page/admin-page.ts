@@ -1,18 +1,47 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmModal} from '../../components/confirm-modal/confirm-modal';
 import { GameModal } from '../../components/game-modal/game-modal';
-import { Game, MockDataService } from '../../data/mock-data';
+import { Game, MockDataService, User } from '../../data/mock-data';
+import { FormsModule } from '@angular/forms';
+
+
+export type AdminTab = 'games' | 'users';
+
 
 @Component({
   selector: 'app-admin-page',
   standalone: true,
   templateUrl: './admin-page.html',
   styleUrl: './admin-page.css',
-  imports: [GameModal, ConfirmModal],
+  imports: [GameModal, ConfirmModal, FormsModule],
 })
 
+
+
 export class AdminPage {
+
     public games : Game[] = [];
+    public users : User[] = [];
+
+    abaAtiva: AdminTab = 'games';
+    gameBusca = '';
+    userBusca = '';
+
+    
+    //retorna uma outra lista filtrada para games e users
+    get gamesFiltrados() : Game[]{
+        const termo = this.gameBusca.trim().toLocaleLowerCase();
+
+        return this.games.filter((game) => 
+            `${game.nome} ${game.desenvolvedora}`.toLocaleLowerCase().includes(termo));
+    }
+
+    get usersFiltrados() : User[] {
+        const termo = this.userBusca.trim().toLocaleLowerCase();
+
+        return this.users.filter((user) =>
+        `${user.nome} ${user.email}`.toLocaleLowerCase().includes(termo));
+    }
 
     public modalAberto : boolean = false;
     public gameEditando : Game | null = null;
@@ -27,6 +56,7 @@ export class AdminPage {
 
     ngOnInit() : void {
         this.games = [...this.mockService.games];
+        this.users = [...this.mockService.users];
     }
 
     abrirNovo() : void {

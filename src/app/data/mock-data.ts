@@ -2,12 +2,16 @@ import { Injectable, signal } from '@angular/core';
 
 export type LibraryStatus = 'JOGANDO' | 'ZERADO' | 'ABANDONADO' | 'DESEJO_JOGAR' | 'PLATINADO';
 
-export interface User {
+export type UserRole = 'USER' | 'ADMIN';
+
+export interface User{
   id: number;
   nome: string;
   email: string;
   fotoPerfil: string;
   bio: string;
+  role: UserRole
+  ativo:boolean;
 }
 
 export interface Game {
@@ -44,6 +48,8 @@ export const MOCK_USERS: User[] = [
     email: 'marina@organostation.dev',
     fotoPerfil: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&q=85',
     bio: 'Coleciono mundos que deixam saudade. No momento: revisitando clássicos de PS2.',
+    role: 'USER',
+    ativo: true
   },
   {
     id: 2,
@@ -51,6 +57,8 @@ export const MOCK_USERS: User[] = [
     email: 'rafa@organostation.dev',
     fotoPerfil: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80',
     bio: 'A vida é curta demais para pular cutscenes.',
+    role: 'USER',
+    ativo: true
   },
   {
     id: 3,
@@ -58,6 +66,8 @@ export const MOCK_USERS: User[] = [
     email: 'lia@organostation.dev',
     fotoPerfil: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=160&q=80',
     bio: 'RPGs longos e finais devastadores.',
+    role: 'USER',
+    ativo: true
   },
 ];
 
