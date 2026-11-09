@@ -3,20 +3,58 @@
   <div class="section-heading">
     <div>
       <span class="eyebrow">Administração</span>
-      <h1 class="section-title">Gerenciar jogos</h1>
+      <h1 class="section-title">
+        {{ abaAtiva === 'games' ? 'Gerenciar jogos' : 'Gerenciar usuários' }}
+      </h1>
     </div>
-    <span class="catalog-count">{{games.length}} Jogos cadastrados</span>
-    <button type="button" class="button-primary" (click)="abrirNovo()">+ Novo jogo</button>
+    <span class="catalog-count">
+      {{ abaAtiva === 'games' ? games.length + ' Jogos cadastrados' : users.length + ' Usuários cadastrados' }}
+    </span>
+    @if (abaAtiva === 'games') {
+      <button type="button" class="button-primary" (click)="abrirNovo()">+ Novo jogo</button>
+    }
   </div>
 
-  <div>
-    <button type="button" (click)="abaAtiva = 'games'">Jogos</button>
-    <button type="button" (click)="abaAtiva = 'users'">Usuários</button>
+  <div class="admin-tabs" role="tablist" aria-label="Tipo de conteúdo">
+    <button
+      type="button"
+      id="games-tab"
+      class="admin-tab"
+      [class.active]="abaAtiva === 'games'"
+      [attr.aria-selected]="abaAtiva === 'games'"
+      aria-controls="games-panel"
+      role="tab"
+      (click)="abaAtiva = 'games'"
+    >
+      Jogos
+    </button>
+    <button
+      type="button"
+      id="users-tab"
+      class="admin-tab"
+      [class.active]="abaAtiva === 'users'"
+      [attr.aria-selected]="abaAtiva === 'users'"
+      aria-controls="users-panel"
+      role="tab"
+      (click)="abaAtiva = 'users'"
+    >
+      Usuários
+    </button>
   </div>
+
   @if (abaAtiva === 'games'){
-    <!--Tabela de listagem por jogos-->
-    <input type="search" aria-label="Pesquisar jogos" [(ngModel)]="gameBusca" placeholder="Nome ou desenvolvedora"
-    />
+    <section id="games-panel" role="tabpanel" aria-labelledby="games-tab">
+      <label class="admin-search" for="game-search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          id="game-search"
+          type="search"
+          aria-label="Pesquisar jogos"
+          [(ngModel)]="gameBusca"
+          placeholder="Buscar por nome ou desenvolvedora"
+        />
+      </label>
+
     <div class="admin-table-wrap">
     <table class="admin-table">
       <thead>
@@ -51,19 +89,30 @@
         }
       </tbody>
     </table>
-  </div>
+    </div>
+    </section>
   }@else {
-    <!--Tabela de listagem por usuarios-->
-    <input type="search" aria-label="Pesquisar usuários" [(ngModel)]="userBusca" placeholder="Nome ou email"/>
+    <section id="users-panel" role="tabpanel" aria-labelledby="users-tab">
+      <label class="admin-search" for="user-search">
+        <span class="search-icon" aria-hidden="true"></span>
+        <input
+          id="user-search"
+          type="search"
+          aria-label="Pesquisar usuários"
+          [(ngModel)]="userBusca"
+          placeholder="Buscar por nome ou e-mail"
+        />
+      </label>
 
-    <table>
+    <div class="admin-table-wrap">
+    <table class="admin-table">
       <thead>
         <tr>
           <th>Nome</th>
           <th>Email</th>
           <th>Acesso</th>
           <th>Estado</th>
-          <th></th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -80,11 +129,13 @@
           </tr>
         } @empty {
           <tr>
-            <td colspan="5">Nenhum usuário encontrado</td>
+            <td colspan="5" class="empty-row">Nenhum usuário encontrado</td>
           </tr>
         }
       </tbody>
     </table>
+    </div>
+    </section>
   }
 </div>
 

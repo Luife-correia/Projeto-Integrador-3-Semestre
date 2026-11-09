@@ -76,7 +76,6 @@ export class AdminPage {
 
     // Salva o jogo cadastrado ou atualiza se for uma edicao
     salvarGame(jogo : Game) : void {
-        // Procura se o jogo ja existe na lista para atualizar
         const index = this.games.findIndex(g => g.id === jogo.id);
         if (index >= 0) {
             this.games[index] = jogo;
@@ -94,18 +93,14 @@ export class AdminPage {
         this.gameEditando = null;
     }
 
-    // Guarda o jogo a ser excluido e abre o modal de confirmacao
     excluirGame(game : Game) : void {
         this.gameExcluindo = game;
     }
 
-    // Exclui o jogo apos o usuario confirmar no modal
     excluirConfimarcao() : void {
         if (this.gameExcluindo) {
             const idExcluir = this.gameExcluindo.id;
-            // Remove o jogo da tabela da tela
             this.games = this.games.filter(g => g.id !== idExcluir);
-            // Procura a posicao do jogo na lista geral e remove 1 item com splice
             const mockIndex = this.mockService.games.findIndex(g => g.id === idExcluir);
             if (mockIndex >= 0) {
                 this.mockService.games.splice(mockIndex, 1);

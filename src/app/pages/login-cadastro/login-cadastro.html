@@ -1,1 +1,166 @@
-<p>login-cadastro works!</p>
+<section class="auth-layout">
+  <aside class="auth-intro">
+    <span class="eyebrow">GAMEBOX / SUA PRÓXIMA MEMÓRIA</span>
+
+    <h1>
+      {{ modo === 'login' ? 'Bom ter você de volta.' : 'Seu próximo mundo começa aqui.' }}
+    </h1>
+
+    <p>
+      Guarde suas jornadas, acompanhe seus jogos e descubra novas histórias
+      para jogar no seu ritmo.
+    </p>
+
+    <a class="explore-link" routerLink="/home">
+      Ou continue explorando o catálogo <span aria-hidden="true">↗</span>
+    </a>
+  </aside>
+
+  <section class="auth-card" aria-labelledby="auth-title">
+    <span class="eyebrow">ACESSO À CONTA</span>
+
+    <div class="mode-switch" aria-label="Escolha uma opção">
+      <button
+        type="button"
+        [class.active]="modo === 'login'"
+        [attr.aria-pressed]="modo === 'login'"
+        (click)="alternarModo('login', authForm)"
+      >
+        Entrar
+      </button>
+
+      <button
+        type="button"
+        [class.active]="modo === 'cadastro'"
+        [attr.aria-pressed]="modo === 'cadastro'"
+        (click)="alternarModo('cadastro', authForm)"
+      >
+        Criar conta
+      </button>
+    </div>
+
+    <h2 id="auth-title">
+      {{ modo === 'login' ? 'Entre na sua conta' : 'Crie sua conta' }}
+    </h2>
+
+    <p class="form-description">
+      {{
+        modo === 'login'
+          ? 'Continue de onde sua última jornada parou.'
+          : 'Só precisamos de alguns dados para começar.'
+      }}
+    </p>
+
+    <form #authForm="ngForm" (ngSubmit)="enviarFormulario(authForm)" novalidate>
+      @if (modo === 'cadastro') {
+        <label for="nome">Nome</label>
+        <input
+          id="nome"
+          name="nome"
+          type="text"
+          placeholder="Como podemos chamar você?"
+          autocomplete="name"
+          [(ngModel)]="dados.nome"
+          #nome="ngModel"
+          required
+          minlength="5"
+        />
+
+        @if (nome.invalid && nome.touched) {
+          <small class="field-error">
+            Informe seu nome com pelo menos 5 caracteres.
+          </small>
+        }
+      }
+
+      <label for="email">E-mail</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="voce@exemplo.com"
+        autocomplete="email"
+        [(ngModel)]="dados.email"
+        #email="ngModel"
+        required
+        email
+      />
+
+      @if (email.invalid && email.touched) {
+        <small class="field-error">Informe um e-mail válido.</small>
+      }
+
+      <label for="senha">Senha</label>
+      <input
+        id="senha"
+        name="senha"
+        type="password"
+        placeholder="Pelo menos 6 caracteres"
+        [attr.autocomplete]="modo === 'login' ? 'current-password' : 'new-password'"
+        [(ngModel)]="dados.senha"
+        #senha="ngModel"
+        required
+        minlength="6"
+      />
+
+      @if (senha.invalid && senha.touched) {
+        <small class="field-error">
+          A senha deve ter pelo menos 6 caracteres.
+        </small>
+      }
+
+      @if (modo === 'cadastro') {
+        <label for="confirmacaoSenha">Confirme sua senha</label>
+        <input
+          id="confirmacaoSenha"
+          name="confirmacaoSenha"
+          type="password"
+          placeholder="Digite a senha novamente"
+          autocomplete="new-password"
+          [(ngModel)]="dados.confirmacaoSenha"
+          #confirmacaoSenha="ngModel"
+          required
+        />
+
+        @if (confirmacaoSenha.touched && dados.confirmacaoSenha !== dados.senha) {
+          <small class="field-error">As senhas precisam ser iguais.</small>
+        }
+      }
+
+      @if (mensagem) {
+        <p
+          class="form-message"
+          [class.error]="tipoMensagem === 'erro'"
+          [class.success]="tipoMensagem === 'sucesso'"
+          aria-live="polite"
+        >
+          {{ mensagem }}
+        </p>
+      }
+
+      <button class="submit-button" type="submit" [disabled]="authForm.invalid">
+        {{ modo === 'login' ? 'Entrar na GameBox' : 'Criar minha conta' }}
+      </button>
+    </form>
+
+    @if (tipoMensagem === 'sucesso' && modo === 'login' && usuarioAtual) {
+      <a class="catalog-link" routerLink="/home">Ir para o catálogo</a>
+    }
+
+    <p class="switch-prompt">
+      {{
+        modo === 'login'
+          ? 'Ainda não tem uma conta?'
+          : 'Já faz parte da GameBox?'
+      }}
+
+      <button
+        type="button"
+        class="text-button"
+        (click)="alternarModo(modo === 'login' ? 'cadastro' : 'login', authForm)"
+      >
+        {{ modo === 'login' ? 'Criar conta' : 'Entrar' }}
+      </button>
+    </p>
+  </section>
+</section>
