@@ -1,20 +1,21 @@
 import { Component, Input } from '@angular/core';
-import { LibraryStatus } from '../data/mock-data';
+import { StatusJogos } from '../../model/api.model';
 
-const STATUS_LABELS: Record<LibraryStatus, string> = {
+const STATUS_LABELS: Record<StatusJogos, string> = {
+  NAO_JOGADO: 'Não jogado',
   JOGANDO: 'Jogando',
+  QUERO_JOGAR: 'Quero jogar',
   ZERADO: 'Zerado',
   ABANDONADO: 'Abandonado',
-  DESEJO_JOGAR: 'Quero jogar',
   PLATINADO: 'Platinado',
 };
 
 @Component({
   selector: 'app-status-badge',
   standalone: true,
-  template: `<span class="status-badge" [class.playing]="status === 'JOGANDO'" [class.abandoned]="status === 'ABANDONADO'" [class.wishlist]="status === 'DESEJO_JOGAR'">{{ labels[status] }}</span>`,
+  templateUrl: './status-badge.html',
 })
 export class StatusBadgeComponent {
-  @Input({ required: true }) status!: LibraryStatus;
+  @Input({ required: true }) status!: StatusJogos;
   protected readonly labels = STATUS_LABELS;
 }

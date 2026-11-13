@@ -1,0 +1,117 @@
+@if (loading()) {
+  <div class="empty-state">Carregando jogo…</div>
+} @else if (error()) {
+  <div class="empty-state" role="alert">{{ error() }}</div>
+} @else if (game(); as g) {
+  <article class="page-enter">
+    <section class="detail-hero">
+      <div
+        class="detail-backdrop"
+        [style.background-image]="'url(' + g.capa + ')'"
+        aria-hidden="true"
+      ></div>
+      <img class="detail-cover" [src]="g.capa" [alt]="'Capa de ' + g.nome" />
+      <div class="detail-copy">
+        <span class="eyebrow">Diário de jogo / {{ g.plataformas[0] }}</span>
+        <h1>{{ g.nome }}</h1>
+        <div class="detail-studio">Desenvolvido por {{ g.desenvolvedora }}</div>
+        <div class="detail-facts">
+          <span>{{ g.dataLancamento | date: 'yyyy' }}</span>
+          <span>{{ g.plataformas.join(' · ') }}</span>
+        </div>
+        <div class="genre-tags">
+          @for (tag of g.generos; track tag) {
+            <span class="genre-tag">{{ tag }}</span>
+          }
+        </div>
+        <p class="detail-synopsis">{{ g.sinopse }}</p>
+        <div class="rating-summary">
+          <span class="rating-number">{{ g.notaTotal | number: '1.1-1' }}</span>
+          <span class="rating-caption">Nota média do catálogo</span>
+        </div>
+
+        @if (auth.usuarioAtual) {
+          @if (status()) {
+            <app-status-badge [status]="status()!" />
+          }
+          <div class="library-add">
+            <select
+              class="library-select"
+              [(ngModel)]="selectedStatus"
+              aria-label="Status na biblioteca"
+            >
+              @for (value of statuses; track value) {
+                <option [value]="value">{{ labels[value] }}</option>
+              }
+            </select>
+            <button class="button-primary" (click)="salvarStatus()" [disabled]="saving()">
+              {{ status() ? 'Atualizar biblioteca' : 'Adicionar à biblioteca' }}
+            </button>
+          </div>
+          @if (libraryError()) {
+            <p class="field-error" role="alert">{{ libraryError() }}</p>
+          }
+        } @else {
+          <p><a routerLink="/login">Entre</a> para adicionar à biblioteca ou avaliar este jogo.</p>
+        }
+      </div>
+    </section>
+
+    <section class="detail-content">
+      <div class="section-heading">
+        <h2 class="section-title">Avaliações da comunidade</h2>
+        <span class="catalog-count">{{ reviews().length }} ENTRADAS</span>
+      </div>
+
+      @if (auth.usuarioAtual) {
+        <div class="panel">
+          <h3>{{ editingReview() ? 'Editar avaliação' : 'Deixe sua avaliação' }}</h3>
+          <label>
+            Nota (0–5 estrelas)
+            <select class="filter-select" [(ngModel)]="nota">
+              @for (value of noteValues; track value) {
+                <option [ngValue]="value">{{ value / 2 }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            Comentário (10–500 caracteres)
+            <textarea
+              class="filter-select"
+              [(ngModel)]="comentario"
+              minlength="10"
+              maxlength="500"
+            ></textarea>
+          </label>
+          <button class="button-primary" (click)="salvarAvaliacao()" [disabled]="saving()">
+            {{ editingReview() ? 'Salvar alterações' : 'Publicar avaliação' }}
+          </button>
+          @if (editingReview()) {
+            <button class="button-secondary" (click)="cancelarEdicao()">Cancelar edição</button>
+          }
+        </div>
+      }
+
+      @if (message()) {
+        <p role="status">{{ message() }}</p>
+      }
+      @for (review of reviews(); track review.id) {
+        <article class="review-row">
+          <div>
+            <strong>{{ usuarioNome(review.usuarioId) }}</strong>
+            <span>{{ review.dataCriacao | date: 'd MMM yyyy' }}</span>
+          </div>
+          <p class="review-text">{{ review.comentario }}</p>
+          <span class="review-score">★ {{ review.notaEmMeiasEstrelas / 2 }}</span>
+          @if (review.usuarioId === auth.usuarioAtual?.id) {
+            <button class="button-secondary" (click)="iniciarEdicao(review)">Editar</button>
+            <button class="button-danger" (click)="excluir(review)">Excluir</button>
+          }
+        </article>
+      }
+      @if (!reviews().length && !reviewsLoading()) {
+        <div class="empty-state">Ainda não há avaliações para este jogo.</div>
+      }
+    </section>
+  </article>
+}

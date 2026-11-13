@@ -1,122 +1,182 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
-import { GameCardComponent } from '../components/game-card';
-import { MockDataService, LibraryStatus } from '../data/mock-data';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import {
+  AvaliacaoResponse,
+  JogoResponse,
+  ListaJogosRequest,
+  ListaJogosResponse,
+  Usuario,
+} from '../../model/api.model';
+import { apiErrorMessage } from '../../services/api-error';
+import { AuthService } from '../../services/auth.service';
+import { AvaliacaoService } from '../../services/avaliacao.service';
+import { JogoService } from '../../services/jogo.service';
+import { ListaJogosService } from '../../services/lista-jogos.service';
+import { UsuarioService } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, GameCardComponent],
-  template: `
-    <div class="page-wrap page-enter">
-      <section class="profile-banner">
-        <img class="profile-avatar" [src]="profile.fotoPerfil" [alt]="'Foto de ' + profile.nome" />
-        <div class="profile-info">
-          <span class="eyebrow">Perfil / membro desde 2024</span>
-          <h1>{{ profile.nome }}</h1>
-          <p>{{ profile.bio }}</p>
-        </div>
-        <div class="profile-stats">
-          <div class="profile-stat"><strong>{{ library().length }}</strong><span>jogos no diário</span></div>
-          <div class="profile-stat"><strong>{{ reviewCount() }}</strong><span>avaliações</span></div>
-          <div class="profile-stat"><strong>{{ totalHours() }}h</strong><span>tempo de jogo</span></div>
-        </div>
-      </section>
-
-      <nav class="profile-tabs" aria-label="Seções do perfil">
-        <button class="profile-tab" [class.active]="tab() === 'library'" (click)="tab.set('library')">Biblioteca</button>
-        <button class="profile-tab" [class.active]="tab() === 'reviews'" (click)="tab.set('reviews')">Avaliações</button>
-        <button class="profile-tab" [class.active]="tab() === 'activity'" (click)="tab.set('activity')">Atividade</button>
-      </nav>
-
-      @if (tab() === 'library') {
-        @for (group of statusGroups; track group.status) {
-          @if (entriesByStatus(group.status).length > 0) {
-            <section class="library-section">
-              <div class="library-section-heading"><h3>{{ group.label }}</h3><span>{{ entriesByStatus(group.status).length }} JOGOS</span></div>
-              <div class="library-row">
-                @for (entry of entriesByStatus(group.status); track entry.jogoId) {
-                  @if (gameFor(entry.jogoId); as game) { <app-game-card [game]="game" [score]="scoreFor(entry)" [status]="entry.status" /> }
-                }
-              </div>
-            </section>
-          }
-        }
-        @if (library().length === 0) { <div class="empty-state">Sua biblioteca está vazia. Encontre algo para jogar no catálogo.</div> }
-      }
-
-      @if (tab() === 'reviews') {
-        <section class="library-section">
-          <div class="library-section-heading"><h3>Seus diários publicados</h3><span>{{ myReviews().length }} AVALIAÇÕES</span></div>
-          @for (review of myReviews(); track review.jogoId) {
-            @if (gameFor(review.jogoId); as game) {
-              <article class="activity-row">
-                <img [src]="game.capa" [alt]="'Capa de ' + game.nome" />
-                <div><strong>{{ game.nome }} <span class="rating-stars">★ {{ review.nota.toFixed(1) }}</span></strong><p>{{ review.texto }}</p></div>
-                <time>{{ review.dataCriacao | date: 'd MMM yyyy' }}</time>
-              </article>
-            }
-          }
-        </section>
-      }
-
-      @if (tab() === 'activity') {
-        <section class="library-section">
-          <div class="library-section-heading"><h3>Atividade recente</h3><span>ÚLTIMOS DIAS</span></div>
-          @for (entry of recentActivity(); track entry.jogoId) {
-            @if (gameFor(entry.jogoId); as game) {
-              <article class="activity-row">
-                <img [src]="game.capa" [alt]="'Capa de ' + game.nome" />
-                <div><strong>{{ game.nome }}</strong><p>{{ statusLabel(entry.status) }} · {{ entry.horasJogadas }} horas registradas</p></div>
-                <time>RECENTE</time>
-              </article>
-            }
-          }
-        </section>
-      }
-    </div>
-  `,
+  imports: [CommonModule, DatePipe, FormsModule],
+  templateUrl: './profile-page.html',
 })
 export class ProfilePage {
-  private readonly data = inject(MockDataService);
-  protected readonly profile = this.data.users[0];
-  protected readonly tab = signal<'library' | 'reviews' | 'activity'>('library');
-  protected readonly library = this.data.library;
-  protected readonly myReviews = computed(() => this.data.reviews.filter((review) => review.usuarioId === this.profile.id));
-  protected readonly reviewCount = computed(() => this.myReviews().length);
-  protected readonly totalHours = computed(() => this.library().reduce((sum, entry) => sum + entry.horasJogadas, 0));
-  protected readonly recentActivity = computed(() => [...this.library()].reverse());
-  protected readonly statusGroups: { status: LibraryStatus; label: string }[] = [
-    { status: 'JOGANDO', label: 'Em andamento' },
-    { status: 'ZERADO', label: 'Zerados' },
-    { status: 'PLATINADO', label: '100% concluído' },
-    { status: 'DESEJO_JOGAR', label: 'Quero jogar' },
-    { status: 'ABANDONADO', label: 'Deixados para depois' },
-  ];
+  readonly auth = inject(AuthService);
+  private readonly avaliacoes = inject(AvaliacaoService);
+  private readonly listaApi = inject(ListaJogosService);
+  private readonly jogoApi = inject(JogoService);
+  private readonly usuarioApi = inject(UsuarioService);
 
-  // Separa os jogos da biblioteca por status para montar as secoes
-  protected entriesByStatus(status: LibraryStatus) {
-    return this.library().filter((entry) => entry.status === status);
+  readonly profile = signal<Usuario | null>(null);
+  readonly reviews = signal<AvaliacaoResponse[]>([]);
+  readonly lists = signal<ListaJogosResponse[]>([]);
+  readonly loading = signal(true);
+  readonly listLoading = signal(true);
+  readonly error = signal('');
+  readonly profileError = signal('');
+  readonly profileSaving = signal(false);
+  readonly profileFormOpen = signal(false);
+  readonly formOpen = signal(false);
+  readonly editing = signal<ListaJogosResponse | null>(null);
+  private readonly games = signal<JogoResponse[]>([]);
+
+  profileFormData = { nome: '', email: '', senha: '', bio: '', fotoPerfil: '' };
+
+  constructor() {
+    const user = this.auth.usuarioAtual;
+    if (!user) return;
+
+    this.usuarioApi.buscar(user.id).subscribe({
+      next: (profile) => {
+        this.profile.set(profile);
+        this.profileFormData = {
+          nome: profile.nome,
+          email: profile.email,
+          senha: '',
+          bio: profile.bio ?? '',
+          fotoPerfil: profile.fotoPerfil ?? '',
+        };
+      },
+      error: (error: unknown) => this.profileError.set(apiErrorMessage(error)),
+    });
+    this.avaliacoes.porUsuario(user.id).subscribe({
+      next: (reviews) => {
+        this.reviews.set(reviews);
+        this.loading.set(false);
+      },
+      error: (error: unknown) => {
+        this.error.set(apiErrorMessage(error));
+        this.loading.set(false);
+      },
+    });
+    this.listaApi.porUsuario(user.id).subscribe({
+      next: (lists) => {
+        this.lists.set(lists);
+        this.listLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.error.set(apiErrorMessage(error));
+        this.listLoading.set(false);
+      },
+    });
+    this.jogoApi.listar().subscribe({
+      next: (games) => this.games.set(games),
+      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+    });
   }
 
-  protected gameFor(gameId: string) {
-    return this.data.games.find((game) => game.id === gameId);
+  jogoNome(id: number): string {
+    return this.games().find((game) => game.id === id)?.nome ?? `Jogo #${id}`;
   }
 
-  protected statusLabel(status: LibraryStatus): string {
-    return this.statusGroups.find((group) => group.status === status)?.label ?? 'Na biblioteca';
-  }
-
-  // Mostra a nota que o usuario deu ou a media geral do jogo
-  protected scoreFor(entry: any): number {
-    if (entry.nota !== null && entry.nota !== undefined && entry.nota > 0) {
-      return entry.nota;
+  salvarPerfil(form: NgForm): void {
+    form.control.markAllAsTouched();
+    const user = this.auth.usuarioAtual;
+    const bio = this.profileFormData.bio.trim();
+    if (!user || form.invalid || (bio.length > 0 && (bio.length < 6 || bio.length > 100))) {
+      this.profileError.set(
+        'Confira os campos: nome mínimo de 5 caracteres, e-mail válido, senha mínima de 6 e bio vazia ou de 6 a 100 caracteres.',
+      );
+      return;
     }
-    const myReview = this.data.reviews.find((r) => r.usuarioId === this.profile.id && r.jogoId === entry.jogoId);
-    if (myReview) {
-      return myReview.nota;
-    }
-    const allReviews = this.data.reviews.filter((r) => r.jogoId === entry.jogoId);
-    return allReviews.length ? allReviews.reduce((sum, r) => sum + r.nota, 0) / allReviews.length : 0;
+
+    this.profileSaving.set(true);
+    this.profileError.set('');
+    const request = {
+      nome: this.profileFormData.nome.trim(),
+      email: this.profileFormData.email.trim(),
+      senha: this.profileFormData.senha,
+      ...(bio ? { bio } : {}),
+      ...(this.profileFormData.fotoPerfil.trim()
+        ? { fotoPerfil: this.profileFormData.fotoPerfil.trim() }
+        : {}),
+    };
+    this.usuarioApi.atualizar(user.id, request).subscribe({
+      next: (profile) => {
+        this.profile.set(profile);
+        this.auth.login({ id: user.id, nome: profile.nome, email: profile.email });
+        this.profileFormData.senha = '';
+        this.profileSaving.set(false);
+        this.profileFormOpen.set(false);
+      },
+      error: (error: unknown) => {
+        this.profileError.set(apiErrorMessage(error));
+        this.profileSaving.set(false);
+      },
+    });
+  }
+
+  editarLista(list: ListaJogosResponse | null = null): void {
+    this.editing.set(list);
+    this.formOpen.set(true);
+  }
+
+  salvarLista(nome: string, publica: boolean, principal: boolean): void {
+    const user = this.auth.usuarioAtual;
+    if (!user || !nome.trim()) return;
+
+    const request: ListaJogosRequest = {
+      nome: nome.trim(),
+      publica,
+      principal,
+      usuarioId: user.id,
+    };
+    const operation = this.editing()
+      ? this.listaApi.atualizar(this.editing()!.id, request)
+      : this.listaApi.criar(request);
+
+    operation.subscribe({
+      next: () => {
+        this.formOpen.set(false);
+        this.loadLists(user.id);
+      },
+      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+    });
+  }
+
+  excluirLista(list: ListaJogosResponse): void {
+    this.listaApi.remover(list.id).subscribe({
+      next: () => this.lists.update((items) => items.filter((item) => item.id !== list.id)),
+      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+    });
+  }
+
+  sair(): void {
+    this.auth.logout();
+    location.assign('/home');
+  }
+
+  private loadLists(userId: number): void {
+    this.listaApi.porUsuario(userId).subscribe({
+      next: (lists) => {
+        this.lists.set(lists);
+        this.listLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.error.set(apiErrorMessage(error));
+        this.listLoading.set(false);
+      },
+    });
   }
 }

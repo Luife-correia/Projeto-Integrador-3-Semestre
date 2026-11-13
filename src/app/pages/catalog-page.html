@@ -1,0 +1,93 @@
+<div class="page-wrap page-enter">
+  <section class="catalog-hero" aria-labelledby="catalog-title">
+    <div class="catalog-hero-copy">
+      <span class="eyebrow">GAMEBOX / CATÁLOGO</span>
+      <h1 id="catalog-title">O que fica depois do jogo?</h1>
+      <p>Descubra novas jornadas, revisite clássicos e acompanhe seus jogos.</p>
+      <div class="hero-actions">
+        <a class="button-primary" routerLink="/home">Explorar catálogo</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Explorar catálogo">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">Sua próxima memória</span>
+        <h2 class="section-title">Explore o catálogo</h2>
+      </div>
+      <span class="catalog-count">{{ filteredGames().length }} RESULTADOS</span>
+    </div>
+
+    <div class="catalog-controls">
+      <label class="search-box">
+        <span class="visually-hidden">Buscar jogos</span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="Buscar jogo pelo nome"
+          [ngModel]="query()"
+          (ngModelChange)="onQueryChange($event)"
+        />
+      </label>
+      <select
+        class="filter-select"
+        aria-label="Filtrar por gênero"
+        [ngModel]="genre()"
+        (ngModelChange)="genre.set($event)"
+      >
+        <option value="">Todos os gêneros</option>
+        @for (item of genres(); track item) {
+          <option [value]="item">{{ item }}</option>
+        }
+      </select>
+      <select
+        class="filter-select"
+        aria-label="Filtrar por plataforma"
+        [ngModel]="platform()"
+        (ngModelChange)="platform.set($event)"
+      >
+        <option value="">Plataformas</option>
+        @for (item of platforms(); track item) {
+          <option [value]="item">{{ item }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="genre-strip" aria-label="Atalhos de gênero">
+      @for (item of genres(); track item) {
+        <button
+          class="genre-pill"
+          type="button"
+          [class.selected]="genre() === item"
+          [attr.aria-pressed]="genre() === item"
+          (click)="toggleGenre(item)"
+        >
+          {{ item }}
+        </button>
+      }
+    </div>
+
+    @if (loading()) {
+      <div class="empty-state" role="status">Carregando catálogo…</div>
+    } @else if (error()) {
+      <div class="empty-state" role="alert">
+        <p>{{ error() }}</p>
+        <button class="button-primary" type="button" (click)="buscar()">Tentar novamente</button>
+      </div>
+    } @else if (filteredGames().length) {
+      <div class="game-grid">
+        @for (game of filteredGames(); track game.id) {
+          <app-game-card [game]="game" [score]="game.notaTotal" />
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <p>Nenhum jogo atende aos filtros selecionados.</p>
+        <button class="button-secondary" type="button" (click)="limparFiltros()">
+          Limpar filtros
+        </button>
+      </div>
+    }
+  </section>
+</div>

@@ -2,155 +2,80 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, combineLatest, concat, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
-import { GameCardComponent } from '../components/game-card';
-import { Game, MockDataService } from '../data/mock-data';
-import { Jogo } from '../../model/jogo.model';
+import { JogoResponse } from '../../model/api.model';
+import { apiErrorMessage } from '../../services/api-error';
 import { JogoService } from '../../services/jogo.service';
-
-type SearchState =
-  | { status: 'loading'; games: Game[] }
-  | { status: 'success'; games: Game[] }
-  | { status: 'error'; games: Game[] };
-
-const initialSearchState: SearchState = { status: 'loading', games: [] };
+import { GameCardComponent } from '../components/game-card';
 
 @Component({
   selector: 'app-catalog-page',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, GameCardComponent],
-  template: `
-    <div class="page-wrap page-enter">
-      <section class="catalog-hero" aria-labelledby="catalog-title">
-        <div class="catalog-hero-copy">
-          <span class="eyebrow">Arquivo 001 / PlayStation 2</span>
-          <h1 id="catalog-title">O que fica depois do jogo?</h1>
-          <p>Um espaço para guardar suas jornadas, revisitar clássicos e descobrir o próximo mundo que vai morar com você.</p>
-          <div class="hero-meta"><span>2000 — 2013</span><span>12 jogos em destaque</span></div>
-          <div class="hero-actions">
-            <a class="button-primary" routerLink="/games/shadow-of-the-colossus">Abrir diário em destaque</a>
-            <span class="text-link">Feito para jogar devagar <span>↗</span></span>
-          </div>
-        </div>
-        <div class="catalog-hero-art" aria-hidden="true">
-          <img src="https://greenhillszone.com/wp-content/uploads/2012/04/shadow-of-the-colossus-box-art-pal.jpg" alt="" />
-          <span class="hero-index">SOTC / 2005 / TEAM ICO</span>
-        </div>
-      </section>
-
-      <section aria-label="Explorar catálogo">
-        <div class="section-heading">
-          <div><span class="eyebrow">Sua próxima memória</span><h2 class="section-title">Explore o catálogo</h2></div>
-          <span class="catalog-count">{{ filteredGames().length }} RESULTADOS</span>
-        </div>
-        <div class="catalog-controls">
-          <label class="search-box"><span class="visually-hidden">Buscar jogos</span><input class="search-input" type="search" placeholder="Buscar jogo pelo nome" [ngModel]="query()" (ngModelChange)="query.set($event)" /></label>
-          <select class="filter-select" aria-label="Filtrar por gênero" [ngModel]="genre()" (ngModelChange)="genre.set($event)">
-            <option value="">Todos os gêneros</option>
-            @for (item of genres(); track item) { <option [value]="item">{{ item }}</option> }
-          </select>
-          <select class="filter-select" aria-label="Filtrar por plataforma" [ngModel]="platform()" (ngModelChange)="platform.set($event)">
-            <option value="">Plataformas</option>
-            @for (item of platforms(); track item) { <option [value]="item">{{ item }}</option> }
-          </select>
-        </div>
-        <div class="genre-strip" aria-label="Atalhos de gênero">
-          @for (item of genres(); track item) {
-            <button class="genre-pill" [class.selected]="genre() === item" (click)="genre.set(genre() === item ? '' : item)">{{ item }}</button>
-          }
-        </div>
-
-        <div class="feature-layout">
-          <div class="game-grid" [attr.aria-busy]="isLoading()">
-            @if (isLoading()) {
-              <div class="empty-state" role="status">Buscando jogos...</div>
-            } @else if (hasSearchError()) {
-              <div class="empty-state" role="alert">
-                <p>Não foi possível carregar o catálogo. Verifique se o servidor está disponível.</p>
-                <button class="button-primary" type="button" (click)="retrySearch()">Tentar novamente</button>
-              </div>
-            } @else {
-              @for (game of filteredGames(); track game.id) { <app-game-card [game]="game" [score]="scoreFor(game.id)" /> }
-              @if (filteredGames().length === 0) { <div class="empty-state">Nenhum jogo encontrado. Tente outro termo ou limpe os filtros.</div> }
-            }
-          </div>
-          <aside class="side-note">
-            <span class="side-note-label">NOTA DE CAMPO / 07</span>
-            <blockquote>“Alguns jogos não acabam quando os créditos sobem. Eles só encontram um lugar novo para existir.”</blockquote>
-            <cite>DO CADERNO DE MARINA</cite>
-          </aside>
-        </div>
-      </section>
-    </div>
-  `,
+  templateUrl: './catalog-page.html',
 })
 export class CatalogPage {
-  private readonly data = inject(MockDataService);
-  private readonly jogoService = inject(JogoService);
-  protected query = signal('');
-  protected genre = signal('');
-  protected platform = signal('');
-  private readonly retryCount = signal(0);
+  private readonly service = inject(JogoService);
 
-  private readonly searchState = toSignal(
-    combineLatest([toObservable(this.query), toObservable(this.retryCount)]).pipe(
-      map(([query, retryCount]) => ({ query: query.trim(), retryCount })),
-      debounceTime(300),
-      distinctUntilChanged(
-        (previous, current) =>
-          previous.query === current.query && previous.retryCount === current.retryCount,
-      ),
-      switchMap(({ query }) =>
-        concat(
-          of<SearchState>({ status: 'loading', games: [] }),
-          this.jogoService.listar(query).pipe(
-            map((jogos) => ({ status: 'success' as const, games: jogos.map((jogo) => this.toGame(jogo)) })),
-            catchError((error: unknown) => {
-              console.error('Falha ao buscar jogos na API.', error);
-              return of<SearchState>({ status: 'error', games: [] });
-            }),
-          ),
-        ),
-      ),
+  readonly jogos = signal<JogoResponse[]>([]);
+  readonly query = signal('');
+  readonly genre = signal('');
+  readonly platform = signal('');
+  readonly loading = signal(true);
+  readonly error = signal('');
+
+  private timer?: ReturnType<typeof setTimeout>;
+
+  readonly genres = computed(() =>
+    [...new Set(this.jogos().flatMap((game) => game.generos))].sort((a, b) => a.localeCompare(b)),
+  );
+  readonly platforms = computed(() =>
+    [...new Set(this.jogos().flatMap((game) => game.plataformas))].sort((a, b) =>
+      a.localeCompare(b),
     ),
-    { initialValue: initialSearchState },
+  );
+  readonly filteredGames = computed(() =>
+    this.jogos().filter(
+      (game) =>
+        (!this.genre() || game.generos.includes(this.genre())) &&
+        (!this.platform() || game.plataformas.includes(this.platform())),
+    ),
   );
 
-  protected readonly isLoading = computed(() => this.searchState().status === 'loading');
-  protected readonly hasSearchError = computed(() => this.searchState().status === 'error');
-  protected readonly genres = computed(() =>
-    [...new Set([...this.data.games, ...this.searchState().games].flatMap((game) => game.generos))].sort(),
-  );
-  protected readonly platforms = computed(() =>
-    [...new Set([...this.data.games, ...this.searchState().games].flatMap((game) => game.plataformas))].sort(),
-  );
-  protected readonly filteredGames = computed(() => {
-    return this.searchState().games.filter((game) =>
-      (!this.genre() || game.generos.includes(this.genre())) &&
-      (!this.platform() || game.plataformas.includes(this.platform())),
-    );
-  });
-
-  protected retrySearch(): void {
-    this.retryCount.update((count) => count + 1);
+  constructor() {
+    this.buscar();
   }
 
-  protected scoreFor(gameId: string): number {
-    const reviews = this.data.reviews.filter((review) => review.jogoId === gameId);
-    return reviews.length ? reviews.reduce((total, review) => total + review.nota, 0) / reviews.length : 4.2;
+  onQueryChange(value: string): void {
+    this.query.set(value);
+    this.buscar();
   }
 
-  private toGame(jogo: Jogo): Game {
-    return {
-      id: String(jogo.id),
-      nome: jogo.nome,
-      capa: jogo.capa,
-      plataformas: jogo.plataformas,
-      generos: jogo.generos,
-      desenvolvedora: jogo.desenvolvedora,
-      dataLancamento: jogo.dataLancamento,
-      sinopse: jogo.sinopse,
-    };
+  buscar(): void {
+    clearTimeout(this.timer);
+    this.loading.set(true);
+    this.error.set('');
+    this.timer = setTimeout(() => {
+      this.service.listar(this.query()).subscribe({
+        next: (games) => {
+          this.jogos.set(games);
+          this.loading.set(false);
+        },
+        error: (error: unknown) => {
+          this.error.set(apiErrorMessage(error));
+          this.loading.set(false);
+        },
+      });
+    }, 250);
+  }
+
+  toggleGenre(value: string): void {
+    this.genre.set(this.genre() === value ? '' : value);
+  }
+
+  limparFiltros(): void {
+    this.genre.set('');
+    this.platform.set('');
+    this.query.set('');
+    this.buscar();
   }
 }

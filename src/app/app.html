@@ -6,15 +6,13 @@
   <nav class="main-nav" aria-label="Navegação principal">
     <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Explorar</a>
     <a routerLink="/profile" routerLinkActive="active">Meu perfil</a>
-    <a routerLink="/admin" routerLinkActive="active">Administração</a>
   </nav>
-  <a class="profile-chip" routerLink="/profile" aria-label="Abrir perfil de Marina Costa">
-    <img
-      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=96&q=80"
-      alt=""
-    />
-    <span>Marina</span>
-  </a>
+  @if (auth.usuarioAtual; as usuario) {
+    <a class="profile-chip" routerLink="/profile"><span>{{ usuario.nome }}</span></a>
+    <button class="button-secondary" type="button" (click)="logout()">Sair</button>
+  } @else {
+    <a class="profile-chip" routerLink="/login"><span>Entrar</span></a>
+  }
 </header>
 <main class="site-main">
   <router-outlet />

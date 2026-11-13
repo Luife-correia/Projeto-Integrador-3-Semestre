@@ -1,0 +1,144 @@
+<div class="page-wrap page-enter">
+  <section class="profile-banner">
+    <div class="profile-info">
+      <span class="eyebrow">Meu perfil</span>
+      <h1>{{ profile()?.nome ?? auth.usuarioAtual?.nome }}</h1>
+      <p>{{ profile()?.email ?? auth.usuarioAtual?.email }}</p>
+    </div>
+    <button
+      class="button-secondary"
+      type="button"
+      (click)="profileFormOpen.set(!profileFormOpen())"
+    >
+      Editar perfil
+    </button>
+    <button class="button-secondary" type="button" (click)="sair()">Sair</button>
+  </section>
+
+  @if (profileFormOpen()) {
+    <form class="panel" #profileForm="ngForm" (ngSubmit)="salvarPerfil(profileForm)">
+      <h2>Editar perfil</h2>
+      <label for="profile-name">Nome</label>
+      <input
+        id="profile-name"
+        name="nome"
+        [(ngModel)]="profileFormData.nome"
+        required
+        minlength="5"
+      />
+      <label for="profile-email">E-mail</label>
+      <input
+        id="profile-email"
+        name="email"
+        type="email"
+        [(ngModel)]="profileFormData.email"
+        required
+        email
+      />
+      <label for="profile-password">Senha</label>
+      <input
+        id="profile-password"
+        name="senha"
+        type="password"
+        [(ngModel)]="profileFormData.senha"
+        required
+        minlength="6"
+        autocomplete="current-password"
+      />
+      <label for="profile-bio">Bio (opcional; de 6 a 100 caracteres se preenchida)</label>
+      <textarea
+        id="profile-bio"
+        name="bio"
+        [(ngModel)]="profileFormData.bio"
+        minlength="6"
+        maxlength="100"
+      ></textarea>
+      <label for="profile-photo">Foto de perfil (opcional)</label>
+      <input id="profile-photo" name="fotoPerfil" [(ngModel)]="profileFormData.fotoPerfil" />
+      @if (profileError()) {
+        <p class="field-error" role="alert">{{ profileError() }}</p>
+      }
+      <button class="button-primary" type="submit" [disabled]="profileSaving()">
+        Salvar perfil
+      </button>
+      <button class="button-secondary" type="button" (click)="profileFormOpen.set(false)">
+        Cancelar
+      </button>
+    </form>
+  }
+
+  <section class="library-section">
+    <div class="library-section-heading"><h3>Minha biblioteca</h3></div>
+    <div class="empty-state">
+      A listagem completa da biblioteca está indisponível no backend. Você pode consultar e
+      atualizar cada jogo na página de detalhes.
+    </div>
+  </section>
+
+  <section class="library-section">
+    <div class="library-section-heading">
+      <h3>Minhas listas</h3>
+      <button class="button-primary" type="button" (click)="editarLista()">Criar lista</button>
+    </div>
+    @if (listLoading()) {
+      <div class="empty-state">Carregando listas…</div>
+    } @else if (lists().length) {
+      @for (list of lists(); track list.id) {
+        <article class="activity-row">
+          <div>
+            <strong>{{ list.nome }}</strong>
+            <p>{{ list.publica ? 'Pública' : 'Privada' }} · {{ list.jogos.length }} jogos</p>
+          </div>
+          <button class="button-secondary" type="button" (click)="editarLista(list)">Editar</button>
+          <button class="button-danger" type="button" (click)="excluirLista(list)">Excluir</button>
+        </article>
+      }
+    } @else {
+      <div class="empty-state">Você ainda não criou listas.</div>
+    }
+    @if (formOpen()) {
+      <form class="panel">
+        <label for="list-name">Nome da lista</label>
+        <input id="list-name" #name [value]="editing()?.nome || ''" required minlength="1" />
+        <label
+          ><input #publica type="checkbox" [checked]="editing()?.publica ?? true" /> Pública</label
+        >
+        <label
+          ><input #principal type="checkbox" [checked]="editing()?.principal ?? false" /> Lista
+          principal</label
+        >
+        <button
+          type="button"
+          class="button-primary"
+          (click)="salvarLista(name.value, publica.checked, principal.checked)"
+        >
+          Salvar
+        </button>
+        <button type="button" class="button-secondary" (click)="formOpen.set(false)">
+          Cancelar
+        </button>
+      </form>
+    }
+  </section>
+
+  <section class="library-section">
+    <div class="library-section-heading"><h3>Minhas avaliações</h3></div>
+    @if (loading()) {
+      <div class="empty-state">Carregando…</div>
+    } @else if (error()) {
+      <div class="empty-state" role="alert">{{ error() }}</div>
+    } @else if (reviews().length) {
+      @for (review of reviews(); track review.id) {
+        <article class="activity-row">
+          <div>
+            <strong>{{ jogoNome(review.jogoId) }} · ★ {{ review.notaEmMeiasEstrelas / 2 }}</strong>
+            <p>{{ review.comentario }}</p>
+          </div>
+          <time>{{ review.dataCriacao | date: 'd MMM yyyy' }}</time>
+        </article>
+      }
+    } @else {
+      <div class="empty-state">Você ainda não publicou avaliações.</div>
+    }
+  </section>
+</div>

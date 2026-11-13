@@ -1,0 +1,7 @@
+<span
+  class="status-badge"
+  [class.playing]="status === 'JOGANDO'"
+  [class.abandoned]="status === 'ABANDONADO'"
+  [class.wishlist]="status === 'QUERO_JOGAR'"
+  >{{ labels[status] }}</span
+>

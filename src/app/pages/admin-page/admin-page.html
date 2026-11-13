@@ -1,155 +1,119 @@
 <div class="page-wrap page-enter">
-
   <div class="section-heading">
     <div>
       <span class="eyebrow">Administração</span>
-      <h1 class="section-title">
-        {{ abaAtiva === 'games' ? 'Gerenciar jogos' : 'Gerenciar usuários' }}
-      </h1>
+      <h1 class="section-title">Painel de gestão</h1>
     </div>
-    <span class="catalog-count">
-      {{ abaAtiva === 'games' ? games.length + ' Jogos cadastrados' : users.length + ' Usuários cadastrados' }}
-    </span>
-    @if (abaAtiva === 'games') {
-      <button type="button" class="button-primary" (click)="abrirNovo()">+ Novo jogo</button>
-    }
   </div>
-
-  <div class="admin-tabs" role="tablist" aria-label="Tipo de conteúdo">
-    <button
-      type="button"
-      id="games-tab"
-      class="admin-tab"
-      [class.active]="abaAtiva === 'games'"
-      [attr.aria-selected]="abaAtiva === 'games'"
-      aria-controls="games-panel"
-      role="tab"
-      (click)="abaAtiva = 'games'"
-    >
-      Jogos
-    </button>
-    <button
-      type="button"
-      id="users-tab"
-      class="admin-tab"
-      [class.active]="abaAtiva === 'users'"
-      [attr.aria-selected]="abaAtiva === 'users'"
-      aria-controls="users-panel"
-      role="tab"
-      (click)="abaAtiva = 'users'"
-    >
+  @if (error()) {
+    <div class="empty-state" role="alert">{{ error() }}</div>
+  }
+  <section class="library-section">
+    <h2>Métricas por status</h2>
+    @if (metricas().length) {
+      @for (m of metricas(); track m.status) {
+        <span class="genre-tag">{{ m.status }}: {{ m.quantidade }}</span>
+      }
+    } @else {
+      <p>{{ loading() ? 'Carregando…' : 'Sem métricas disponíveis.' }}</p>
+    }
+  </section>
+  <div class="admin-tabs">
+    <button class="admin-tab" [class.active]="tab() === 'games'" (click)="tab.set('games')">
+      Jogos</button
+    ><button class="admin-tab" [class.active]="tab() === 'users'" (click)="tab.set('users')">
       Usuários
     </button>
   </div>
-
-  @if (abaAtiva === 'games'){
-    <section id="games-panel" role="tabpanel" aria-labelledby="games-tab">
-      <label class="admin-search" for="game-search">
-        <span class="search-icon" aria-hidden="true"></span>
-        <input
-          id="game-search"
-          type="search"
-          aria-label="Pesquisar jogos"
-          [(ngModel)]="gameBusca"
-          placeholder="Buscar por nome ou desenvolvedora"
-        />
-      </label>
-
-    <div class="admin-table-wrap">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Capa</th>
-          <th>Nome</th>
-          <th class="col-hide-mobile">Desenvolvedora</th>
-          <th>Ano</th>
-          <th class="col-hide-mobile">Plataformas</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (game of gamesFiltrados; track game.id) {
-          <tr>
-            <td><img class="admin-thumb" [src]="game.capa" [alt]="'Capa de ' + game.nome"></td>
-            <td>{{ game.nome }}</td>
-            <td class="col-hide-mobile">{{game.desenvolvedora}}</td>
-            <td>{{ game.dataLancamento.slice(0, 4) }}</td>
-            <td class="col-hide-mobile">{{game.plataformas.join(', ')}}</td>
-            <td>
-              <div class="admin-actions">
-                <button type="button" class="button-secondary" (click)="abrirEdicao(game)">Editar</button>
-                <button type="button" class="button-danger" (click)="excluirGame(game)">Excluir</button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="6">Nenhum jogo encontrado</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-    </div>
+  @if (tab() === 'games') {
+    <section>
+      <button class="button-primary" (click)="novo()">+ Novo jogo</button>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Desenvolvedora</th>
+              <th>Data</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (g of jogos(); track g.id) {
+              <tr>
+                <td>{{ g.nome }}</td>
+                <td>{{ g.desenvolvedora }}</td>
+                <td>{{ g.dataLancamento }}</td>
+                <td>
+                  <button class="button-secondary" (click)="editar(g)">Editar</button>
+                  <button class="button-danger" (click)="excluirJogo(g)">Excluir</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4">{{ loading() ? 'Carregando…' : 'Nenhum jogo cadastrado.' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
-  }@else {
-    <section id="users-panel" role="tabpanel" aria-labelledby="users-tab">
-      <label class="admin-search" for="user-search">
-        <span class="search-icon" aria-hidden="true"></span>
-        <input
-          id="user-search"
-          type="search"
-          aria-label="Pesquisar usuários"
-          [(ngModel)]="userBusca"
-          placeholder="Buscar por nome ou e-mail"
-        />
-      </label>
-
-    <div class="admin-table-wrap">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Acesso</th>
-          <th>Estado</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-        @for(user of usersFiltrados; track user.id){
+    @if (formOpen()) {
+      <form class="panel" (ngSubmit)="salvarJogo()">
+        <h3>{{ editId() ? 'Editar' : 'Novo' }} jogo</h3>
+        <label>Nome<input [(ngModel)]="form.nome" name="nome" required /></label
+        ><label>Capa (URL)<input [(ngModel)]="form.capa" name="capa" required /></label
+        ><label>Desenvolvedora<input [(ngModel)]="form.desenvolvedora" name="dev" required /></label
+        ><label
+          >Data de lançamento<input
+            type="date"
+            [(ngModel)]="form.dataLancamento"
+            name="data"
+            required /></label
+        ><label
+          >Plataformas (separadas por vírgula)<input
+            [(ngModel)]="plataformas"
+            name="platforms"
+            required /></label
+        ><label
+          >Gêneros (separados por vírgula)<input
+            [(ngModel)]="generos"
+            name="genres"
+            required /></label
+        ><label
+          >Sinopse<textarea [(ngModel)]="form.sinopse" name="sinopse" required></textarea></label
+        ><button class="button-primary">Salvar</button>
+        <button type="button" class="button-secondary" (click)="formOpen.set(false)">
+          Cancelar
+        </button>
+      </form>
+    }
+  } @else {
+    <section class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <td>{{user.nome}}</td>
-            <td>{{user.email}}</td>
-            <td>{{user.role === 'ADMIN' ? 'Administrador' : 'Usuário'}}</td>
-            <td>{{user.ativo ? 'Ativa' : 'Desativada'}}</td>
-            <td>
-              <!--botao para mudar a role de usuario para administrador-->
-            </td>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Cadastro</th>
+            <th>Ações</th>
           </tr>
-        } @empty {
-          <tr>
-            <td colspan="5" class="empty-row">Nenhum usuário encontrado</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-    </div>
+        </thead>
+        <tbody>
+          @for (u of usuarios(); track u.id) {
+            <tr>
+              <td>{{ u.nome }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.dataCriacao || '—' }}</td>
+              <td><button class="button-danger" (click)="excluirUsuario(u)">Excluir</button></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">{{ loading() ? 'Carregando…' : 'Nenhum usuário.' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </section>
   }
 </div>
-
-@if (modalAberto) {
-  <app-game-modal
-    [game]="gameEditando"
-    (save)="salvarGame($event)"
-    (closed)="fecharModal()" />
-}
-
-@if (gameExcluindo; as game) {
-  <app-confirm-modal
-    title="Excluir jogo"
-    [message]="'Tem certeza que deseja excluir ' + game.nome + '?'"
-    (confirmed)="excluirConfimarcao()"
-    (canceled)="excluirCancelar()" />
-}

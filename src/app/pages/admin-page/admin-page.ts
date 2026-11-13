@@ -1,116 +1,133 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfirmModal} from '../../components/confirm-modal/confirm-modal';
-import { GameModal } from '../../components/game-modal/game-modal';
-import { Game, MockDataService, User } from '../../data/mock-data';
+import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-
-export type AdminTab = 'games' | 'users';
-
-
+import { JogoService } from '../../../services/jogo.service';
+import { UsuarioService } from '../../../services/usuario.service';
+import { MetricasService } from '../../../services/metricas.service';
+import {
+  JogoRequest,
+  JogoResponse,
+  Usuario,
+  MetricaStatusResponse,
+} from '../../../model/api.model';
+import { apiErrorMessage } from '../../../services/api-error';
 @Component({
   selector: 'app-admin-page',
   standalone: true,
-  templateUrl: './admin-page.html',
+  imports: [CommonModule, FormsModule],
   styleUrl: './admin-page.css',
-  imports: [GameModal, ConfirmModal, FormsModule],
+  templateUrl: './admin-page.html',
 })
-
-
-
 export class AdminPage {
-
-    public games : Game[] = [];
-    public users : User[] = [];
-
-    abaAtiva: AdminTab = 'games';
-    gameBusca = '';
-    userBusca = '';
-
-    
-    //retorna uma outra lista filtrada para games e users
-    get gamesFiltrados() : Game[]{
-        const termo = this.gameBusca.trim().toLocaleLowerCase();
-
-        return this.games.filter((game) => 
-            `${game.nome} ${game.desenvolvedora}`.toLocaleLowerCase().includes(termo));
+  private jogoApi = inject(JogoService);
+  private userApi = inject(UsuarioService);
+  private metricApi = inject(MetricasService);
+  tab = signal<'games' | 'users'>('games');
+  jogos = signal<JogoResponse[]>([]);
+  usuarios = signal<Usuario[]>([]);
+  metricas = signal<MetricaStatusResponse[]>([]);
+  loading = signal(true);
+  error = signal('');
+  formOpen = signal(false);
+  editId = signal<number | null>(null);
+  form: JogoRequest = this.blank();
+  plataformas = '';
+  generos = '';
+  constructor() {
+    this.load();
+  }
+  private load() {
+    this.loading.set(true);
+    this.jogoApi.listar().subscribe({
+      next: (x) => this.jogos.set(x),
+      error: (e) => this.error.set(apiErrorMessage(e)),
+    });
+    this.userApi.listar().subscribe({
+      next: (x) => this.usuarios.set(x),
+      error: (e) => this.error.set(apiErrorMessage(e)),
+    });
+    this.metricApi.listar().subscribe({
+      next: (x) => {
+        this.metricas.set(x);
+        this.loading.set(false);
+      },
+      error: (e) => {
+        this.error.set(apiErrorMessage(e));
+        this.loading.set(false);
+      },
+    });
+  }
+  private blank(): JogoRequest {
+    return {
+      nome: '',
+      capa: '',
+      plataformas: [],
+      generos: [],
+      desenvolvedora: '',
+      dataLancamento: '',
+      sinopse: '',
+    };
+  }
+  novo() {
+    this.form = this.blank();
+    this.plataformas = '';
+    this.generos = '';
+    this.editId.set(null);
+    this.formOpen.set(true);
+  }
+  editar(g: JogoResponse) {
+    this.form = {
+      nome: g.nome,
+      capa: g.capa,
+      plataformas: g.plataformas,
+      generos: g.generos,
+      desenvolvedora: g.desenvolvedora,
+      dataLancamento: g.dataLancamento,
+      sinopse: g.sinopse,
+    };
+    this.plataformas = g.plataformas.join(', ');
+    this.generos = g.generos.join(', ');
+    this.editId.set(g.id);
+    this.formOpen.set(true);
+  }
+  salvarJogo() {
+    const r = {
+      ...this.form,
+      plataformas: this.plataformas
+        .split(',')
+        .map((x) => x.trim())
+        .filter(Boolean),
+      generos: this.generos
+        .split(',')
+        .map((x) => x.trim())
+        .filter(Boolean),
+    };
+    if (!r.plataformas.length || !r.generos.length) {
+      this.error.set('Informe ao menos uma plataforma e um gênero.');
+      return;
     }
-
-    get usersFiltrados() : User[] {
-        const termo = this.userBusca.trim().toLocaleLowerCase();
-
-        return this.users.filter((user) =>
-        `${user.nome} ${user.email}`.toLocaleLowerCase().includes(termo));
-    }
-
-    public modalAberto : boolean = false;
-    public gameEditando : Game | null = null;
-
-    public gameExcluindo : Game | null = null;
-
-    private mockService : MockDataService;
-
-    constructor(mockService : MockDataService) {
-        this.mockService = mockService;
-    }
-
-    ngOnInit() : void {
-        this.games = [...this.mockService.games];
-        this.users = [...this.mockService.users];
-    }
-
-    abrirNovo() : void {
-        this.gameEditando = null;
-        this.modalAberto = true;
-    }
-
-    abrirEdicao(game : Game) : void {
-        this.gameEditando = game;
-        this.modalAberto = true;
-    }
-
-    fecharModal() : void {
-        this.modalAberto = false;
-        this.gameEditando = null;
-    }
-
-    // Salva o jogo cadastrado ou atualiza se for uma edicao
-    salvarGame(jogo : Game) : void {
-        const index = this.games.findIndex(g => g.id === jogo.id);
-        if (index >= 0) {
-            this.games[index] = jogo;
-            const mockIndex = this.mockService.games.findIndex(g => g.id === jogo.id);
-            if (mockIndex >= 0) {
-                this.mockService.games[mockIndex] = jogo;
-            }
-        } else {
-            // Se for jogo novo, insere no inicio da lista
-            this.games.unshift(jogo);
-            this.mockService.games.unshift(jogo);
-        }
-        this.mockService.salvarJogos();
-        this.modalAberto = false;
-        this.gameEditando = null;
-    }
-
-    excluirGame(game : Game) : void {
-        this.gameExcluindo = game;
-    }
-
-    excluirConfimarcao() : void {
-        if (this.gameExcluindo) {
-            const idExcluir = this.gameExcluindo.id;
-            this.games = this.games.filter(g => g.id !== idExcluir);
-            const mockIndex = this.mockService.games.findIndex(g => g.id === idExcluir);
-            if (mockIndex >= 0) {
-                this.mockService.games.splice(mockIndex, 1);
-                this.mockService.salvarJogos();
-            }
-        }
-        this.gameExcluindo = null;
-    }
-
-    excluirCancelar() : void {
-        this.gameExcluindo = null;
-    }
+    const req = this.editId() ? this.jogoApi.atualizar(this.editId()!, r) : this.jogoApi.criar(r);
+    req.subscribe({
+      next: (g) => {
+        this.jogos.update((a) =>
+          this.editId() ? a.map((x) => (x.id === g.id ? g : x)) : [g, ...a],
+        );
+        this.formOpen.set(false);
+        this.error.set('');
+      },
+      error: (e) => this.error.set(apiErrorMessage(e)),
+    });
+  }
+  excluirJogo(g: JogoResponse) {
+    this.jogoApi.remover(g.id).subscribe({
+      next: () => this.jogos.update((a) => a.filter((x) => x.id !== g.id)),
+      error: (e) => this.error.set(apiErrorMessage(e)),
+    });
+  }
+  excluirUsuario(u: Usuario) {
+    this.userApi.remover(u.id).subscribe({
+      next: () => this.usuarios.update((a) => a.filter((x) => x.id !== u.id)),
+      error: (e) => this.error.set(apiErrorMessage(e)),
+    });
+  }
 }
