@@ -2,6 +2,7 @@ package com.gamebox.app.Controller;
 
 import com.gamebox.app.Domain.UsuarioJogo;
 import com.gamebox.app.Dto.request.StatusUsuarioJogoRequest;
+import com.gamebox.app.Dto.response.BibliotecaJogoResponse;
 import com.gamebox.app.Dto.response.UsuarioJogoResponse;
 import com.gamebox.app.Service.UsuarioJogoService;
 import jakarta.validation.Valid;
@@ -9,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/usuarios/{usuarioId}/jogos/{jogoId}")
+@RequestMapping("/usuarios/{usuarioId}/jogos")
 public class UsuarioJogoController {
 
     private final UsuarioJogoService usuarioJogoService;
@@ -19,8 +22,19 @@ public class UsuarioJogoController {
         this.usuarioJogoService = usuarioJogoService;
     }
 
+    // Lista os jogos com status diferente de NAO_JOGADO e já retorna
+    // capa, nome, desenvolvedora, nota e status para o frontend.
+    @GetMapping
+    public ResponseEntity<List<BibliotecaJogoResponse>> listarBiblioteca(
+            @PathVariable Long usuarioId
+    ) {
+        return ResponseEntity.ok(
+                usuarioJogoService.listarBibliotecaResposta(usuarioId)
+        );
+    }
+
     // Adiciona o jogo à biblioteca do usuário.
-    @PostMapping
+    @PostMapping("/{jogoId}")
     public ResponseEntity<UsuarioJogoResponse> criar(
             @PathVariable Long usuarioId,
             @PathVariable Long jogoId
@@ -33,7 +47,7 @@ public class UsuarioJogoController {
     }
 
     // Busca o jogo na biblioteca do usuário.
-    @GetMapping
+    @GetMapping("/{jogoId}")
     public ResponseEntity<UsuarioJogoResponse> buscar(
             @PathVariable Long usuarioId,
             @PathVariable Long jogoId
@@ -44,7 +58,7 @@ public class UsuarioJogoController {
     }
 
     // Atualiza o status do jogo para este usuário.
-    @PatchMapping("/status")
+    @PatchMapping("/{jogoId}/status")
     public ResponseEntity<UsuarioJogoResponse> atualizarStatus(
             @PathVariable Long usuarioId,
             @PathVariable Long jogoId,

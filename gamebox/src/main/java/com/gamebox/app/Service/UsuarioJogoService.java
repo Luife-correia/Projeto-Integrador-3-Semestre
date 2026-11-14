@@ -3,6 +3,7 @@ package com.gamebox.app.Service;
 import com.gamebox.app.Domain.Jogo;
 import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Domain.UsuarioJogo;
+import com.gamebox.app.Dto.response.BibliotecaJogoResponse;
 import com.gamebox.app.Enum.StatusJogos;
 import com.gamebox.app.Exception.RecursoNaoEncontradoException;
 import com.gamebox.app.Exception.RegraNegocioException;
@@ -111,6 +112,22 @@ public class UsuarioJogoService {
                 usuarioId,
                 StatusJogos.NAO_JOGADO
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<BibliotecaJogoResponse> listarBibliotecaResposta(Long usuarioId) {
+        // Converte o vínculo usuário-jogo em uma resposta com os dados
+        // necessários para renderizar cada item da biblioteca no frontend.
+        return listarBiblioteca(usuarioId).stream()
+                .map(usuarioJogo -> new BibliotecaJogoResponse(
+                        usuarioJogo.getJogo().getId(),
+                        usuarioJogo.getJogo().getCapa(),
+                        usuarioJogo.getJogo().getNome(),
+                        usuarioJogo.getJogo().getDesenvolvedora(),
+                        usuarioJogo.getJogo().getNotaTotal(),
+                        usuarioJogo.getStatus()
+                ))
+                .toList();
     }
 
     private Usuario buscarUsuario(Long usuarioId) {
