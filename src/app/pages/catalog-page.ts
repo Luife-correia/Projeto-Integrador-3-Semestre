@@ -15,6 +15,44 @@ import { GameCardComponent } from '../components/game-card';
 })
 export class CatalogPage {
   private readonly service = inject(JogoService);
+  private readonly traducaoGeneros: Record<string, string> = {
+    action: 'Ação',
+    adventure: 'Aventura',
+    'action-adventure': 'Ação e aventura',
+    'action adventure': 'Ação e aventura',
+    'role-playing': 'RPG',
+    'role playing': 'RPG',
+    rpg: 'RPG',
+    strategy: 'Estratégia',
+    simulation: 'Simulação',
+    sports: 'Esportes',
+    sport: 'Esporte',
+    racing: 'Corrida',
+    driving: 'Corrida',
+    fighting: 'Luta',
+    shooter: 'Tiro',
+    'first-person shooter': 'Tiro em primeira pessoa',
+    'third-person shooter': 'Tiro em terceira pessoa',
+    platformer: 'Plataforma',
+    puzzle: 'Quebra-cabeça',
+    horror: 'Terror',
+    'survival horror': 'Terror de sobrevivência',
+    'hack and slash': 'Ação e combate',
+    music: 'Música',
+    mystery: 'Mistério',
+    stealth: 'Furtividade',
+    'visual novel': 'Romance visual',
+    'battle royale': 'Battle royale',
+    'open world': 'Mundo aberto',
+    sandbox: 'Mundo aberto',
+    educational: 'Educativo',
+    arcade: 'Fliperama',
+    casual: 'Casual',
+    indie: 'Independente',
+    'card game': 'Jogo de cartas',
+    'board game': 'Jogo de tabuleiro',
+    mmorpg: 'MMORPG',
+  };
 
   readonly jogos = signal<JogoResponse[]>([]);
   readonly query = signal('');
@@ -26,7 +64,9 @@ export class CatalogPage {
   private timer?: ReturnType<typeof setTimeout>;
 
   readonly genres = computed(() =>
-    [...new Set(this.jogos().flatMap((game) => game.generos))].sort((a, b) => a.localeCompare(b)),
+    [...new Set(this.jogos().flatMap((game) => game.generos))].sort((a, b) =>
+      this.nomeGenero(a).localeCompare(this.nomeGenero(b), 'pt-BR'),
+    ),
   );
   readonly platforms = computed(() =>
     [...new Set(this.jogos().flatMap((game) => game.plataformas))].sort((a, b) =>
@@ -43,6 +83,10 @@ export class CatalogPage {
 
   constructor() {
     this.buscar();
+  }
+
+  nomeGenero(genero: string): string {
+    return this.traducaoGeneros[genero.trim().toLocaleLowerCase('pt-BR')] ?? genero;
   }
 
   onQueryChange(value: string): void {

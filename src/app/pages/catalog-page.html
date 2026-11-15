@@ -38,7 +38,7 @@
       >
         <option value="">Todos os gêneros</option>
         @for (item of genres(); track item) {
-          <option [value]="item">{{ item }}</option>
+          <option [value]="item">{{ nomeGenero(item) }}</option>
         }
       </select>
       <select
@@ -63,7 +63,7 @@
           [attr.aria-pressed]="genre() === item"
           (click)="toggleGenre(item)"
         >
-          {{ item }}
+          {{ nomeGenero(item) }}
         </button>
       }
     </div>

@@ -95,22 +95,32 @@ export class GameDetailPage {
 
     this.saving.set(true);
     this.libraryError.set('');
-    const request = this.status()
-      ? this.biblioteca.atualizarStatus(user.id, this.id, this.selectedStatus)
-      : this.biblioteca.adicionar(user.id, this.id);
+    const salvarOuAtualizar = () => {
+      this.biblioteca.atualizarStatus(user.id, this.id, this.selectedStatus).subscribe({
+        next: (entry) => {
+          this.status.set(entry.status);
+          this.selectedStatus = entry.status;
+          this.saving.set(false);
+          this.message.set('Biblioteca atualizada.');
+        },
+        error: (error: unknown) => {
+          this.saving.set(false);
+          this.message.set(apiErrorMessage(error));
+        },
+      });
+    };
 
-    request.subscribe({
-      next: (entry) => {
-        this.status.set(entry.status);
-        this.selectedStatus = entry.status;
-        this.saving.set(false);
-        this.message.set('Biblioteca atualizada.');
-      },
-      error: (error: unknown) => {
-        this.saving.set(false);
-        this.message.set(apiErrorMessage(error));
-      },
-    });
+    if (!this.status()) {
+      this.biblioteca.adicionar(user.id, this.id).subscribe({
+        next: () => salvarOuAtualizar(),
+        error: (error: unknown) => {
+          this.saving.set(false);
+          this.message.set(apiErrorMessage(error));
+        },
+      });
+    } else {
+      salvarOuAtualizar();
+    }
   }
 
   salvarAvaliacao(): void {

@@ -79,3 +79,12 @@ export interface MetricaStatusResponse {
   status: StatusJogos;
   quantidade: number;
 }
+
+export interface BibliotecaJogoResponse {
+  jogoId: number;
+  desenvolvedora: string;
+  status: StatusJogos;
+  capa: string;
+  nome: string;
+  notaTotal: number;
+}

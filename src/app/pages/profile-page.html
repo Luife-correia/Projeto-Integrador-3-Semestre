@@ -68,33 +68,142 @@
   }
 
   <section class="library-section">
-    <div class="library-section-heading"><h3>Minha biblioteca</h3></div>
-    <div class="empty-state">
-      A listagem completa da biblioteca está indisponível no backend. Você pode consultar e
-      atualizar cada jogo na página de detalhes.
+    <div class="library-section-heading">
+      <h2>Minha biblioteca</h2>
+      <span>{{ library().length }} {{ library().length === 1 ? 'JOGO NO DIÁRIO' : 'JOGOS NO DIÁRIO' }}</span>
     </div>
+    @if (libraryLoading()) {
+      <div class="empty-state">Carregando biblioteca…</div>
+    } @else if (library().length) {
+      @for (group of statusGroups; track group.status) {
+        @if (entriesByStatus(group.status).length > 0) {
+          <div class="library-section" style="padding-top: 15px;">
+            <div class="library-section-heading">
+              <h3>{{ group.label }}</h3>
+              <span>{{ entriesByStatus(group.status).length }} {{ entriesByStatus(group.status).length === 1 ? 'JOGO' : 'JOGOS' }}</span>
+            </div>
+            <div class="game-grid">
+              @for (item of entriesByStatus(group.status); track item.jogoId) {
+                <article class="game-card">
+                  <a class="cover-link" [routerLink]="['/games', item.jogoId]" [attr.aria-label]="'Ver ' + item.nome">
+                    <img [src]="item.capa" [alt]="'Capa de ' + item.nome" loading="lazy" />
+                    <span class="cover-score"><app-rating [value]="item.notaTotal" /></span>
+                  </a>
+                  <h3 class="game-card-title">
+                    <a [routerLink]="['/games', item.jogoId]">{{ item.nome }}</a>
+                  </h3>
+                  <div class="game-card-meta">
+                    {{ item.desenvolvedora }}
+                    <span> · </span><app-status-badge [status]="item.status" />
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        }
+      }
+    } @else {
+      <div class="empty-state">
+        Sua biblioteca ainda não tem jogos. Acesse o catálogo para adicionar!
+      </div>
+    }
   </section>
 
   <section class="library-section">
     <div class="library-section-heading">
-      <h3>Minhas listas</h3>
-      <button class="button-primary" type="button" (click)="editarLista()">Criar lista</button>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <h3>Listas</h3>
+        <button
+          class="button-secondary"
+          type="button"
+          [style.opacity]="listTab() === 'my' ? '1' : '0.6'"
+          (click)="listTab.set('my')"
+        >
+          Minhas listas
+        </button>
+        <button
+          class="button-secondary"
+          type="button"
+          [style.opacity]="listTab() === 'all' ? '1' : '0.6'"
+          (click)="carregarListasPublicas()"
+        >
+          Comunidade
+        </button>
+      </div>
+      @if (listTab() === 'my') {
+        <button class="button-primary" type="button" (click)="editarLista()">Criar lista</button>
+      }
     </div>
-    @if (listLoading()) {
-      <div class="empty-state">Carregando listas…</div>
-    } @else if (lists().length) {
-      @for (list of lists(); track list.id) {
-        <article class="activity-row">
-          <div>
-            <strong>{{ list.nome }}</strong>
-            <p>{{ list.publica ? 'Pública' : 'Privada' }} · {{ list.jogos.length }} jogos</p>
-          </div>
-          <button class="button-secondary" type="button" (click)="editarLista(list)">Editar</button>
-          <button class="button-danger" type="button" (click)="excluirLista(list)">Excluir</button>
-        </article>
+    @if (listTab() === 'my') {
+      @if (listLoading()) {
+        <div class="empty-state">Carregando listas…</div>
+      } @else if (lists().length) {
+        @for (list of lists(); track list.id) {
+          <article class="activity-row">
+            <div>
+              <strong>{{ list.nome }}</strong>
+              <p>{{ list.publica ? 'Pública' : 'Privada' }} · {{ list.jogos.length }} jogos</p>
+            </div>
+            <button class="button-secondary" type="button" (click)="verDetalhesLista(list)">
+              {{ selectedList()?.id === list.id ? 'Fechar' : 'Ver jogos' }}
+            </button>
+            <button class="button-secondary" type="button" (click)="editarLista(list)">Editar</button>
+            <button class="button-danger" type="button" (click)="excluirLista(list)">Excluir</button>
+          </article>
+          @if (selectedList()?.id === list.id) {
+            <div class="panel" style="margin: 8px 0 16px;">
+              <h4>Jogos em "{{ selectedList()!.nome }}"</h4>
+              @if (selectedList()!.jogos.length) {
+                <div class="library-row" style="margin-top: 12px;">
+                  @for (game of selectedList()!.jogos; track game.id) {
+                    <a class="cover-link" [routerLink]="['/jogos', game.id]" [title]="game.nome">
+                      <img [src]="game.capa" [alt]="game.nome" loading="lazy" />
+                    </a>
+                  }
+                </div>
+              } @else {
+                <p class="field-error" style="color: var(--muted); margin-top: 8px;">Nenhum jogo adicionado nesta lista ainda.</p>
+              }
+            </div>
+          }
+        }
+      } @else {
+        <div class="empty-state">Você ainda não criou listas.</div>
       }
     } @else {
-      <div class="empty-state">Você ainda não criou listas.</div>
+      @if (publicListLoading()) {
+        <div class="empty-state">Carregando listas da comunidade…</div>
+      } @else if (publicLists().length) {
+        @for (list of publicLists(); track list.id) {
+          <article class="activity-row">
+            <div>
+              <strong>{{ list.nome }}</strong>
+              <p>Criada por {{ list.usuarioNome }} · {{ list.jogos.length }} jogos</p>
+            </div>
+            <button class="button-secondary" type="button" (click)="verDetalhesLista(list)">
+              {{ selectedList()?.id === list.id ? 'Fechar' : 'Ver jogos' }}
+            </button>
+          </article>
+          @if (selectedList()?.id === list.id) {
+            <div class="panel" style="margin: 8px 0 16px;">
+              <h4>Jogos em "{{ selectedList()!.nome }}"</h4>
+              @if (selectedList()!.jogos.length) {
+                <div class="library-row" style="margin-top: 12px;">
+                  @for (game of selectedList()!.jogos; track game.id) {
+                    <a class="cover-link" [routerLink]="['/jogos', game.id]" [title]="game.nome">
+                      <img [src]="game.capa" [alt]="game.nome" loading="lazy" />
+                    </a>
+                  }
+                </div>
+              } @else {
+                <p class="field-error" style="color: var(--muted); margin-top: 8px;">Nenhum jogo adicionado nesta lista ainda.</p>
+              }
+            </div>
+          }
+        }
+      } @else {
+        <div class="empty-state">Nenhuma lista encontrada na comunidade.</div>
+      }
     }
     @if (formOpen()) {
       <form class="panel">
@@ -129,7 +238,8 @@
       <div class="empty-state" role="alert">{{ error() }}</div>
     } @else if (reviews().length) {
       @for (review of reviews(); track review.id) {
-        <article class="activity-row">
+        <article class="activity-row"> 
+          <img [src]="jogoCapa(review.jogoId)" [alt]="jogoNome(review.jogoId)" />
           <div>
             <strong>{{ jogoNome(review.jogoId) }} · ★ {{ review.notaEmMeiasEstrelas / 2 }}</strong>
             <p>{{ review.comentario }}</p>

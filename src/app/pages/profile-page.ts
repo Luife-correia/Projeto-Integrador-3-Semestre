@@ -1,8 +1,11 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { StatusJogos } from '../../model/api.model';
 import {
   AvaliacaoResponse,
+  BibliotecaJogoResponse,
   JogoResponse,
   ListaJogosRequest,
   ListaJogosResponse,
@@ -11,14 +14,17 @@ import {
 import { apiErrorMessage } from '../../services/api-error';
 import { AuthService } from '../../services/auth.service';
 import { AvaliacaoService } from '../../services/avaliacao.service';
+import { BibliotecaService } from '../../services/biblioteca.service';  
 import { JogoService } from '../../services/jogo.service';
 import { ListaJogosService } from '../../services/lista-jogos.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { RatingComponent } from '../components/rating';
+import { StatusBadgeComponent } from '../components/status-badge';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule],
+  imports: [CommonModule, DatePipe, FormsModule, RouterLink, RatingComponent, StatusBadgeComponent], 
   templateUrl: './profile-page.html',
 })
 export class ProfilePage {
@@ -27,8 +33,23 @@ export class ProfilePage {
   private readonly listaApi = inject(ListaJogosService);
   private readonly jogoApi = inject(JogoService);
   private readonly usuarioApi = inject(UsuarioService);
+  private readonly bibliotecaApi = inject(BibliotecaService);
+
+  readonly statusGroups: { status: StatusJogos; label: string }[] = [
+    { status: 'JOGANDO', label: 'Em andamento' },
+    { status: 'ZERADO', label: 'Zerados' },
+    { status: 'PLATINADO', label: 'Platinados' },
+    { status: 'QUERO_JOGAR', label: 'Quero jogar' },
+    { status: 'ABANDONADO', label: 'Deixados para depois' },
+  ];
 
   readonly profile = signal<Usuario | null>(null);
+  readonly library = signal<BibliotecaJogoResponse[]>([]);
+  readonly libraryLoading = signal(true);
+  readonly publicLists = signal<ListaJogosResponse[]>([]);
+  readonly publicListLoading = signal(false);
+  readonly selectedList = signal<ListaJogosResponse | null>(null);
+  readonly listTab = signal<'my' | 'all'>('my');
   readonly reviews = signal<AvaliacaoResponse[]>([]);
   readonly lists = signal<ListaJogosResponse[]>([]);
   readonly loading = signal(true);
@@ -46,6 +67,14 @@ export class ProfilePage {
   constructor() {
     const user = this.auth.usuarioAtual;
     if (!user) return;
+
+    this.bibliotecaApi.listarBiblioteca(user.id).subscribe({
+      next: (library) => {
+        this.library.set(library);
+        this.libraryLoading.set(false);
+      },
+      error: () => this.libraryLoading.set(false),
+    });
 
     this.usuarioApi.buscar(user.id).subscribe({
       next: (profile) => {
@@ -88,6 +117,14 @@ export class ProfilePage {
 
   jogoNome(id: number): string {
     return this.games().find((game) => game.id === id)?.nome ?? `Jogo #${id}`;
+  }
+
+  jogoCapa(id: number): string {
+    return this.games().find((game) => game.id === id)?.capa ?? '';
+  }
+
+  entriesByStatus(status: StatusJogos): BibliotecaJogoResponse[] {
+    return this.library().filter((item) => item.status === status);
   }
 
   salvarPerfil(form: NgForm): void {
@@ -151,6 +188,33 @@ export class ProfilePage {
         this.formOpen.set(false);
         this.loadLists(user.id);
       },
+      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+    });
+  }
+
+  carregarListasPublicas(): void {
+    this.listTab.set('all');
+    if (this.publicLists().length) return;
+    this.publicListLoading.set(true);
+    this.listaApi.listar().subscribe({
+      next: (lists) => {
+        this.publicLists.set(lists);
+        this.publicListLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.error.set(apiErrorMessage(error));
+        this.publicListLoading.set(false);
+      },
+    });
+  }
+
+  verDetalhesLista(list: ListaJogosResponse): void {
+    if (this.selectedList()?.id === list.id) {
+      this.selectedList.set(null);
+      return;
+    }
+    this.listaApi.buscar(list.id).subscribe({
+      next: (detalhes) => this.selectedList.set(detalhes),
       error: (error: unknown) => this.error.set(apiErrorMessage(error)),
     });
   }

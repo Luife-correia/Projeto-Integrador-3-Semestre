@@ -2,12 +2,16 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environments';
-import { StatusJogos, UsuarioJogoResponse } from '../model/api.model';
+import { StatusJogos, UsuarioJogoResponse, BibliotecaJogoResponse} from '../model/api.model';
 
 @Injectable({ providedIn: 'root' })
 export class BibliotecaService {
   private readonly http = inject(HttpClient);
   private readonly url = environment.apiUrl;
+
+  listarBiblioteca(usuarioId: number): Observable<BibliotecaJogoResponse[]> {
+    return this.http.get<BibliotecaJogoResponse[]>(`${this.url}/usuarios/${usuarioId}/jogos`);
+  }
 
   buscar(usuarioId: number, jogoId: number): Observable<UsuarioJogoResponse> {
     return this.http.get<UsuarioJogoResponse>(`${this.url}/usuarios/${usuarioId}/jogos/${jogoId}`);
@@ -31,3 +35,4 @@ export class BibliotecaService {
     );
   }
 }
+
