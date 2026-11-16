@@ -1,5 +1,6 @@
 package com.gamebox.app.Service;
 
+import com.gamebox.app.Domain.Jogo;
 import com.gamebox.app.Domain.ListaJogos;
 import com.gamebox.app.Domain.Usuario;
 import com.gamebox.app.Dto.request.ListaJogosRequest;
@@ -11,6 +12,7 @@ import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,55 +26,36 @@ public class ListaJogosService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Busca a entidade da lista e informa 404 quando ela não existe.
-    public ListaJogos buscarListaJogos(Long id) {
-        return listaJogosRepository.findById(id)
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException("Lista de jogos não encontrada!"));
-    }
-
-    // Valida o proprietário antes de criar ou alterar uma lista.
-    private Usuario buscarUsuario(Long usuarioId) {
-        return usuarioRepository.findById(usuarioId)
-                .orElseThrow(() ->
-                        new RecursoNaoEncontradoException(
-                                "Usuário não encontrado com id: " + usuarioId));
-    }
-
     @Transactional
     public ListaJogosResponse criarLista(ListaJogosRequest request) {
         Usuario usuario = buscarUsuario(request.usuarioId());
-
-        ListaJogos listaJogos = new ListaJogos(
+        ListaJogos lista = new ListaJogos(
                 usuario,
-                null,
+                new ArrayList<>(),
                 request.nome(),
                 request.publica(),
                 request.principal()
         );
+        return paraResposta(listaJogosRepository.save(lista));
+    }
 
-        ListaJogos salva = listaJogosRepository.save(listaJogos);
-        return paraResposta(salva);
+    @Transactional
+    public ListaJogosResponse atualizar(Long id, ListaJogosRequest request) {
+        ListaJogos lista = buscarListaJogos(id);
+        Usuario usuario = buscarUsuario(request.usuarioId());
+
+        lista.setNome(request.nome());
+        lista.setPublica(request.publica());
+        lista.setPrincipal(request.principal());
+        lista.setUsuario(usuario);
+
+        return paraResposta(listaJogosRepository.save(lista));
     }
 
     @Transactional
     public void deletar(Long id) {
         buscarListaJogos(id);
         listaJogosRepository.deleteById(id);
-    }
-
-    @Transactional
-    public ListaJogosResponse atualizar(Long id, ListaJogosRequest request) {
-        ListaJogos listaAtual = buscarListaJogos(id);
-        Usuario usuario = buscarUsuario(request.usuarioId());
-
-        listaAtual.setNome(request.nome());
-        listaAtual.setPublica(request.publica());
-        listaAtual.setPrincipal(request.principal());
-        listaAtual.setUsuario(usuario);
-
-        ListaJogos salva = listaJogosRepository.save(listaAtual);
-        return paraResposta(salva);
     }
 
     @Transactional(readOnly = true)
@@ -82,8 +65,7 @@ public class ListaJogosService {
 
     @Transactional(readOnly = true)
     public List<ListaJogosResponse> listarTodas() {
-        return listaJogosRepository.findAll()
-                .stream()
+        return listaJogosRepository.findAll().stream()
                 .map(this::paraResposta)
                 .toList();
     }
@@ -91,13 +73,28 @@ public class ListaJogosService {
     @Transactional(readOnly = true)
     public List<ListaJogosResponse> listarPorUsuario(Long usuarioId) {
         buscarUsuario(usuarioId);
-        return listaJogosRepository.findByUsuarioId(usuarioId)
-                .stream()
+        return listaJogosRepository.findByUsuarioId(usuarioId).stream()
                 .map(this::paraResposta)
                 .toList();
     }
 
+    // --- Métodos Auxiliares e de Mapeamento ---
+
+    public ListaJogos buscarListaJogos(Long id) {
+        return listaJogosRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Lista de jogos não encontrada!"));
+    }
+
+    private Usuario buscarUsuario(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com id: " + usuarioId));
+    }
+
     public ListaJogosResponse paraResposta(ListaJogos lista) {
+        List<JogoResponse> jogosResponse = lista.getJogos() != null
+                ? lista.getJogos().stream().map(this::jogoParaResposta).toList()
+                : new ArrayList<>();
+
         return new ListaJogosResponse(
                 lista.getId(),
                 lista.getNome(),
@@ -105,14 +102,11 @@ public class ListaJogosService {
                 lista.isPrincipal(),
                 lista.getUsuario() != null ? lista.getUsuario().getId() : null,
                 lista.getUsuario() != null ? lista.getUsuario().getNome() : null,
-                lista.getJogos().stream()
-                        .map(this::jogoParaResposta)
-                        .toList()
+                jogosResponse
         );
     }
 
-    // Evita expor entidades JPA e serializar relacionamentos em ciclo na resposta.
-    private JogoResponse jogoParaResposta(com.gamebox.app.Domain.Jogo jogo) {
+    private JogoResponse jogoParaResposta(Jogo jogo) {
         return new JogoResponse(
                 jogo.getId(),
                 jogo.getNome(),

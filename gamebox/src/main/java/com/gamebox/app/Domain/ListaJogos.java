@@ -33,24 +33,20 @@ public class ListaJogos {
     )
     private List<Jogo> jogos = new ArrayList<>();
 
-    // Nome que identifica a lista.
     @Column(nullable = false)
     @NotBlank
     private String nome;
 
-    // Indica se a lista pode ser vista por outros usuários.
+
     @Column(nullable = false)
     private Boolean publica;
 
-    // Diferencia a biblioteca principal das listas criadas pelo usuário.
     @Column(nullable = false)
     private boolean principal;
 
-    // Construtor vazio utilizado pelo JPA.
     public ListaJogos() {
     }
 
-    // Permite criar uma lista já informando seus dados principais.
     public ListaJogos(
             Usuario usuario,
             List<Jogo> jogos,
@@ -59,63 +55,49 @@ public class ListaJogos {
             boolean principal
     ) {
         this.usuario = usuario;
-        this.jogos = jogos;
+        this.jogos = jogos != null ? jogos : new ArrayList<>();
         this.nome = nome;
         this.publica = publica;
         this.principal = principal;
     }
 
-    // Retorna o identificador da lista.
+
     public Long getId() {
         return id;
     }
 
-    // Retorna o usuário dono da lista.
+
     public Usuario getUsuario() {
         return usuario;
     }
-
-    // Define quem é o dono da lista.
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 
-    // Retorna os jogos que fazem parte da lista.
     public List<Jogo> getJogos() {
         return jogos;
     }
-
-    // Atualiza os jogos da lista.
     public void setJogos(List<Jogo> jogos) {
         this.jogos = jogos;
     }
 
-    // Retorna o nome da lista.
     public String getNome() {
         return nome;
     }
-
-    // Define o nome da lista.
     public void setNome(String nome) {
         this.nome = nome;
     }
 
-    // Informa se a lista é pública.
     public Boolean getPublica() {
         return publica;
     }
-
-    // Altera a visibilidade da lista.
     public void setPublica(Boolean publica) {
         this.publica = publica;
     }
 
-    // Informa se esta é a biblioteca principal do usuário.
     public boolean isPrincipal() {
         return principal;
     }
-
-    // Define se a lista é a principal.
     public void setPrincipal(boolean principal) {
         this.principal = principal;
     }
