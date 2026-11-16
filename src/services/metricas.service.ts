@@ -6,6 +6,7 @@ import { MetricaStatusResponse } from '../model/api.model';
 @Injectable({ providedIn: 'root' })
 export class MetricasService {
   private http = inject(HttpClient);
+  // GET /metricas: busca a contagem de jogos por status.
   listar(): Observable<MetricaStatusResponse[]> {
     return this.http.get<MetricaStatusResponse[]>(`${environment.apiUrl}/metricas`);
   }

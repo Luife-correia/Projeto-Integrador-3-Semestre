@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+// Usa a mensagem do servidor ou um texto simples quando não há resposta legível.
 export function apiErrorMessage(
   error: unknown,
   fallback = 'Não foi possível concluir a operação. Tente novamente.',

@@ -36,16 +36,20 @@ export class AdminPage {
   constructor() {
     this.load();
   }
+  // GET /jogos, /usuarios e /metricas carrega os dados do painel.
   private load() {
     this.loading.set(true);
+    // GET /jogos preenche a tabela de jogos.
     this.jogoApi.listar().subscribe({
       next: (x) => this.jogos.set(x),
       error: (e) => this.error.set(apiErrorMessage(e)),
     });
+    // GET /usuarios preenche a tabela de usuários.
     this.userApi.listar().subscribe({
       next: (x) => this.usuarios.set(x),
       error: (e) => this.error.set(apiErrorMessage(e)),
     });
+    // GET /metricas carrega os totais agrupados por status.
     this.metricApi.listar().subscribe({
       next: (x) => {
         this.metricas.set(x);
@@ -90,6 +94,7 @@ export class AdminPage {
     this.editId.set(g.id);
     this.formOpen.set(true);
   }
+  // POST cria o jogo ou PUT /jogos/{id} atualiza; depois sincroniza a tabela.
   salvarJogo() {
     const r = {
       ...this.form,
@@ -118,12 +123,14 @@ export class AdminPage {
       error: (e) => this.error.set(apiErrorMessage(e)),
     });
   }
+  // DELETE /jogos/{id} exclui o jogo e remove sua linha da tabela.
   excluirJogo(g: JogoResponse) {
     this.jogoApi.remover(g.id).subscribe({
       next: () => this.jogos.update((a) => a.filter((x) => x.id !== g.id)),
       error: (e) => this.error.set(apiErrorMessage(e)),
     });
   }
+  // DELETE /usuarios/{id} exclui o usuário selecionado.
   excluirUsuario(u: Usuario) {
     this.userApi.remover(u.id).subscribe({
       next: () => this.usuarios.update((a) => a.filter((x) => x.id !== u.id)),

@@ -34,6 +34,7 @@ export class GameDetailPage {
   readonly libraryError = signal('');
   readonly message = signal('');
   readonly saving = signal(false);
+  readonly reviewLoading = signal(false);
   readonly status = signal<StatusJogos | null>(null);
   readonly editingReview = signal<AvaliacaoResponse | null>(null);
   private readonly names = signal<Record<number, string>>({});
@@ -61,6 +62,7 @@ export class GameDetailPage {
   private readonly id = Number(this.route.snapshot.paramMap.get('id'));
 
   constructor() {
+    // GET /jogos/{id} carrega os dados principais do jogo.
     this.jogos.buscar(this.id).subscribe({
       next: (game) => {
         this.game.set(game);
@@ -71,6 +73,7 @@ export class GameDetailPage {
         this.loading.set(false);
       },
     });
+    // GET /avaliacoes/jogo/{id} carrega as avaliações exibidas na tela.
     this.avaliacoes.porJogo(this.id).subscribe({
       next: (reviews) => {
         this.reviews.set(reviews);
@@ -89,6 +92,7 @@ export class GameDetailPage {
     return this.names()[id] ?? 'Carregando usuário…';
   }
 
+  // POST cria o vínculo e PATCH /status salva o progresso escolhido.
   salvarStatus(): void {
     const user = this.auth.usuarioAtual;
     if (!user) return;
@@ -123,6 +127,7 @@ export class GameDetailPage {
     }
   }
 
+  // POST cria a avaliação ou PUT /avaliacoes/{id} atualiza a existente.
   salvarAvaliacao(): void {
     const user = this.auth.usuarioAtual;
     if (!user) return;
@@ -161,11 +166,27 @@ export class GameDetailPage {
     });
   }
 
+  // GET /avaliacoes/{id} carrega a avaliação antes de abrir a edição.
   iniciarEdicao(review: AvaliacaoResponse): void {
-    this.editingReview.set(review);
-    this.nota = review.notaEmMeiasEstrelas;
-    this.comentario = review.comentario;
+    this.reviewLoading.set(true);
     this.message.set('');
+    this.avaliacoes.buscar(review.id).subscribe({
+      next: (fullReview) => {
+        if (fullReview.usuarioId !== this.auth.usuarioAtual?.id) {
+          this.message.set('Você só pode editar suas próprias avaliações.');
+          this.reviewLoading.set(false);
+          return;
+        }
+        this.editingReview.set(fullReview);
+        this.nota = fullReview.notaEmMeiasEstrelas;
+        this.comentario = fullReview.comentario;
+        this.reviewLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.message.set(apiErrorMessage(error));
+        this.reviewLoading.set(false);
+      },
+    });
   }
 
   cancelarEdicao(): void {
@@ -174,6 +195,7 @@ export class GameDetailPage {
     this.nota = 8;
   }
 
+  // DELETE /avaliacoes/{id} remove a avaliação e atualiza a lista.
   excluir(review: AvaliacaoResponse): void {
     this.avaliacoes.remover(review.id).subscribe({
       next: () => this.reviews.update((items) => items.filter((item) => item.id !== review.id)),
@@ -181,6 +203,7 @@ export class GameDetailPage {
     });
   }
 
+  // Consulta o vínculo do jogo; 404 significa que ainda não está na biblioteca.
   private loadStatus(): void {
     const user = this.auth.usuarioAtual;
     if (!user) return;
@@ -201,7 +224,9 @@ export class GameDetailPage {
     });
   }
 
+  // Busca nomes dos autores para não exibir apenas o ID nas avaliações.
   private loadReviewerNames(reviews: AvaliacaoResponse[]): void {
+    // GET /usuarios/{id} resolve o nome de cada autor; UsuarioService usa cache.
     for (const review of reviews) {
       if (this.names()[review.usuarioId]) continue;
       this.usuarios.buscar(review.usuarioId).subscribe({

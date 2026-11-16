@@ -9,6 +9,7 @@ export class JogoService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/jogos`;
 
+  // GET /jogos: lista jogos e pode filtrar por nome.
   listar(nome?: string): Observable<JogoResponse[]> {
     let params = new HttpParams();
     if (nome?.trim()) {
@@ -16,8 +17,20 @@ export class JogoService {
     }
     return this.http.get<JogoResponse[]>(this.url, { params });
   }
-  buscar(id:number):Observable<JogoResponse>{return this.http.get<JogoResponse>(`${this.url}/${id}`)}
-  criar(request:JogoRequest):Observable<JogoResponse>{return this.http.post<JogoResponse>(this.url,request)}
-  atualizar(id:number,request:JogoRequest):Observable<JogoResponse>{return this.http.put<JogoResponse>(`${this.url}/${id}`,request)}
-  remover(id:number):Observable<void>{return this.http.delete<void>(`${this.url}/${id}`)}
+  // GET /jogos/{id}: busca os dados completos de um jogo.
+  buscar(id: number): Observable<JogoResponse> {
+    return this.http.get<JogoResponse>(`${this.url}/${id}`);
+  }
+  // POST /jogos: cadastra um jogo novo no catálogo.
+  criar(request: JogoRequest): Observable<JogoResponse> {
+    return this.http.post<JogoResponse>(this.url, request);
+  }
+  // PUT /jogos/{id}: atualiza os dados de um jogo.
+  atualizar(id: number, request: JogoRequest): Observable<JogoResponse> {
+    return this.http.put<JogoResponse>(`${this.url}/${id}`, request);
+  }
+  // DELETE /jogos/{id}: exclui um jogo do catálogo.
+  remover(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
 }

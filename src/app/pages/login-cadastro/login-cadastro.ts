@@ -1,6 +1,84 @@
-import { Component, inject } from '@angular/core'; import { FormsModule, NgForm } from '@angular/forms'; import { Router, RouterLink } from '@angular/router'; import { UsuarioService } from '../../../services/usuario.service'; import { AuthService } from '../../../services/auth.service'; import { apiErrorMessage } from '../../../services/api-error';
-type Modo='login'|'cadastro';
-@Component({selector:'app-login-cadastro',standalone:true,imports:[FormsModule,RouterLink],styleUrl:'./login-cadastro.css',templateUrl:'./login-cadastro.html'})
-export class LoginCadastro {private api=inject(UsuarioService);private auth=inject(AuthService);private router=inject(Router);modo:Modo='login';dados={nome:'',email:'',senha:'',confirmacaoSenha:''};mensagem='';tipoMensagem:'erro'|'sucesso'|''='';usuarioAtual=null as {id:number;nome:string;email:string}|null;loading=false;
-enviarFormulario(form:NgForm){form.control.markAllAsTouched();if(form.invalid||this.loading)return;this.mensagem='';if(this.modo==='cadastro'){if(this.dados.senha!==this.dados.confirmacaoSenha){this.mensagem='As senhas precisam corresponder.';this.tipoMensagem='erro';return}this.loading=true;this.api.cadastrar({nome:this.dados.nome.trim(),email:this.dados.email.trim(),senha:this.dados.senha}).subscribe({next:()=>{this.loading=false;this.modo='login';this.dados={...this.dados,senha:'',confirmacaoSenha:''};this.mensagem='Conta criada. Agora entre com suas credenciais.';this.tipoMensagem='sucesso'},error:e=>{this.loading=false;this.mensagem=apiErrorMessage(e);this.tipoMensagem='erro'}});return}this.loading=true;this.api.login({email:this.dados.email.trim(),senha:this.dados.senha}).subscribe({next:u=>{this.loading=false;this.auth.login(u);this.usuarioAtual=u;this.mensagem=`Boas-vindas, ${u.nome}!`;this.tipoMensagem='sucesso';this.router.navigateByUrl('/home')},error:e=>{this.loading=false;this.mensagem=apiErrorMessage(e,'E-mail ou senha inválidos.');this.tipoMensagem='erro'}})}
-alternarModo(m:Modo,form:NgForm){this.modo=m;this.dados={nome:'',email:'',senha:'',confirmacaoSenha:''};this.mensagem='';this.tipoMensagem='';form.resetForm(this.dados)} }
+import { Component, inject } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { UsuarioService } from '../../../services/usuario.service';
+import { AuthService } from '../../../services/auth.service';
+import { apiErrorMessage } from '../../../services/api-error';
+type Modo = 'login' | 'cadastro';
+@Component({
+  selector: 'app-login-cadastro',
+  standalone: true,
+  imports: [FormsModule, RouterLink],
+  styleUrl: './login-cadastro.css',
+  templateUrl: './login-cadastro.html',
+})
+export class LoginCadastro {
+  private api = inject(UsuarioService);
+  private auth = inject(AuthService);
+  private router = inject(Router);
+  modo: Modo = 'login';
+  dados = { nome: '', email: '', senha: '', confirmacaoSenha: '' };
+  mensagem = '';
+  tipoMensagem: 'erro' | 'sucesso' | '' = '';
+  usuarioAtual = null as { id: number; nome: string; email: string } | null;
+  loading = false;
+
+  // Valida o formulário e chama POST /usuarios ou POST /usuarios/login.
+  enviarFormulario(form: NgForm) {
+    form.control.markAllAsTouched();
+    if (form.invalid || this.loading) return;
+    this.mensagem = '';
+    if (this.modo === 'cadastro') {
+      if (this.dados.senha !== this.dados.confirmacaoSenha) {
+        this.mensagem = 'As senhas precisam corresponder.';
+        this.tipoMensagem = 'erro';
+        return;
+      }
+      this.loading = true;
+      this.api
+        .cadastrar({
+          nome: this.dados.nome.trim(),
+          email: this.dados.email.trim(),
+          senha: this.dados.senha,
+        })
+        .subscribe({
+          next: () => {
+            this.loading = false;
+            this.modo = 'login';
+            this.dados = { ...this.dados, senha: '', confirmacaoSenha: '' };
+            this.mensagem = 'Conta criada. Agora entre com suas credenciais.';
+            this.tipoMensagem = 'sucesso';
+          },
+          error: (e) => {
+            this.loading = false;
+            this.mensagem = apiErrorMessage(e);
+            this.tipoMensagem = 'erro';
+          },
+        });
+      return;
+    }
+    this.loading = true;
+    this.api.login({ email: this.dados.email.trim(), senha: this.dados.senha }).subscribe({
+      next: (u) => {
+        this.loading = false;
+        this.auth.login(u);
+        this.usuarioAtual = u;
+        this.mensagem = `Boas-vindas, ${u.nome}!`;
+        this.tipoMensagem = 'sucesso';
+        this.router.navigateByUrl('/home');
+      },
+      error: (e) => {
+        this.loading = false;
+        this.mensagem = apiErrorMessage(e, 'E-mail ou senha inválidos.');
+        this.tipoMensagem = 'erro';
+      },
+    });
+  }
+  alternarModo(m: Modo, form: NgForm) {
+    this.modo = m;
+    this.dados = { nome: '', email: '', senha: '', confirmacaoSenha: '' };
+    this.mensagem = '';
+    this.tipoMensagem = '';
+    form.resetForm(this.dados);
+  }
+}

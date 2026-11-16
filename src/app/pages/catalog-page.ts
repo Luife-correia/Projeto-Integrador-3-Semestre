@@ -94,6 +94,7 @@ export class CatalogPage {
     this.buscar();
   }
 
+  // GET /jogos: busca por nome na API; gênero e plataforma filtram no front.
   buscar(): void {
     clearTimeout(this.timer);
     this.loading.set(true);

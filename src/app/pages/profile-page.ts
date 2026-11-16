@@ -14,7 +14,7 @@ import {
 import { apiErrorMessage } from '../../services/api-error';
 import { AuthService } from '../../services/auth.service';
 import { AvaliacaoService } from '../../services/avaliacao.service';
-import { BibliotecaService } from '../../services/biblioteca.service';  
+import { BibliotecaService } from '../../services/biblioteca.service';
 import { JogoService } from '../../services/jogo.service';
 import { ListaJogosService } from '../../services/lista-jogos.service';
 import { UsuarioService } from '../../services/usuario.service';
@@ -24,7 +24,7 @@ import { StatusBadgeComponent } from '../components/status-badge';
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [CommonModule, DatePipe, FormsModule, RouterLink, RatingComponent, StatusBadgeComponent], 
+  imports: [CommonModule, DatePipe, FormsModule, RouterLink, RatingComponent, StatusBadgeComponent],
   templateUrl: './profile-page.html',
 })
 export class ProfilePage {
@@ -36,16 +36,17 @@ export class ProfilePage {
   private readonly bibliotecaApi = inject(BibliotecaService);
 
   readonly statusGroups: { status: StatusJogos; label: string }[] = [
-    { status: 'JOGANDO', label: 'Em andamento' },
+    { status: 'JOGANDO', label: 'Jogando' },
     { status: 'ZERADO', label: 'Zerados' },
     { status: 'PLATINADO', label: 'Platinados' },
     { status: 'QUERO_JOGAR', label: 'Quero jogar' },
-    { status: 'ABANDONADO', label: 'Deixados para depois' },
+    { status: 'ABANDONADO', label: 'Abandonados' },
   ];
 
   readonly profile = signal<Usuario | null>(null);
   readonly library = signal<BibliotecaJogoResponse[]>([]);
   readonly libraryLoading = signal(true);
+  readonly libraryError = signal('');
   readonly publicLists = signal<ListaJogosResponse[]>([]);
   readonly publicListLoading = signal(false);
   readonly selectedList = signal<ListaJogosResponse | null>(null);
@@ -68,14 +69,20 @@ export class ProfilePage {
     const user = this.auth.usuarioAtual;
     if (!user) return;
 
+    // GET /usuarios/{id}/jogos carrega jogos e status para a biblioteca.
     this.bibliotecaApi.listarBiblioteca(user.id).subscribe({
       next: (library) => {
         this.library.set(library);
+        this.libraryError.set('');
         this.libraryLoading.set(false);
       },
-      error: () => this.libraryLoading.set(false),
+      error: (error: unknown) => {
+        this.libraryError.set(apiErrorMessage(error));
+        this.libraryLoading.set(false);
+      },
     });
 
+    // GET /usuarios/{id} carrega os dados atuais para o formulário de perfil.
     this.usuarioApi.buscar(user.id).subscribe({
       next: (profile) => {
         this.profile.set(profile);
@@ -89,6 +96,7 @@ export class ProfilePage {
       },
       error: (error: unknown) => this.profileError.set(apiErrorMessage(error)),
     });
+    // GET /avaliacoes/usuario/{id} carrega as avaliações do perfil.
     this.avaliacoes.porUsuario(user.id).subscribe({
       next: (reviews) => {
         this.reviews.set(reviews);
@@ -99,6 +107,7 @@ export class ProfilePage {
         this.loading.set(false);
       },
     });
+    // GET /ListaJogos/usuario/{id} carrega as listas do perfil.
     this.listaApi.porUsuario(user.id).subscribe({
       next: (lists) => {
         this.lists.set(lists);
@@ -109,6 +118,7 @@ export class ProfilePage {
         this.listLoading.set(false);
       },
     });
+    // GET /jogos busca nomes e capas dos títulos avaliados.
     this.jogoApi.listar().subscribe({
       next: (games) => this.games.set(games),
       error: (error: unknown) => this.error.set(apiErrorMessage(error)),
@@ -127,6 +137,7 @@ export class ProfilePage {
     return this.library().filter((item) => item.status === status);
   }
 
+  // PATCH /usuarios/{id}/Me valida e salva as alterações do perfil.
   salvarPerfil(form: NgForm): void {
     form.control.markAllAsTouched();
     const user = this.auth.usuarioAtual;
@@ -169,6 +180,7 @@ export class ProfilePage {
     this.formOpen.set(true);
   }
 
+  // POST cria a lista ou PUT /ListaJogos/{id} atualiza os metadados.
   salvarLista(nome: string, publica: boolean, principal: boolean): void {
     const user = this.auth.usuarioAtual;
     if (!user || !nome.trim()) return;
@@ -192,6 +204,7 @@ export class ProfilePage {
     });
   }
 
+  // GET /ListaJogos carrega as listas mostradas na Comunidade.
   carregarListasPublicas(): void {
     this.listTab.set('all');
     if (this.publicLists().length) return;
@@ -208,6 +221,7 @@ export class ProfilePage {
     });
   }
 
+  // GET /ListaJogos/{id} carrega os jogos que a lista já contém.
   verDetalhesLista(list: ListaJogosResponse): void {
     if (this.selectedList()?.id === list.id) {
       this.selectedList.set(null);
@@ -219,6 +233,7 @@ export class ProfilePage {
     });
   }
 
+  // DELETE /ListaJogos/{id} exclui a lista do servidor.
   excluirLista(list: ListaJogosResponse): void {
     this.listaApi.remover(list.id).subscribe({
       next: () => this.lists.update((items) => items.filter((item) => item.id !== list.id)),
@@ -231,6 +246,7 @@ export class ProfilePage {
     location.assign('/home');
   }
 
+  // GET /ListaJogos/usuario/{id} atualiza as listas após uma alteração.
   private loadLists(userId: number): void {
     this.listaApi.porUsuario(userId).subscribe({
       next: (lists) => {

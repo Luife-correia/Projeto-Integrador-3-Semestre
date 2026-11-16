@@ -104,7 +104,13 @@
           <p class="review-text">{{ review.comentario }}</p>
           <span class="review-score">★ {{ review.notaEmMeiasEstrelas / 2 }}</span>
           @if (review.usuarioId === auth.usuarioAtual?.id) {
-            <button class="button-secondary" (click)="iniciarEdicao(review)">Editar</button>
+            <button
+              class="button-secondary"
+              [disabled]="reviewLoading()"
+              (click)="iniciarEdicao(review)"
+            >
+              {{ reviewLoading() ? 'Carregando…' : 'Editar' }}
+            </button>
             <button class="button-danger" (click)="excluir(review)">Excluir</button>
           }
         </article>
