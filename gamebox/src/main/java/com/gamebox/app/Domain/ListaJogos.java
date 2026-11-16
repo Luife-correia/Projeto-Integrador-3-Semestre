@@ -78,7 +78,7 @@ public class ListaJogos {
     public List<Jogo> getJogos() {
         return jogos;
     }
-    public void setJogos(List<Long> jogos) {
+    public void setJogos(List<Jogo> jogos) {
         this.jogos = jogos;
     }
 

@@ -32,13 +32,14 @@ public class ListaJogosService {
     @Transactional
     public ListaJogosResponse criarLista(ListaJogosRequest request) {
         Usuario usuario = buscarUsuario(request.usuarioId());
+        List<Jogo> jogos = buscarJogosPorIds(request.jogoIds());
 
         ListaJogos lista = new ListaJogos(
                 usuario,
+                jogos,
                 request.nome(),
                 request.publica(),
-                request.principal(),
-                request.jogoIds()
+                request.principal()
         );
         return paraResposta(listaJogosRepository.save(lista));
     }
@@ -47,12 +48,13 @@ public class ListaJogosService {
     public ListaJogosResponse atualizar(Long id, ListaJogosRequest request) {
         ListaJogos lista = buscarListaJogos(id);
         Usuario usuario = buscarUsuario(request.usuarioId());
+        List<Jogo> jogos = buscarJogosPorIds(request.jogoIds());
 
         lista.setNome(request.nome());
         lista.setPublica(request.publica());
         lista.setPrincipal(request.principal());
         lista.setUsuario(usuario);
-        lista.setJogos(request.jogoIds());
+        lista.setJogos(jogos);
 
         return paraResposta(listaJogosRepository.save(lista));
     }
