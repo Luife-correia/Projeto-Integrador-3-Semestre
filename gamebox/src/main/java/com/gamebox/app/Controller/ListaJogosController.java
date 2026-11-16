@@ -2,6 +2,7 @@ package com.gamebox.app.Controller;
 
 import com.gamebox.app.Dto.request.ListaJogosRequest;
 import com.gamebox.app.Dto.response.ListaJogosResponse;
+import com.gamebox.app.Repository.JogoRepository;
 import com.gamebox.app.Service.ListaJogosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,11 @@ import java.util.List;
 public class ListaJogosController {
 
     private final ListaJogosService listaJogosService;
+    private final JogoRepository jogoRepository;
 
-    public ListaJogosController(ListaJogosService listaJogosService) {
+    public ListaJogosController(ListaJogosService listaJogosService, JogoRepository jogoRepository) {
         this.listaJogosService = listaJogosService;
+        this.jogoRepository = jogoRepository;
     }
 
     @PostMapping
@@ -46,7 +49,7 @@ public class ListaJogosController {
         return ResponseEntity.ok(respostas);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ListaJogosResponse> atualizar(
             @PathVariable Long id,
             @RequestBody @Valid ListaJogosRequest request

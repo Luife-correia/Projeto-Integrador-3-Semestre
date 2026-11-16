@@ -2,6 +2,7 @@ package com.gamebox.app.Domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ListaJogos {
     @Column(nullable = false)
     private boolean principal;
 
-    public ListaJogos() {
+    public ListaJogos(Usuario usuario, @NotBlank(message = "O nome da lista é obrigatório") String nome, @NotNull(message = "A visibilidade da lista (pública/privada) é obrigatória") Boolean publica, boolean principal, List<Long> longs) {
     }
 
     public ListaJogos(
@@ -77,7 +78,7 @@ public class ListaJogos {
     public List<Jogo> getJogos() {
         return jogos;
     }
-    public void setJogos(List<Jogo> jogos) {
+    public void setJogos(List<Long> jogos) {
         this.jogos = jogos;
     }
 

@@ -7,6 +7,7 @@ import com.gamebox.app.Dto.request.ListaJogosRequest;
 import com.gamebox.app.Dto.response.JogoResponse;
 import com.gamebox.app.Dto.response.ListaJogosResponse;
 import com.gamebox.app.Exception.RecursoNaoEncontradoException;
+import com.gamebox.app.Repository.JogoRepository;
 import com.gamebox.app.Repository.ListaJogosRepository;
 import com.gamebox.app.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -19,22 +20,25 @@ import java.util.List;
 public class ListaJogosService {
 
     private final ListaJogosRepository listaJogosRepository;
+    private final JogoRepository jogoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public ListaJogosService(ListaJogosRepository listaJogosRepository, UsuarioRepository usuarioRepository) {
+    public ListaJogosService(ListaJogosRepository listaJogosRepository, JogoRepository jogoRepository, UsuarioRepository usuarioRepository) {
         this.listaJogosRepository = listaJogosRepository;
+        this.jogoRepository = jogoRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
     @Transactional
     public ListaJogosResponse criarLista(ListaJogosRequest request) {
         Usuario usuario = buscarUsuario(request.usuarioId());
+
         ListaJogos lista = new ListaJogos(
                 usuario,
-                new ArrayList<>(),
                 request.nome(),
                 request.publica(),
-                request.principal()
+                request.principal(),
+                request.jogoIds()
         );
         return paraResposta(listaJogosRepository.save(lista));
     }
@@ -48,6 +52,7 @@ public class ListaJogosService {
         lista.setPublica(request.publica());
         lista.setPrincipal(request.principal());
         lista.setUsuario(usuario);
+        lista.setJogos(request.jogoIds());
 
         return paraResposta(listaJogosRepository.save(lista));
     }
@@ -80,7 +85,15 @@ public class ListaJogosService {
 
     // --- Métodos Auxiliares e de Mapeamento ---
 
-    public ListaJogos buscarListaJogos(Long id) {
+    private List<Jogo> buscarJogosPorIds(List<Long> ids) {
+
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return jogoRepository.findAllById(ids);
+    }
+
+    private ListaJogos buscarListaJogos(Long id) {
         return listaJogosRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Lista de jogos não encontrada!"));
     }
