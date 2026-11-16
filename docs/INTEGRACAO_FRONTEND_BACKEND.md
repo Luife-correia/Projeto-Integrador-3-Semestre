@@ -121,11 +121,11 @@ O status **Integrado** indica que a interface chama o endpoint. **Parcial** indi
 
 | Método e rota                         | Serviço e método Angular       | Tela que usa | Status    | Observações                                |
 | ------------------------------------- | ------------------------------ | ------------ | --------- | ------------------------------------------ |
-| `POST /ListaJogos`                    | `ListaJogosService.criar`      | Perfil       | Integrado | Cria lista com seus metadados.             |
+| `POST /ListaJogos`                    | `ListaJogosService.criar`      | Perfil       | Integrado | Cria uma lista com metadados e os `jogoIds` selecionados. |
 | `GET /ListaJogos`                     | `ListaJogosService.listar`     | Perfil       | Integrado | Alimenta a seção Comunidade.               |
-| `GET /ListaJogos/{id}`                | `ListaJogosService.buscar`     | Perfil       | Integrado | Carrega detalhes de uma lista selecionada. |
-| `GET /ListaJogos/usuario/{usuarioId}` | `ListaJogosService.porUsuario` | Perfil       | Integrado | Lista as listas do usuário.                |
-| `PUT /ListaJogos/{id}`                | `ListaJogosService.atualizar`  | Perfil       | Integrado | Atualiza metadados da lista.               |
+| `GET /ListaJogos/{id}`                | `ListaJogosService.buscar`     | Perfil e detalhe do jogo | Integrado | Carrega jogos para exibir/editar e preservar associações no PUT. |
+| `GET /ListaJogos/usuario/{usuarioId}` | `ListaJogosService.porUsuario` | Perfil e detalhe do jogo | Integrado | Lista coleções do usuário para exibição e seleção no detalhe. |
+| `PUT /ListaJogos/{id}`                | `ListaJogosService.atualizar`  | Perfil e detalhe do jogo | Integrado | Atualiza metadados e associações conforme `jogoIds`. |
 | `DELETE /ListaJogos/{id}`             | `ListaJogosService.remover`    | Perfil       | Integrado | Exclui lista.                              |
 
 ### Métricas
@@ -154,8 +154,8 @@ Os nomes dos campos abaixo seguem os models do front-end e os schemas do OpenAPI
 | `StatusUsuarioJogoRequest` / `StatusJogos` | `status` enum                                                                            | Valores: `NAO_JOGADO`, `JOGANDO`, `QUERO_JOGAR`, `ZERADO`, `PLATINADO`, `ABANDONADO`.                                                                                                             |
 | `UsuarioJogoResponse`                      | `id`, `usuarioId`, `jogoId`, `status`                                                    | Usado nas respostas descritas no OpenAPI para operações de vínculo e status.                                                                                                                      |
 | `BibliotecaJogoResponse`                   | `jogoId`, `desenvolvedora`, `status`, `capa`, `nome`, `notaTotal`                        | Resposta usada na biblioteca do perfil e documentada no OpenAPI atualizado.                                                                                                                       |
-| `ListaJogosRequest`                        | `nome`, `publica`, `usuarioId`; `principal` opcional no schema                           | O front envia os quatro campos. Nome não vazio e visibilidade/lista principal são capturados no formulário. Não há associação de jogos nesse request.                                             |
-| `ListaJogosResponse`                       | `id`, metadados, `usuarioNome`, `jogos: JogoResponse[]`                                  | Usado para mostrar as listas e abrir seus detalhes.                                                                                                                                               |
+| `ListaJogosRequest`                        | `nome`, `publica`, `principal`, `usuarioId`; `jogoIds?: number[]`                        | O front envia os metadados e os IDs selecionados. `jogoIds` é opcional no contrato; os formulários enviam a seleção atual, inclusive um array vazio.                                                |
+| `ListaJogosResponse`                       | `id`, metadados, `usuarioNome`, `jogos: JogoResponse[]`                                  | Exibe os jogos da lista. Na edição, o front busca a lista por ID para preencher a seleção com todos os jogos já associados.                                                                          |
 | `MetricaStatusResponse`                    | `status`, `quantidade`                                                                   | Resposta tratada como array por `GET /metricas`.                                                                                                                                                  |
 
 No OpenAPI, todos os endpoints listados declaram resposta `200`. O documento não declara schemas de erro para `400`, `404` ou `409`. Esses códigos são tratados pelo front quando retornados, mas sua semântica detalhada não pode ser comprovada pelo schema fornecido.
@@ -191,9 +191,11 @@ Há uma diferença de obrigatoriedade no schema: o OpenAPI lista somente `coment
 
 ### Listas de jogos
 
-1. O perfil carrega listas do usuário por `GET /ListaJogos/usuario/{usuarioId}`; a aba Comunidade chama `GET /ListaJogos`.
-2. O front usa `GET /ListaJogos/{id}` para carregar os detalhes da lista selecionada.
-3. Criação, edição de metadados e exclusão usam POST, PUT e DELETE, respectivamente. A tela mostra jogos já presentes na resposta, mas o front-end não dispõe de uma operação de associação/desassociação de jogos.
+1. O perfil carrega as listas do usuário por `GET /ListaJogos/usuario/{usuarioId}`; a aba Comunidade chama `GET /ListaJogos`.
+2. Ao abrir os detalhes ou editar uma lista, o perfil chama `GET /ListaJogos/{id}`. A resposta inclui `jogos: JogoResponse[]`; o formulário converte os objetos em IDs e marca as opções correspondentes.
+3. O formulário de criação/edição carrega as opções de jogos obtidas por `GET /jogos`. O POST de criação e o PUT de edição enviam `jogoIds` junto com os metadados da lista.
+4. No detalhe de um jogo, o front carrega as listas próprias pelo endpoint de usuário. Após escolher uma, consulta `GET /ListaJogos/{id}` para obter os IDs já associados, acrescenta o ID do jogo atual sem duplicar e envia o conjunto completo no `PUT /ListaJogos/{id}`.
+5. Como o PUT substitui as associações conforme o array, sempre enviamos todos os IDs que devem permanecer. Após criar ou atualizar, o front consulta novamente `GET /ListaJogos/{id}` e confirma que os jogos enviados foram persistidos antes de mostrar sucesso. A exclusão usa `DELETE /ListaJogos/{id}`.
 
 ### Perfil e edição de dados
 
@@ -223,7 +225,7 @@ O OpenAPI fornecido não especifica o formato JSON de erro nem respostas `400`, 
 
 ## 9. Limitações conhecidas e pontos de melhoria
 
-- **Itens de listas:** o contrato publicado não apresenta endpoint nem request para adicionar ou remover jogos de uma lista. A tela só mostra itens já retornados.
+- **Contrato de listas:** o front envia `jogoIds` no POST e PUT conforme a atualização do backend informada para este projeto. O arquivo OpenAPI anterior pode não refletir essa atualização; confirme a definição no OpenAPI atual do backend quando ele estiver disponível.
 - **Identificação de nomes:** respostas de avaliação contêm IDs, não nomes de usuário ou jogo. O front consulta usuários individualmente, com cache, e carrega a lista de jogos para resolver nomes e capas no perfil. Para reduzir chamadas e simplificar a tela, o back-end poderia incluir esses dados em DTOs apropriados.
 - **Autenticação e papel:** o contrato OpenAPI não apresenta token nem `role`. O painel administrativo não verifica papel; esconder ou proteger uma rota no Angular não substitui autorização no servidor. O back-end pode definir autenticação e autorização adequadas para uso real.
 - **CORS, banco e inicialização:** a configuração CORS, o uso de H2 em memória e o comando para iniciar o back-end não estão no código deste repositório nem no OpenAPI. Devem ser confirmados na documentação/código do back-end.
@@ -239,7 +241,7 @@ Pré-requisitos: front-end em `localhost:4200`, API acessível em `localhost:808
 3. Abra um jogo, confira os dados e avaliações. Logado, publique um comentário entre 10 e 500 caracteres com nota de 0 a 10 em meias-estrelas; ao editar a própria avaliação, confira que o front busca `GET /avaliacoes/{id}` antes de preencher o formulário; depois edite e exclua. Verifique os nomes dos autores após as consultas de usuário.
 4. No detalhe, adicione o jogo à biblioteca e selecione um status. Reabra/atualize a tela e confira o status. Um `404` na consulta individual deve aparecer como ausência do vínculo; falhas de conexão devem mostrar erro.
 5. No perfil, teste edição de nome, e-mail e senha; deixe bio vazia ou informe entre 6 e 100 caracteres. Confira mensagens de validação. A listagem de biblioteca depende do endpoint adicional que não está no OpenAPI fornecido.
-6. Crie uma lista, atualize seus metadados, abra seus detalhes e exclua-a. Teste também a aba Comunidade, que usa `GET /ListaJogos`.
+6. Crie uma lista selecionando jogos; edite-a, confirme que os jogos existentes aparecem selecionados, altere a seleção e salve. No detalhe de um jogo, selecione uma lista sua e use “Adicionar à lista”; confira que os outros jogos foram preservados e que o jogo atual aparece. Teste a aba Comunidade e a exclusão de uma lista.
 7. No painel, confira métricas, crie/edite/exclua um jogo e exclua um usuário de teste. O painel é acessível a qualquer sessão local; a API não documenta um papel de administrador.
 
 Os status de resposta publicados no OpenAPI para as operações listadas são `200`. O resultado esperado para códigos de erro depende do comportamento do back-end, não especificado nesse arquivo.

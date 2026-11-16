@@ -67,8 +67,9 @@ export interface UsuarioJogoResponse {
 export interface ListaJogosRequest {
   nome: string;
   publica: boolean;
-  principal?: boolean;
+  principal: boolean;
   usuarioId: number;
+  jogoIds?: number[];
 }
 export interface ListaJogosResponse extends ListaJogosRequest {
   id: number;

@@ -34,7 +34,7 @@
           @if (status()) {
             <app-status-badge [status]="status()!" />
           }
-          <div class="library-add">
+          <div class="library-add library-status-controls">
             <select
               class="library-select"
               [(ngModel)]="selectedStatus"
@@ -51,6 +51,33 @@
           @if (libraryError()) {
             <p class="field-error" role="alert">{{ libraryError() }}</p>
           }
+          <div class="library-add library-list-controls">
+            @if (listsLoading()) {
+              <span>Carregando suas listas…</span>
+            } @else if (userLists().length) {
+              <select
+                class="library-select"
+                name="listaSelecionadaId"
+                [(ngModel)]="listaSelecionadaId"
+                aria-label="Lista personalizada"
+              >
+                <option [ngValue]="null">Selecione uma lista</option>
+                @for (list of userLists(); track list.id) {
+                  <option [ngValue]="list.id">{{ list.nome }}</option>
+                }
+              </select>
+              <button
+                class="button-secondary"
+                type="button"
+                [disabled]="listaSelecionadaId === null || addingToList()"
+                (click)="adicionarJogoALista()"
+              >
+                {{ addingToList() ? 'Adicionando…' : 'Adicionar à lista' }}
+              </button>
+            } @else {
+              <a routerLink="/profile">Crie uma lista no seu perfil</a>
+            }
+          </div>
         } @else {
           <p><a routerLink="/login">Entre</a> para adicionar à biblioteca ou avaliar este jogo.</p>
         }
@@ -64,37 +91,43 @@
       </div>
 
       @if (auth.usuarioAtual) {
-        <div class="panel">
+        <div class="panel review-form">
           <h3>{{ editingReview() ? 'Editar avaliação' : 'Deixe sua avaliação' }}</h3>
-          <label>
-            Nota (0–5 estrelas)
-            <select class="filter-select" [(ngModel)]="nota">
+          <div class="review-field review-rating-field">
+            <label for="review-rating">Nota (0–5 estrelas)</label>
+            <select id="review-rating" class="filter-select" [(ngModel)]="nota">
               @for (value of noteValues; track value) {
                 <option [ngValue]="value">{{ value / 2 }}</option>
               }
             </select>
-          </label>
-          <label>
-            Comentário (10–500 caracteres)
+          </div>
+          <div class="review-field">
+            <label for="review-comment">Comentário (10–500 caracteres)</label>
             <textarea
-              class="filter-select"
+              id="review-comment"
+              class="filter-select review-comment"
               [(ngModel)]="comentario"
               minlength="10"
               maxlength="500"
             ></textarea>
-          </label>
-          <button class="button-primary" (click)="salvarAvaliacao()" [disabled]="saving()">
-            {{ editingReview() ? 'Salvar alterações' : 'Publicar avaliação' }}
-          </button>
-          @if (editingReview()) {
-            <button class="button-secondary" (click)="cancelarEdicao()">Cancelar edição</button>
+            <small class="character-count">{{ comentario.length }}/500</small>
+          </div>
+          @if (message()) {
+            <p class="review-feedback" role="status">{{ message() }}</p>
           }
+          <div class="review-actions">
+            <button class="button-primary" (click)="salvarAvaliacao()" [disabled]="saving()">
+              {{ editingReview() ? 'Salvar alterações' : 'Publicar avaliação' }}
+            </button>
+          @if (editingReview()) {
+              <button class="button-secondary" (click)="cancelarEdicao()">
+                Cancelar edição
+              </button>
+            }
+          </div>
         </div>
       }
 
-      @if (message()) {
-        <p role="status">{{ message() }}</p>
-      }
       @for (review of reviews(); track review.id) {
         <article class="review-row">
           <div>

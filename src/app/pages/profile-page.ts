@@ -56,12 +56,15 @@ export class ProfilePage {
   readonly loading = signal(true);
   readonly listLoading = signal(true);
   readonly error = signal('');
+  readonly listError = signal('');
   readonly profileError = signal('');
   readonly profileSaving = signal(false);
   readonly profileFormOpen = signal(false);
   readonly formOpen = signal(false);
+  readonly listFormLoading = signal(false);
   readonly editing = signal<ListaJogosResponse | null>(null);
-  private readonly games = signal<JogoResponse[]>([]);
+  readonly games = signal<JogoResponse[]>([]);
+  selectedGameIds: number[] = [];
 
   profileFormData = { nome: '', email: '', senha: '', bio: '', fotoPerfil: '' };
 
@@ -114,7 +117,7 @@ export class ProfilePage {
         this.listLoading.set(false);
       },
       error: (error: unknown) => {
-        this.error.set(apiErrorMessage(error));
+        this.listError.set(apiErrorMessage(error));
         this.listLoading.set(false);
       },
     });
@@ -176,8 +179,27 @@ export class ProfilePage {
   }
 
   editarLista(list: ListaJogosResponse | null = null): void {
-    this.editing.set(list);
-    this.formOpen.set(true);
+    this.listError.set('');
+    this.selectedGameIds = [];
+    if (!list) {
+      this.editing.set(null);
+      this.formOpen.set(true);
+      return;
+    }
+
+    this.listFormLoading.set(true);
+    this.listaApi.buscar(list.id).subscribe({
+      next: (details) => {
+        this.editing.set(details);
+        this.selectedGameIds = details.jogos.map((game) => game.id);
+        this.formOpen.set(true);
+        this.listFormLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.listError.set(apiErrorMessage(error));
+        this.listFormLoading.set(false);
+      },
+    });
   }
 
   // POST cria a lista ou PUT /ListaJogos/{id} atualiza os metadados.
@@ -190,17 +212,37 @@ export class ProfilePage {
       publica,
       principal,
       usuarioId: user.id,
+      jogoIds: this.selectedGameIds,
     };
     const operation = this.editing()
       ? this.listaApi.atualizar(this.editing()!.id, request)
       : this.listaApi.criar(request);
 
     operation.subscribe({
-      next: () => {
-        this.formOpen.set(false);
-        this.loadLists(user.id);
+      next: (saved) => {
+        this.listaApi.buscar(saved.id).subscribe({
+          next: (persisted) => {
+            const expectedIds = new Set(this.selectedGameIds);
+            const persistedIds = new Set(persisted.jogos.map((game) => game.id));
+            const gamesWereSaved =
+              expectedIds.size === persistedIds.size &&
+              [...expectedIds].every((gameId) => persistedIds.has(gameId));
+
+            if (!gamesWereSaved) {
+              this.listError.set(
+                'A lista foi salva, mas o backend não retornou os jogos selecionados. Verifique a implementação de jogoIds no backend.',
+              );
+              return;
+            }
+
+            this.formOpen.set(false);
+            this.listError.set('');
+            this.loadLists(user.id);
+          },
+          error: (error: unknown) => this.listError.set(apiErrorMessage(error)),
+        });
       },
-      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+      error: (error: unknown) => this.listError.set(apiErrorMessage(error)),
     });
   }
 
@@ -215,7 +257,7 @@ export class ProfilePage {
         this.publicListLoading.set(false);
       },
       error: (error: unknown) => {
-        this.error.set(apiErrorMessage(error));
+        this.listError.set(apiErrorMessage(error));
         this.publicListLoading.set(false);
       },
     });
@@ -229,7 +271,7 @@ export class ProfilePage {
     }
     this.listaApi.buscar(list.id).subscribe({
       next: (detalhes) => this.selectedList.set(detalhes),
-      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+      error: (error: unknown) => this.listError.set(apiErrorMessage(error)),
     });
   }
 
@@ -237,7 +279,7 @@ export class ProfilePage {
   excluirLista(list: ListaJogosResponse): void {
     this.listaApi.remover(list.id).subscribe({
       next: () => this.lists.update((items) => items.filter((item) => item.id !== list.id)),
-      error: (error: unknown) => this.error.set(apiErrorMessage(error)),
+      error: (error: unknown) => this.listError.set(apiErrorMessage(error)),
     });
   }
 
@@ -254,7 +296,7 @@ export class ProfilePage {
         this.listLoading.set(false);
       },
       error: (error: unknown) => {
-        this.error.set(apiErrorMessage(error));
+        this.listError.set(apiErrorMessage(error));
         this.listLoading.set(false);
       },
     });

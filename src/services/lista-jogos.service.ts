@@ -19,11 +19,11 @@ export class ListaJogosService {
   porUsuario(id: number): Observable<ListaJogosResponse[]> {
     return this.http.get<ListaJogosResponse[]>(`${this.url}/usuario/${id}`);
   }
-  // POST /ListaJogos: cria uma lista com seus metadados.
+  // POST /ListaJogos: cria a lista e envia os IDs dos jogos selecionados.
   criar(r: ListaJogosRequest): Observable<ListaJogosResponse> {
     return this.http.post<ListaJogosResponse>(this.url, r);
   }
-  // PUT /ListaJogos/{id}: atualiza os metadados de uma lista.
+  // PUT /ListaJogos/{id}: atualiza os dados e substitui os jogos pelos IDs enviados.
   atualizar(id: number, r: ListaJogosRequest): Observable<ListaJogosResponse> {
     return this.http.put<ListaJogosResponse>(`${this.url}/${id}`, r);
   }

@@ -3,12 +3,18 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AvaliacaoResponse, JogoResponse, StatusJogos } from '../../model/api.model';
+import {
+  AvaliacaoResponse,
+  JogoResponse,
+  ListaJogosResponse,
+  StatusJogos,
+} from '../../model/api.model';
 import { apiErrorMessage } from '../../services/api-error';
 import { AuthService } from '../../services/auth.service';
 import { AvaliacaoService } from '../../services/avaliacao.service';
 import { BibliotecaService } from '../../services/biblioteca.service';
 import { JogoService } from '../../services/jogo.service';
+import { ListaJogosService } from '../../services/lista-jogos.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { StatusBadgeComponent } from '../components/status-badge';
 
@@ -24,6 +30,7 @@ export class GameDetailPage {
   private readonly avaliacoes = inject(AvaliacaoService);
   private readonly biblioteca = inject(BibliotecaService);
   private readonly usuarios = inject(UsuarioService);
+  private readonly listas = inject(ListaJogosService);
   readonly auth = inject(AuthService);
 
   readonly game = signal<JogoResponse | null>(null);
@@ -37,6 +44,10 @@ export class GameDetailPage {
   readonly reviewLoading = signal(false);
   readonly status = signal<StatusJogos | null>(null);
   readonly editingReview = signal<AvaliacaoResponse | null>(null);
+  readonly userLists = signal<ListaJogosResponse[]>([]);
+  readonly listsLoading = signal(false);
+  readonly addingToList = signal(false);
+  listaSelecionadaId: number | null = null;
   private readonly names = signal<Record<number, string>>({});
 
   selectedStatus: StatusJogos = 'JOGANDO';
@@ -86,10 +97,82 @@ export class GameDetailPage {
       },
     });
     this.loadStatus();
+    this.loadUserLists();
   }
 
   usuarioNome(id: number): string {
     return this.names()[id] ?? 'Carregando usuário…';
+  }
+
+  // GET busca as listas do usuário antes de permitir escolher uma delas.
+  private loadUserLists(): void {
+    const user = this.auth.usuarioAtual;
+    if (!user) return;
+
+    this.listsLoading.set(true);
+    this.listas.porUsuario(user.id).subscribe({
+      next: (lists) => {
+        this.userLists.set(lists);
+        this.listsLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.message.set(apiErrorMessage(error));
+        this.listsLoading.set(false);
+      },
+    });
+  }
+
+  // GET carrega todos os jogos atuais; PUT envia a lista completa com o jogo atual.
+  adicionarJogoALista(): void {
+    const user = this.auth.usuarioAtual;
+    const listId = this.listaSelecionadaId;
+    if (!user || listId === null) return;
+
+    this.addingToList.set(true);
+    this.message.set('');
+    this.listas.buscar(listId).subscribe({
+      next: (list) => {
+        const jogoIds = [...new Set([...list.jogos.map((game) => game.id), this.id])];
+        this.listas
+          .atualizar(list.id, {
+            nome: list.nome,
+            publica: list.publica,
+            principal: list.principal ?? false,
+            usuarioId: user.id,
+            jogoIds,
+          })
+          .subscribe({
+            next: () => {
+              this.listas.buscar(list.id).subscribe({
+                next: (persisted) => {
+                  const wasAdded = persisted.jogos.some((game) => game.id === this.id);
+                  if (wasAdded) {
+                    this.message.set(`Jogo adicionado à lista "${list.nome}".`);
+                    this.loadUserLists();
+                  } else {
+                    this.message.set(
+                      'A API aceitou a atualização, mas o jogo não apareceu na lista. Verifique se o backend está persistindo jogoIds.',
+                    );
+                  }
+                  this.addingToList.set(false);
+                },
+                error: (error: unknown) => {
+                  this.message.set(apiErrorMessage(error));
+                  this.addingToList.set(false);
+                },
+              });
+            },
+            error: (error: unknown) => {
+              this.message.set(apiErrorMessage(error));
+              this.addingToList.set(false);
+            },
+          });
+      },
+      error: (error: unknown) => {
+        this.message.set(apiErrorMessage(error));
+        this.addingToList.set(false);
+      },
+    });
   }
 
   // POST cria o vínculo e PATCH /status salva o progresso escolhido.
