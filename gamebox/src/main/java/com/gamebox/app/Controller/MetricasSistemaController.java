@@ -20,7 +20,6 @@ public class MetricasSistemaController {
     }
 
 
-    // @PreAuthorize("hasAnyRole('USER')")
     @GetMapping
     public ResponseEntity<List<MetricaStatusResponse>> listarTodos() {
         return ResponseEntity.ok
