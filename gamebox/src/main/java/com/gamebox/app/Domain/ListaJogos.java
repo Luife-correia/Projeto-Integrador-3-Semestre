@@ -45,6 +45,9 @@ public class ListaJogos {
     @Column(nullable = false)
     private boolean principal;
 
+    protected ListaJogos() {
+    }
+
     public ListaJogos(Usuario usuario, @NotBlank(message = "O nome da lista é obrigatório") String nome, @NotNull(message = "A visibilidade da lista (pública/privada) é obrigatória") Boolean publica, boolean principal, List<Long> longs) {
     }
 
