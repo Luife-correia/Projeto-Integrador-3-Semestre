@@ -8,15 +8,15 @@ import {
   JogoResponse,
   ListaJogosResponse,
   StatusJogos,
-} from '../../model/api.model';
-import { apiErrorMessage } from '../../services/api-error';
-import { AuthService } from '../../services/auth.service';
-import { AvaliacaoService } from '../../services/avaliacao.service';
-import { BibliotecaService } from '../../services/biblioteca.service';
-import { JogoService } from '../../services/jogo.service';
-import { ListaJogosService } from '../../services/lista-jogos.service';
-import { UsuarioService } from '../../services/usuario.service';
-import { StatusBadgeComponent } from '../components/status-badge';
+} from '../../../model/api.model';
+import { apiErrorMessage } from '../../../services/api-error';
+import { AuthService } from '../../../services/auth.service';
+import { AvaliacaoService } from '../../../services/avaliacao.service';
+import { BibliotecaService } from '../../../services/biblioteca.service';
+import { JogoService } from '../../../services/jogo.service';
+import { ListaJogosService } from '../../../services/lista-jogos.service';
+import { UsuarioService } from '../../../services/usuario.service';
+import { StatusBadgeComponent } from '../../components/status-badge';
 
 @Component({
   selector: 'app-game-detail-page',

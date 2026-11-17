@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { CatalogPage } from './pages/catalog-page';
-import { GameDetailPage } from './pages/game-detail-page';
-import { ProfilePage } from './pages/profile-page';
+import { CatalogPage } from './pages/catalog-page/catalog-page';
+import { GameDetailPage } from './pages/game-detail-page/game-detail-page';
+import { ProfilePage } from './pages/profile-page/profile-page';
 import { AdminPage } from './pages/admin-page/admin-page';
 import { LoginCadastro } from './pages/login-cadastro/login-cadastro';
 import { authGuard } from './auth.guard';

@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { JogoResponse } from '../../model/api.model';
-import { apiErrorMessage } from '../../services/api-error';
-import { JogoService } from '../../services/jogo.service';
-import { GameCardComponent } from '../components/game-card';
+import { JogoResponse } from '../../../model/api.model';
+import { apiErrorMessage } from '../../../services/api-error';
+import { JogoService } from '../../../services/jogo.service';
+import { GameCardComponent } from '../../components/game-card';
 
 @Component({
   selector: 'app-catalog-page',
