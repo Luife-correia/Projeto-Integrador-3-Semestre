@@ -9,6 +9,7 @@
   </nav>
   @if (auth.usuarioAtual; as usuario) {
     <a class="profile-chip" routerLink="/profile"><span>{{ usuario.nome }}</span></a>
+    <!-- Tela: barra superior. Ação: encerra a sessão atual. -->
     <button class="button-secondary" type="button" (click)="logout()">Sair</button>
   } @else {
     <a class="profile-chip" routerLink="/login"><span>Entrar</span></a>

@@ -15,6 +15,8 @@ import { GameCardComponent } from '../../components/game-card';
 })
 export class CatalogPage {
   private readonly service = inject(JogoService);
+
+  // Converte gêneros em inglês para nomes usados nos filtros da tela.
   private readonly traducaoGeneros: Record<string, string> = {
     action: 'Ação',
     adventure: 'Aventura',
@@ -54,6 +56,7 @@ export class CatalogPage {
     mmorpg: 'MMORPG',
   };
 
+  // Guarda os jogos, os filtros escolhidos e os estados de carregamento/erro.
   readonly jogos = signal<JogoResponse[]>([]);
   readonly query = signal('');
   readonly genre = signal('');
@@ -63,6 +66,7 @@ export class CatalogPage {
 
   private timer?: ReturnType<typeof setTimeout>;
 
+  // Cria as opções e a lista filtrada a partir dos jogos carregados.
   readonly genres = computed(() =>
     [...new Set(this.jogos().flatMap((game) => game.generos))].sort((a, b) =>
       this.nomeGenero(a).localeCompare(this.nomeGenero(b), 'pt-BR'),
@@ -82,13 +86,16 @@ export class CatalogPage {
   );
 
   constructor() {
+    // Carrega o catálogo assim que a tela é aberta.
     this.buscar();
   }
 
+  // Exibe o gênero traduzido sem mudar o valor original usado na busca.
   nomeGenero(genero: string): string {
     return this.traducaoGeneros[genero.trim().toLocaleLowerCase('pt-BR')] ?? genero;
   }
 
+  // Atualiza o texto de busca e inicia a nova consulta com atraso.
   onQueryChange(value: string): void {
     this.query.set(value);
     this.buscar();
@@ -114,10 +121,12 @@ export class CatalogPage {
   }
 
   toggleGenre(value: string): void {
+    // Ativa o gênero escolhido ou remove o filtro se ele já estiver selecionado.
     this.genre.set(this.genre() === value ? '' : value);
   }
 
   limparFiltros(): void {
+    // Limpa gênero, plataforma e texto de busca.
     this.genre.set('');
     this.platform.set('');
     this.query.set('');

@@ -16,6 +16,7 @@ export class LoginCadastro {
   private api = inject(UsuarioService);
   private auth = inject(AuthService);
   private router = inject(Router);
+  // Guarda o modo atual, os campos do formulário e as mensagens mostradas na tela.
   modo: Modo = 'login';
   dados = { nome: '', email: '', senha: '', confirmacaoSenha: '' };
   mensagem = '';
@@ -74,6 +75,7 @@ export class LoginCadastro {
       },
     });
   }
+  // Alterna entre login e cadastro e limpa o formulário.
   alternarModo(m: Modo, form: NgForm) {
     this.modo = m;
     this.dados = { nome: '', email: '', senha: '', confirmacaoSenha: '' };

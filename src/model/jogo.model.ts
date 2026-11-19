@@ -1,3 +1,4 @@
+// Modelo básico dos dados de um jogo.
 export interface Jogo {
  id: number;
  nome: string;

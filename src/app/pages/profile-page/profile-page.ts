@@ -28,6 +28,7 @@ import { StatusBadgeComponent } from '../../components/status-badge';
   templateUrl: './profile-page.html',
 })
 export class ProfilePage {
+  // Serviços usados para carregar e atualizar os dados mostrados no perfil.
   readonly auth = inject(AuthService);
   private readonly avaliacoes = inject(AvaliacaoService);
   private readonly listaApi = inject(ListaJogosService);
@@ -35,6 +36,7 @@ export class ProfilePage {
   private readonly usuarioApi = inject(UsuarioService);
   private readonly bibliotecaApi = inject(BibliotecaService);
 
+  // Ordem e nomes dos grupos usados para separar a biblioteca por status.
   readonly statusGroups: { status: StatusJogos; label: string }[] = [
     { status: 'JOGANDO', label: 'Jogando' },
     { status: 'ZERADO', label: 'Zerados' },
@@ -43,6 +45,7 @@ export class ProfilePage {
     { status: 'ABANDONADO', label: 'Abandonados' },
   ];
 
+  // Dados e estados usados pelas seções do perfil.
   readonly profile = signal<Usuario | null>(null);
   readonly library = signal<BibliotecaJogoResponse[]>([]);
   readonly libraryLoading = signal(true);
@@ -69,6 +72,7 @@ export class ProfilePage {
   profileFormData = { nome: '', email: '', senha: '', bio: '', fotoPerfil: '' };
 
   constructor() {
+    // Carrega perfil, biblioteca, avaliações, listas e catálogo do usuário logado.
     const user = this.auth.usuarioAtual;
     if (!user) return;
 
@@ -128,14 +132,17 @@ export class ProfilePage {
     });
   }
 
+  // Encontra o nome de um jogo pelo ID da avaliação.
   jogoNome(id: number): string {
     return this.games().find((game) => game.id === id)?.nome ?? `Jogo #${id}`;
   }
 
+  // Encontra a capa do jogo pelo ID da avaliação.
   jogoCapa(id: number): string {
     return this.games().find((game) => game.id === id)?.capa ?? '';
   }
 
+  // Retorna somente os jogos que pertencem ao status escolhido.
   entriesByStatus(status: StatusJogos): BibliotecaJogoResponse[] {
     return this.library().filter((item) => item.status === status);
   }
@@ -179,6 +186,7 @@ export class ProfilePage {
   }
 
   editarLista(list: ListaJogosResponse | null = null): void {
+    // Ao editar, busca a lista completa para marcar os jogos já associados.
     this.listError.set('');
     this.selectedGameIds = [];
     if (!list) {
@@ -284,6 +292,7 @@ export class ProfilePage {
   }
 
   sair(): void {
+    // Encerra a sessão local e volta para a página inicial.
     this.auth.logout();
     location.assign('/home');
   }

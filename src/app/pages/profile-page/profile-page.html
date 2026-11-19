@@ -5,6 +5,7 @@
       <h1>{{ profile()?.nome ?? auth.usuarioAtual?.nome }}</h1>
       <p>{{ profile()?.email ?? auth.usuarioAtual?.email }}</p>
     </div>
+    <!-- Tela: Perfil > cabeçalho. Ação: abre ou fecha o formulário de perfil. -->
     <button
       class="button-secondary"
       type="button"
@@ -12,12 +13,14 @@
     >
       Editar perfil
     </button>
+    <!-- Tela: Perfil > cabeçalho. Ação: encerra a sessão e retorna ao início. -->
     <button class="button-secondary" type="button" (click)="sair()">Sair</button>
   </section>
 
   @if (profileFormOpen()) {
     <form class="panel" #profileForm="ngForm" (ngSubmit)="salvarPerfil(profileForm)">
       <h2>Editar perfil</h2>
+      <!-- Tela: Perfil > editar perfil. Digite o nome que será exibido na conta. -->
       <label for="profile-name">Nome</label>
       <input
         id="profile-name"
@@ -26,6 +29,7 @@
         required
         minlength="5"
       />
+      <!-- Tela: Perfil > editar perfil. Digite o e-mail da conta. -->
       <label for="profile-email">E-mail</label>
       <input
         id="profile-email"
@@ -35,6 +39,7 @@
         required
         email
       />
+      <!-- Tela: Perfil > editar perfil. Digite a senha atualizada da conta. -->
       <label for="profile-password">Senha</label>
       <input
         id="profile-password"
@@ -45,6 +50,7 @@
         minlength="6"
         autocomplete="current-password"
       />
+      <!-- Tela: Perfil > editar perfil. Digite uma bio opcional. -->
       <label for="profile-bio">Bio (opcional; de 6 a 100 caracteres se preenchida)</label>
       <textarea
         id="profile-bio"
@@ -53,14 +59,17 @@
         minlength="6"
         maxlength="100"
       ></textarea>
+      <!-- Tela: Perfil > editar perfil. Digite a URL da foto, se desejar. -->
       <label for="profile-photo">Foto de perfil (opcional)</label>
       <input id="profile-photo" name="fotoPerfil" [(ngModel)]="profileFormData.fotoPerfil" />
       @if (profileError()) {
         <p class="field-error" role="alert">{{ profileError() }}</p>
       }
+      <!-- Tela: Perfil > edição de perfil. Ação: salva os dados editados. -->
       <button class="button-primary" type="submit" [disabled]="profileSaving()">
         Salvar perfil
       </button>
+      <!-- Tela: Perfil > edição de perfil. Ação: fecha o formulário sem salvar. -->
       <button class="button-secondary" type="button" (click)="profileFormOpen.set(false)">
         Cancelar
       </button>
@@ -125,6 +134,7 @@
     <div class="library-section-heading lists-heading">
       <div class="list-tabs">
         <h3>Listas</h3>
+        <!-- Tela: Perfil > Listas. Ação: mostra as listas do usuário logado. -->
         <button
           class="button-secondary"
           type="button"
@@ -133,6 +143,7 @@
         >
           Minhas listas
         </button>
+        <!-- Tela: Perfil > Listas. Ação: carrega as listas públicas da comunidade. -->
         <button
           class="button-secondary"
           type="button"
@@ -143,6 +154,7 @@
         </button>
       </div>
       @if (listTab() === 'my') {
+        <!-- Tela: Perfil > Minhas listas. Ação: abre o formulário para criar uma lista. -->
         <button class="button-primary" type="button" (click)="editarLista()">Criar lista</button>
       }
     </div>
@@ -162,12 +174,15 @@
               </p>
             </div>
             <div class="list-actions">
+              <!-- Tela: Perfil > Minhas listas. Ação: abre ou fecha os jogos desta lista. -->
               <button class="button-secondary" type="button" (click)="verDetalhesLista(list)">
                 {{ selectedList()?.id === list.id ? 'Fechar' : 'Ver jogos' }}
               </button>
+              <!-- Tela: Perfil > Minhas listas. Ação: abre o formulário para editar esta lista. -->
               <button class="button-secondary" type="button" (click)="editarLista(list)">
                 {{ listFormLoading() ? 'Carregando…' : 'Editar' }}
               </button>
+              <!-- Tela: Perfil > Minhas listas. Ação: exclui esta lista. -->
               <button class="button-danger" type="button" (click)="excluirLista(list)">
                 Excluir
               </button>
@@ -208,6 +223,7 @@
               </p>
             </div>
             <div class="list-actions">
+              <!-- Tela: Perfil > Comunidade. Ação: abre ou fecha os jogos desta lista pública. -->
               <button class="button-secondary" type="button" (click)="verDetalhesLista(list)">
                 {{ selectedList()?.id === list.id ? 'Fechar' : 'Ver jogos' }}
               </button>
@@ -242,6 +258,7 @@
         #listForm="ngForm"
         (ngSubmit)="salvarLista(name.value, publica.checked, principal.checked)"
       >
+        <!-- Tela: Perfil > formulário de lista. Digite o nome da lista. -->
         <label for="list-name">Nome da lista</label>
         <input
           id="list-name"
@@ -251,6 +268,7 @@
           required
           minlength="1"
         />
+        <!-- Tela: Perfil > formulário de lista. Selecione os jogos que farão parte da lista. -->
         <label for="list-games">Jogos da lista</label>
         <select
           id="list-games"
@@ -262,13 +280,16 @@
             <option [ngValue]="game.id">{{ game.nome }}</option>
           }
         </select>
+        <!-- Tela: Perfil > formulário de lista. Marque se a lista ficará pública. -->
         <label
           ><input #publica type="checkbox" [checked]="editing()?.publica ?? true" /> Pública</label
         >
+        <!-- Tela: Perfil > formulário de lista. Marque se esta será a lista principal. -->
         <label
           ><input #principal type="checkbox" [checked]="editing()?.principal ?? false" /> Lista
           principal</label
         >
+        <!-- Tela: Perfil > formulário de lista. Ação: cria ou salva as alterações da lista. -->
         <button
           type="submit"
           class="button-primary"
@@ -276,6 +297,7 @@
         >
           Salvar
         </button>
+        <!-- Tela: Perfil > formulário de lista. Ação: fecha o formulário sem salvar. -->
         <button type="button" class="button-secondary" (click)="formOpen.set(false)">
           Cancelar
         </button>

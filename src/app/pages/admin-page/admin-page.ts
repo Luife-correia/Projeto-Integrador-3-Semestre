@@ -22,6 +22,7 @@ export class AdminPage {
   private jogoApi = inject(JogoService);
   private userApi = inject(UsuarioService);
   private metricApi = inject(MetricasService);
+  // Guarda dados das tabelas, estado do painel e valores do formulário de jogo.
   tab = signal<'games' | 'users'>('games');
   jogos = signal<JogoResponse[]>([]);
   usuarios = signal<Usuario[]>([]);
@@ -34,6 +35,7 @@ export class AdminPage {
   plataformas = '';
   generos = '';
   constructor() {
+    // Busca jogos, usuários e métricas ao abrir o painel.
     this.load();
   }
   // GET /jogos, /usuarios e /metricas carrega os dados do painel.
@@ -62,6 +64,7 @@ export class AdminPage {
     });
   }
   private blank(): JogoRequest {
+    // Cria um formulário de jogo vazio para cadastro ou limpeza após edição.
     return {
       nome: '',
       capa: '',
@@ -73,6 +76,7 @@ export class AdminPage {
     };
   }
   novo() {
+    // Prepara o formulário vazio para cadastrar um jogo.
     this.form = this.blank();
     this.plataformas = '';
     this.generos = '';
@@ -80,6 +84,7 @@ export class AdminPage {
     this.formOpen.set(true);
   }
   editar(g: JogoResponse) {
+    // Copia os dados do jogo escolhido para o formulário.
     this.form = {
       nome: g.nome,
       capa: g.capa,

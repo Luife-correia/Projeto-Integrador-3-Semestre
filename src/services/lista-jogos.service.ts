@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environments';
 import { ListaJogosRequest, ListaJogosResponse } from '../model/api.model';
+// Reúne as chamadas da API para listas personalizadas e seus jogos.
 @Injectable({ providedIn: 'root' })
 export class ListaJogosService {
   private http = inject(HttpClient);

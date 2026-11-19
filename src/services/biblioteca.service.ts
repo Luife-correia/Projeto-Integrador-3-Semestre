@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../environments/environments';
 import { StatusJogos, UsuarioJogoResponse, BibliotecaJogoResponse } from '../model/api.model';
 
+// Reúne as chamadas usadas para consultar a biblioteca e mudar status.
 @Injectable({ providedIn: 'root' })
 export class BibliotecaService {
   private readonly http = inject(HttpClient);

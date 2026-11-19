@@ -7,6 +7,7 @@ import {
   AvaliacaoRequest,
   AvaliacaoResponse,
 } from '../model/api.model';
+// Reúne as chamadas da API para avaliações de usuários e jogos.
 @Injectable({ providedIn: 'root' })
 export class AvaliacaoService {
   private http = inject(HttpClient);

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../environments/environments';
 import { JogoRequest, JogoResponse } from '../model/api.model';
 
+// Reúne as chamadas para listar, consultar e administrar jogos.
 @Injectable({ providedIn: 'root' })
 export class JogoService {
   private readonly http = inject(HttpClient);

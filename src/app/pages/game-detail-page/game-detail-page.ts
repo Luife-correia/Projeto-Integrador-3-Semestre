@@ -25,6 +25,7 @@ import { StatusBadgeComponent } from '../../components/status-badge';
   templateUrl: './game-detail-page.html',
 })
 export class GameDetailPage {
+  // Serviços que fornecem dados do jogo, avaliações, biblioteca e listas.
   private readonly route = inject(ActivatedRoute);
   private readonly jogos = inject(JogoService);
   private readonly avaliacoes = inject(AvaliacaoService);
@@ -33,6 +34,7 @@ export class GameDetailPage {
   private readonly listas = inject(ListaJogosService);
   readonly auth = inject(AuthService);
 
+  // Estado exibido na tela de detalhe do jogo.
   readonly game = signal<JogoResponse | null>(null);
   readonly reviews = signal<AvaliacaoResponse[]>([]);
   readonly loading = signal(true);
@@ -73,6 +75,7 @@ export class GameDetailPage {
   private readonly id = Number(this.route.snapshot.paramMap.get('id'));
 
   constructor() {
+    // Usa o ID da rota para carregar jogo e avaliações; depois verifica biblioteca e listas.
     // GET /jogos/{id} carrega os dados principais do jogo.
     this.jogos.buscar(this.id).subscribe({
       next: (game) => {
@@ -100,6 +103,7 @@ export class GameDetailPage {
     this.loadUserLists();
   }
 
+  // Mostra o nome do autor ou um texto temporário durante a busca.
   usuarioNome(id: number): string {
     return this.names()[id] ?? 'Carregando usuário…';
   }
@@ -273,6 +277,7 @@ export class GameDetailPage {
   }
 
   cancelarEdicao(): void {
+    // Descarta o texto da avaliação em edição e restaura a nota inicial.
     this.editingReview.set(null);
     this.comentario = '';
     this.nota = 8;
@@ -324,6 +329,7 @@ export class GameDetailPage {
   }
 
   private validReview(): boolean {
+    // Confere nota e tamanho do comentário antes de enviar a avaliação.
     if (
       !Number.isInteger(this.nota) ||
       this.nota < 0 ||

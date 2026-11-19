@@ -19,14 +19,18 @@
     }
   </section>
   <div class="admin-tabs">
+    <!-- Tela: Painel administrativo. Ação: mostra a tabela de jogos. -->
     <button class="admin-tab" [class.active]="tab() === 'games'" (click)="tab.set('games')">
-      Jogos</button
-    ><button class="admin-tab" [class.active]="tab() === 'users'" (click)="tab.set('users')">
+      Jogos
+    </button>
+    <!-- Tela: Painel administrativo. Ação: mostra a tabela de usuários. -->
+    <button class="admin-tab" [class.active]="tab() === 'users'" (click)="tab.set('users')">
       Usuários
     </button>
   </div>
   @if (tab() === 'games') {
     <section>
+      <!-- Tela: Painel administrativo > Jogos. Ação: abre o formulário de novo jogo. -->
       <button class="button-primary" (click)="novo()">+ Novo jogo</button>
       <div class="admin-table-wrap">
         <table class="admin-table">
@@ -45,7 +49,9 @@
                 <td>{{ g.desenvolvedora }}</td>
                 <td>{{ g.dataLancamento }}</td>
                 <td>
+                  <!-- Tela: Painel administrativo > Jogos. Ação: abre o formulário para editar este jogo. -->
                   <button class="button-secondary" (click)="editar(g)">Editar</button>
+                  <!-- Tela: Painel administrativo > Jogos. Ação: inicia a exclusão deste jogo. -->
                   <button class="button-danger" (click)="excluirJogo(g)">Excluir</button>
                 </td>
               </tr>
@@ -61,28 +67,48 @@
     @if (formOpen()) {
       <form class="panel" (ngSubmit)="salvarJogo()">
         <h3>{{ editId() ? 'Editar' : 'Novo' }} jogo</h3>
-        <label>Nome<input [(ngModel)]="form.nome" name="nome" required /></label
-        ><label>Capa (URL)<input [(ngModel)]="form.capa" name="capa" required /></label
-        ><label>Desenvolvedora<input [(ngModel)]="form.desenvolvedora" name="dev" required /></label
-        ><label
-          >Data de lançamento<input
+        <!-- Tela: Painel administrativo > Formulário de jogo. Digite o nome do jogo. -->
+        <label>Nome<input [(ngModel)]="form.nome" name="nome" required /></label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Digite a URL da capa. -->
+        <label>Capa (URL)<input [(ngModel)]="form.capa" name="capa" required /></label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Digite o nome da desenvolvedora. -->
+        <label>Desenvolvedora<input [(ngModel)]="form.desenvolvedora" name="dev" required /></label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Selecione a data de lançamento. -->
+        <label>
+          Data de lançamento
+          <input
             type="date"
             [(ngModel)]="form.dataLancamento"
             name="data"
-            required /></label
-        ><label
-          >Plataformas (separadas por vírgula)<input
+            required
+          />
+        </label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Digite as plataformas separadas por vírgula. -->
+        <label>
+          Plataformas (separadas por vírgula)
+          <input
             [(ngModel)]="plataformas"
             name="platforms"
-            required /></label
-        ><label
-          >Gêneros (separados por vírgula)<input
+            required
+          />
+        </label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Digite os gêneros separados por vírgula. -->
+        <label>
+          Gêneros (separados por vírgula)
+          <input
             [(ngModel)]="generos"
             name="genres"
-            required /></label
-        ><label
-          >Sinopse<textarea [(ngModel)]="form.sinopse" name="sinopse" required></textarea></label
-        ><button class="button-primary">Salvar</button>
+            required
+          />
+        </label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Digite a sinopse do jogo. -->
+        <label>
+          Sinopse
+          <textarea [(ngModel)]="form.sinopse" name="sinopse" required></textarea>
+        </label>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Ação: salva o jogo. -->
+        <button class="button-primary">Salvar</button>
+        <!-- Tela: Painel administrativo > Formulário de jogo. Ação: fecha o formulário sem salvar. -->
         <button type="button" class="button-secondary" (click)="formOpen.set(false)">
           Cancelar
         </button>
@@ -105,7 +131,10 @@
               <td>{{ u.nome }}</td>
               <td>{{ u.email }}</td>
               <td>{{ u.dataCriacao || '—' }}</td>
-              <td><button class="button-danger" (click)="excluirUsuario(u)">Excluir</button></td>
+              <td>
+                <!-- Tela: Painel administrativo > Usuários. Ação: inicia a exclusão deste usuário. -->
+                <button class="button-danger" (click)="excluirUsuario(u)">Excluir</button>
+              </td>
             </tr>
           } @empty {
             <tr>

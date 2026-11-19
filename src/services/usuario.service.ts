@@ -10,6 +10,7 @@ import {
   UsuarioLoginRequest,
 } from '../model/api.model';
 
+// Centraliza as requisições e o cache de dados de usuários.
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private readonly http = inject(HttpClient);

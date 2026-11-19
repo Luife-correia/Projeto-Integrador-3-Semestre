@@ -35,6 +35,7 @@
             <app-status-badge [status]="status()!" />
           }
           <div class="library-add library-status-controls">
+            <!-- Tela: Detalhe do jogo > Biblioteca. Selecione o status deste jogo. -->
             <select
               class="library-select"
               [(ngModel)]="selectedStatus"
@@ -44,6 +45,7 @@
                 <option [value]="value">{{ labels[value] }}</option>
               }
             </select>
+            <!-- Tela: Detalhe do jogo > Biblioteca. Ação: adiciona o jogo ou salva o novo status. -->
             <button class="button-primary" (click)="salvarStatus()" [disabled]="saving()">
               {{ status() ? 'Atualizar biblioteca' : 'Adicionar à biblioteca' }}
             </button>
@@ -55,6 +57,7 @@
             @if (listsLoading()) {
               <span>Carregando suas listas…</span>
             } @else if (userLists().length) {
+              <!-- Tela: Detalhe do jogo > Listas. Selecione a lista que receberá este jogo. -->
               <select
                 class="library-select"
                 name="listaSelecionadaId"
@@ -66,6 +69,7 @@
                   <option [ngValue]="list.id">{{ list.nome }}</option>
                 }
               </select>
+              <!-- Tela: Detalhe do jogo > Listas. Ação: adiciona este jogo à lista selecionada. -->
               <button
                 class="button-secondary"
                 type="button"
@@ -95,6 +99,7 @@
           <h3>{{ editingReview() ? 'Editar avaliação' : 'Deixe sua avaliação' }}</h3>
           <div class="review-field review-rating-field">
             <label for="review-rating">Nota (0–5 estrelas)</label>
+            <!-- Tela: Detalhe do jogo > Avaliação. Selecione a nota para o jogo. -->
             <select id="review-rating" class="filter-select" [(ngModel)]="nota">
               @for (value of noteValues; track value) {
                 <option [ngValue]="value">{{ value / 2 }}</option>
@@ -103,6 +108,7 @@
           </div>
           <div class="review-field">
             <label for="review-comment">Comentário (10–500 caracteres)</label>
+            <!-- Tela: Detalhe do jogo > Avaliação. Digite o comentário sobre o jogo. -->
             <textarea
               id="review-comment"
               class="filter-select review-comment"
@@ -116,10 +122,12 @@
             <p class="review-feedback" role="status">{{ message() }}</p>
           }
           <div class="review-actions">
+            <!-- Tela: Detalhe do jogo > Avaliação. Ação: publica ou salva as alterações da avaliação. -->
             <button class="button-primary" (click)="salvarAvaliacao()" [disabled]="saving()">
               {{ editingReview() ? 'Salvar alterações' : 'Publicar avaliação' }}
             </button>
-          @if (editingReview()) {
+            @if (editingReview()) {
+              <!-- Tela: Detalhe do jogo > Edição da avaliação. Ação: descarta as alterações. -->
               <button class="button-secondary" (click)="cancelarEdicao()">
                 Cancelar edição
               </button>
@@ -137,6 +145,7 @@
           <p class="review-text">{{ review.comentario }}</p>
           <span class="review-score">★ {{ review.notaEmMeiasEstrelas / 2 }}</span>
           @if (review.usuarioId === auth.usuarioAtual?.id) {
+            <!-- Tela: Detalhe do jogo > Avaliações próprias. Ação: abre a edição da avaliação. -->
             <button
               class="button-secondary"
               [disabled]="reviewLoading()"
@@ -144,6 +153,7 @@
             >
               {{ reviewLoading() ? 'Carregando…' : 'Editar' }}
             </button>
+            <!-- Tela: Detalhe do jogo > Avaliações próprias. Ação: exclui esta avaliação. -->
             <button class="button-danger" (click)="excluir(review)">Excluir</button>
           }
         </article>

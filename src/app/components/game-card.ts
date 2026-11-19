@@ -4,6 +4,7 @@ import { JogoResponse, StatusJogos } from '../../model/api.model';
 import { RatingComponent } from './rating';
 import { StatusBadgeComponent } from './status-badge';
 
+// Recebe os dados de um jogo e monta seu cartão no catálogo.
 @Component({
   selector: 'app-game-card',
   standalone: true,

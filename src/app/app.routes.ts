@@ -7,6 +7,7 @@ import { LoginCadastro } from './pages/login-cadastro/login-cadastro';
 import { authGuard } from './auth.guard';
 
 
+// Relaciona cada endereço do navegador com sua tela.
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'home' },
 	{ path: 'home', component: CatalogPage, title: 'Explorar jogos | GameBox' },

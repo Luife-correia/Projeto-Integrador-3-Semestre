@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { UsuarioAtual } from '../model/api.model';
 const KEY = 'gamebox_user';
+// Mantém os dados mínimos da sessão no estado Angular e no navegador.
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private current = signal<UsuarioAtual | null>(this.read());
