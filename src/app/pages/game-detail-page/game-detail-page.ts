@@ -16,7 +16,7 @@ import { BibliotecaService } from '../../../services/biblioteca.service';
 import { JogoService } from '../../../services/jogo.service';
 import { ListaJogosService } from '../../../services/lista-jogos.service';
 import { UsuarioService } from '../../../services/usuario.service';
-import { StatusBadgeComponent } from '../../components/status-badge';
+import { StatusBadgeComponent } from '../../components/status-badge/status-badge';
 
 @Component({
   selector: 'app-game-detail-page',

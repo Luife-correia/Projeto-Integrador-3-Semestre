@@ -43,22 +43,22 @@ export class AdminPage {
     this.loading.set(true);
     // GET /jogos preenche a tabela de jogos.
     this.jogoApi.listar().subscribe({
-      next: (x) => this.jogos.set(x),
-      error: (e) => this.error.set(apiErrorMessage(e)),
+      next: (jogosRecebidos) => this.jogos.set(jogosRecebidos),
+      error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
     // GET /usuarios preenche a tabela de usuários.
     this.userApi.listar().subscribe({
-      next: (x) => this.usuarios.set(x),
-      error: (e) => this.error.set(apiErrorMessage(e)),
+      next: (usuariosRecebidos) => this.usuarios.set(usuariosRecebidos),
+      error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
     // GET /metricas carrega os totais agrupados por status.
     this.metricApi.listar().subscribe({
-      next: (x) => {
-        this.metricas.set(x);
+      next: (metricasRecebidas) => {
+        this.metricas.set(metricasRecebidas);
         this.loading.set(false);
       },
-      error: (e) => {
-        this.error.set(apiErrorMessage(e));
+      error: (erro) => {
+        this.error.set(apiErrorMessage(erro));
         this.loading.set(false);
       },
     });
@@ -83,63 +83,75 @@ export class AdminPage {
     this.editId.set(null);
     this.formOpen.set(true);
   }
-  editar(g: JogoResponse) {
+  editar(jogoParaEditar: JogoResponse) {
     // Copia os dados do jogo escolhido para o formulário.
     this.form = {
-      nome: g.nome,
-      capa: g.capa,
-      plataformas: g.plataformas,
-      generos: g.generos,
-      desenvolvedora: g.desenvolvedora,
-      dataLancamento: g.dataLancamento,
-      sinopse: g.sinopse,
+      nome: jogoParaEditar.nome,
+      capa: jogoParaEditar.capa,
+      plataformas: jogoParaEditar.plataformas,
+      generos: jogoParaEditar.generos,
+      desenvolvedora: jogoParaEditar.desenvolvedora,
+      dataLancamento: jogoParaEditar.dataLancamento,
+      sinopse: jogoParaEditar.sinopse,
     };
-    this.plataformas = g.plataformas.join(', ');
-    this.generos = g.generos.join(', ');
-    this.editId.set(g.id);
+    this.plataformas = jogoParaEditar.plataformas.join(', ');
+    this.generos = jogoParaEditar.generos.join(', ');
+    this.editId.set(jogoParaEditar.id);
     this.formOpen.set(true);
   }
   // POST cria o jogo ou PUT /jogos/{id} atualiza; depois sincroniza a tabela.
   salvarJogo() {
-    const r = {
+    const dadosJogo = {
       ...this.form,
       plataformas: this.plataformas
         .split(',')
-        .map((x) => x.trim())
+        .map((plataforma) => plataforma.trim())
         .filter(Boolean),
       generos: this.generos
         .split(',')
-        .map((x) => x.trim())
+        .map((genero) => genero.trim())
         .filter(Boolean),
     };
-    if (!r.plataformas.length || !r.generos.length) {
+    if (!dadosJogo.plataformas.length || !dadosJogo.generos.length) {
       this.error.set('Informe ao menos uma plataforma e um gênero.');
       return;
     }
-    const req = this.editId() ? this.jogoApi.atualizar(this.editId()!, r) : this.jogoApi.criar(r);
+    const req = this.editId()
+      ? this.jogoApi.atualizar(this.editId()!, dadosJogo)
+      : this.jogoApi.criar(dadosJogo);
     req.subscribe({
-      next: (g) => {
-        this.jogos.update((a) =>
-          this.editId() ? a.map((x) => (x.id === g.id ? g : x)) : [g, ...a],
+      next: (jogoSalvo) => {
+        this.jogos.update((listaDeJogos) =>
+          this.editId()
+            ? listaDeJogos.map((jogoExistente) =>
+                jogoExistente.id === jogoSalvo.id ? jogoSalvo : jogoExistente,
+              )
+            : [jogoSalvo, ...listaDeJogos],
         );
         this.formOpen.set(false);
         this.error.set('');
       },
-      error: (e) => this.error.set(apiErrorMessage(e)),
+      error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
   }
   // DELETE /jogos/{id} exclui o jogo e remove sua linha da tabela.
-  excluirJogo(g: JogoResponse) {
-    this.jogoApi.remover(g.id).subscribe({
-      next: () => this.jogos.update((a) => a.filter((x) => x.id !== g.id)),
-      error: (e) => this.error.set(apiErrorMessage(e)),
+  excluirJogo(jogoParaExcluir: JogoResponse) {
+    this.jogoApi.remover(jogoParaExcluir.id).subscribe({
+      next: () =>
+        this.jogos.update((listaDeJogos) =>
+          listaDeJogos.filter((jogoExistente) => jogoExistente.id !== jogoParaExcluir.id),
+        ),
+      error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
   }
   // DELETE /usuarios/{id} exclui o usuário selecionado.
-  excluirUsuario(u: Usuario) {
-    this.userApi.remover(u.id).subscribe({
-      next: () => this.usuarios.update((a) => a.filter((x) => x.id !== u.id)),
-      error: (e) => this.error.set(apiErrorMessage(e)),
+  excluirUsuario(usuarioParaExcluir: Usuario) {
+    this.userApi.remover(usuarioParaExcluir.id).subscribe({
+      next: () =>
+        this.usuarios.update((listaDeUsuarios) =>
+          listaDeUsuarios.filter((usuarioExistente) => usuarioExistente.id !== usuarioParaExcluir.id),
+        ),
+      error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
   }
 }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StatusJogos } from '../../model/api.model';
+import { StatusJogos } from '../../../model/api.model';
 
 // Traduz os códigos de status recebidos da API para rótulos da tela.
 const STATUS_LABELS: Record<StatusJogos, string> = {

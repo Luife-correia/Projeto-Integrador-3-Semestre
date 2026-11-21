@@ -13,8 +13,8 @@ export class AvaliacaoService {
   private http = inject(HttpClient);
   private url = `${environment.apiUrl}/avaliacoes`;
   // POST /avaliacoes: envia uma nova avaliação.
-  criar(r: AvaliacaoRequest): Observable<AvaliacaoResponse> {
-    return this.http.post<AvaliacaoResponse>(this.url, r);
+  criar(dadosAvaliacao: AvaliacaoRequest): Observable<AvaliacaoResponse> {
+    return this.http.post<AvaliacaoResponse>(this.url, dadosAvaliacao);
   }
   // GET /avaliacoes/{id}: busca a avaliação antes de editar.
   buscar(id: number): Observable<AvaliacaoResponse> {
@@ -29,8 +29,8 @@ export class AvaliacaoService {
     return this.http.get<AvaliacaoResponse[]>(`${this.url}/jogo/${id}`);
   }
   // PUT /avaliacoes/{id}: atualiza a nota e o comentário.
-  atualizar(id: number, r: AvaliacaoAtualizacaoRequest): Observable<AvaliacaoResponse> {
-    return this.http.put<AvaliacaoResponse>(`${this.url}/${id}`, r);
+  atualizar(id: number, dadosAtualizacao: AvaliacaoAtualizacaoRequest): Observable<AvaliacaoResponse> {
+    return this.http.put<AvaliacaoResponse>(`${this.url}/${id}`, dadosAtualizacao);
   }
   // DELETE /avaliacoes/{id}: exclui uma avaliação.
   remover(id: number): Observable<void> {

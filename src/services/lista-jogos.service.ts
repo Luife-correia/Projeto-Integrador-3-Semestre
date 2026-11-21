@@ -21,12 +21,12 @@ export class ListaJogosService {
     return this.http.get<ListaJogosResponse[]>(`${this.url}/usuario/${id}`);
   }
   // POST /ListaJogos: cria a lista e envia os IDs dos jogos selecionados.
-  criar(r: ListaJogosRequest): Observable<ListaJogosResponse> {
-    return this.http.post<ListaJogosResponse>(this.url, r);
+  criar(dadosLista: ListaJogosRequest): Observable<ListaJogosResponse> {
+    return this.http.post<ListaJogosResponse>(this.url, dadosLista);
   }
   // PUT /ListaJogos/{id}: atualiza os dados e substitui os jogos pelos IDs enviados.
-  atualizar(id: number, r: ListaJogosRequest): Observable<ListaJogosResponse> {
-    return this.http.put<ListaJogosResponse>(`${this.url}/${id}`, r);
+  atualizar(id: number, dadosLista: ListaJogosRequest): Observable<ListaJogosResponse> {
+    return this.http.put<ListaJogosResponse>(`${this.url}/${id}`, dadosLista);
   }
   // DELETE /ListaJogos/{id}: exclui uma lista.
   remover(id: number): Observable<void> {

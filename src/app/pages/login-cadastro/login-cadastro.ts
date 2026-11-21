@@ -50,9 +50,9 @@ export class LoginCadastro {
             this.mensagem = 'Conta criada. Agora entre com suas credenciais.';
             this.tipoMensagem = 'sucesso';
           },
-          error: (e) => {
+          error: (erro) => {
             this.loading = false;
-            this.mensagem = apiErrorMessage(e);
+            this.mensagem = apiErrorMessage(erro);
             this.tipoMensagem = 'erro';
           },
         });
@@ -60,24 +60,24 @@ export class LoginCadastro {
     }
     this.loading = true;
     this.api.login({ email: this.dados.email.trim(), senha: this.dados.senha }).subscribe({
-      next: (u) => {
+      next: (usuarioLogado) => {
         this.loading = false;
-        this.auth.login(u);
-        this.usuarioAtual = u;
-        this.mensagem = `Boas-vindas, ${u.nome}!`;
+        this.auth.login(usuarioLogado);
+        this.usuarioAtual = usuarioLogado;
+        this.mensagem = `Boas-vindas, ${usuarioLogado.nome}!`;
         this.tipoMensagem = 'sucesso';
         this.router.navigateByUrl('/home');
       },
-      error: (e) => {
+      error: (erro) => {
         this.loading = false;
-        this.mensagem = apiErrorMessage(e, 'E-mail ou senha inválidos.');
+        this.mensagem = apiErrorMessage(erro, 'E-mail ou senha inválidos.');
         this.tipoMensagem = 'erro';
       },
     });
   }
   // Alterna entre login e cadastro e limpa o formulário.
-  alternarModo(m: Modo, form: NgForm) {
-    this.modo = m;
+  alternarModo(novoModo: Modo, form: NgForm) {
+    this.modo = novoModo;
     this.dados = { nome: '', email: '', senha: '', confirmacaoSenha: '' };
     this.mensagem = '';
     this.tipoMensagem = '';

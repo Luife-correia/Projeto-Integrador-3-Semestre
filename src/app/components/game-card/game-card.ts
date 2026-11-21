@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { JogoResponse, StatusJogos } from '../../model/api.model';
-import { RatingComponent } from './rating';
-import { StatusBadgeComponent } from './status-badge';
+import { JogoResponse, StatusJogos } from '../../../model/api.model';
+import { RatingComponent } from '../rating/rating';
+import { StatusBadgeComponent } from '../status-badge/status-badge';
 
 // Recebe os dados de um jogo e monta seu cartão no catálogo.
 @Component({

@@ -18,8 +18,8 @@ import { BibliotecaService } from '../../../services/biblioteca.service';
 import { JogoService } from '../../../services/jogo.service';
 import { ListaJogosService } from '../../../services/lista-jogos.service';
 import { UsuarioService } from '../../../services/usuario.service';
-import { RatingComponent } from '../../components/rating';
-import { StatusBadgeComponent } from '../../components/status-badge';
+import { RatingComponent } from '../../components/rating/rating';
+import { StatusBadgeComponent } from '../../components/status-badge/status-badge';
 
 @Component({
   selector: 'app-profile-page',

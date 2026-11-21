@@ -11,8 +11,8 @@
   <section class="library-section">
     <h2>Métricas por status</h2>
     @if (metricas().length) {
-      @for (m of metricas(); track m.status) {
-        <span class="genre-tag">{{ m.status }}: {{ m.quantidade }}</span>
+      @for (metrica of metricas(); track metrica.status) {
+        <span class="genre-tag">{{ metrica.status }}: {{ metrica.quantidade }}</span>
       }
     } @else {
       <p>{{ loading() ? 'Carregando…' : 'Sem métricas disponíveis.' }}</p>
@@ -43,16 +43,16 @@
             </tr>
           </thead>
           <tbody>
-            @for (g of jogos(); track g.id) {
+            @for (jogo of jogos(); track jogo.id) {
               <tr>
-                <td>{{ g.nome }}</td>
-                <td>{{ g.desenvolvedora }}</td>
-                <td>{{ g.dataLancamento }}</td>
+                <td>{{ jogo.nome }}</td>
+                <td>{{ jogo.desenvolvedora }}</td>
+                <td>{{ jogo.dataLancamento }}</td>
                 <td>
                   <!-- Tela: Painel administrativo > Jogos. Ação: abre o formulário para editar este jogo. -->
-                  <button class="button-secondary" (click)="editar(g)">Editar</button>
+                  <button class="button-secondary" (click)="editar(jogo)">Editar</button>
                   <!-- Tela: Painel administrativo > Jogos. Ação: inicia a exclusão deste jogo. -->
-                  <button class="button-danger" (click)="excluirJogo(g)">Excluir</button>
+                  <button class="button-danger" (click)="excluirJogo(jogo)">Excluir</button>
                 </td>
               </tr>
             } @empty {
@@ -126,14 +126,14 @@
           </tr>
         </thead>
         <tbody>
-          @for (u of usuarios(); track u.id) {
+          @for (usuario of usuarios(); track usuario.id) {
             <tr>
-              <td>{{ u.nome }}</td>
-              <td>{{ u.email }}</td>
-              <td>{{ u.dataCriacao || '—' }}</td>
+              <td>{{ usuario.nome }}</td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ usuario.dataCriacao || '—' }}</td>
               <td>
                 <!-- Tela: Painel administrativo > Usuários. Ação: inicia a exclusão deste usuário. -->
-                <button class="button-danger" (click)="excluirUsuario(u)">Excluir</button>
+                <button class="button-danger" (click)="excluirUsuario(usuario)">Excluir</button>
               </td>
             </tr>
           } @empty {

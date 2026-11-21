@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { JogoResponse } from '../../../model/api.model';
 import { apiErrorMessage } from '../../../services/api-error';
 import { JogoService } from '../../../services/jogo.service';
-import { GameCardComponent } from '../../components/game-card';
+import { GameCardComponent } from '../../components/game-card/game-card';
 
 @Component({
   selector: 'app-catalog-page',

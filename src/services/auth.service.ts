@@ -10,8 +10,8 @@ export class AuthService {
     return this.current();
   }
   // Guarda somente ID, nome e e-mail; a senha não fica salva no navegador.
-  login(u: UsuarioAtual): void {
-    this.current.set({ id: u.id, nome: u.nome, email: u.email });
+  login(usuario: UsuarioAtual): void {
+    this.current.set({ id: usuario.id, nome: usuario.nome, email: usuario.email });
     localStorage.setItem(KEY, JSON.stringify(this.current()));
   }
   // Encerra a sessão local e remove os dados persistidos.
@@ -22,11 +22,11 @@ export class AuthService {
   // Recupera do localStorage a sessão mínima, se ela estiver válida.
   private read(): UsuarioAtual | null {
     try {
-      const x = localStorage.getItem(KEY);
-      if (!x) return null;
-      const u = JSON.parse(x);
-      return typeof u.id === 'number' && typeof u.nome === 'string' && typeof u.email === 'string'
-        ? { id: u.id, nome: u.nome, email: u.email }
+      const dadosSalvos = localStorage.getItem(KEY);
+      if (!dadosSalvos) return null;
+      const usuario = JSON.parse(dadosSalvos);
+      return typeof usuario.id === 'number' && typeof usuario.nome === 'string' && typeof usuario.email === 'string'
+        ? { id: usuario.id, nome: usuario.nome, email: usuario.email }
         : null;
     } catch {
       return null;
