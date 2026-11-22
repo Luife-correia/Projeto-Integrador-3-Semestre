@@ -91,7 +91,8 @@ public class UsuarioService {
         return new UserLoginResponse(
                 usuario.getId(),
                 usuario.getNome(),
-                usuario.getEmail()
+                usuario.getEmail(),
+                usuario.getRole().name()
         );
     }
 

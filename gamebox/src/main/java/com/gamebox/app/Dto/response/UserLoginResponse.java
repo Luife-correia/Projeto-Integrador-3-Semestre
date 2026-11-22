@@ -5,7 +5,8 @@ public record UserLoginResponse
         (
                 Long id,
                 String nome,
-                String email
+                String email,
+                String role
 
         ) {
 }
