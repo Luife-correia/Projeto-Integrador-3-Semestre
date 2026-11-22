@@ -2,6 +2,8 @@
 export type StatusJogos =
   'NAO_JOGADO' | 'JOGANDO' | 'QUERO_JOGAR' | 'ZERADO' | 'PLATINADO' | 'ABANDONADO';
 
+export type Role = 'ADMIN' | 'USER';
+
 // Dados opcionais de erro que a API pode retornar.
 export interface ApiError {
   timestamp?: string;
@@ -23,6 +25,7 @@ export interface UsuarioAtual {
   id: number;
   nome: string;
   email: string;
+  role: Role;
 }
 // Campos enviados para criar uma conta.
 export interface UsuarioCadastroRequest {

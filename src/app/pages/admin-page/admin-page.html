@@ -74,33 +74,36 @@
         <!-- Tela: Painel administrativo > Formulário de jogo. Digite o nome da desenvolvedora. -->
         <label>Desenvolvedora<input [(ngModel)]="form.desenvolvedora" name="dev" required /></label>
         <!-- Tela: Painel administrativo > Formulário de jogo. Selecione a data de lançamento. -->
-        <label>
-          Data de lançamento
-          <input
-            type="date"
-            [(ngModel)]="form.dataLancamento"
-            name="data"
-            required
-          />
-        </label>
-        <!-- Tela: Painel administrativo > Formulário de jogo. Digite as plataformas separadas por vírgula. -->
-        <label>
-          Plataformas (separadas por vírgula)
-          <input
-            [(ngModel)]="plataformas"
-            name="platforms"
-            required
-          />
-        </label>
-        <!-- Tela: Painel administrativo > Formulário de jogo. Digite os gêneros separados por vírgula. -->
-        <label>
-          Gêneros (separados por vírgula)
-          <input
-            [(ngModel)]="generos"
-            name="genres"
-            required
-          />
-        </label>
+        <label> Data de lançamento <input type="date" [(ngModel)]="form.dataLancamento" name="data" required /></label>
+
+        <!-- Tela: Painel administrativo > Formulário de jogo.  -->
+        <details class="admin-multi-select">
+          <summary>Plataformas selecionadas ({{ form.plataformas.length }}) </summary>
+            <div class="admin-option-list">
+              @for(plataforma of opcaoPlataforma; track plataforma){
+              <label>
+                <input #checkbox type="checkbox" [checked]="form.plataformas.includes(plataforma)"
+                (change)="selecionarPlataforma(plataforma, checkbox.checked)"/> 
+              {{plataforma}}
+              </label>
+            }
+            </div>
+        </details>
+
+        <!-- Tela: Painel administrativo > Formulário de jogo -->
+        <details class="admin-multi-select">
+          <summary>Gêneros selecionados ({{ form.generos.length }})</summary>
+            <div class="admin-option-list">
+              @for(genero of opcaoGenero; track genero){
+                <label>
+                  <input #checkbox type="checkbox" [checked]="form.generos.includes(genero)"
+                  (change)="selecionarGenero(genero, checkbox.checked)"/> 
+                {{genero}}
+                </label>
+              }
+            </div>
+        </details>
+
         <!-- Tela: Painel administrativo > Formulário de jogo. Digite a sinopse do jogo. -->
         <label>
           Sinopse
@@ -133,7 +136,11 @@
               <td>{{ usuario.dataCriacao || '—' }}</td>
               <td>
                 <!-- Tela: Painel administrativo > Usuários. Ação: inicia a exclusão deste usuário. -->
-                <button class="button-danger" (click)="excluirUsuario(usuario)">Excluir</button>
+                 @if(usuario.id === auth.usuarioAtual?.id){
+                  <span>Sua conta</span>
+                 }@else{
+                  <button class="button-danger" (click)="excluirUsuario(usuario)">Desativar</button>
+                 }
               </td>
             </tr>
           } @empty {
