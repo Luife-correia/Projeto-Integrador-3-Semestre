@@ -76,6 +76,7 @@ export class ProfilePage {
     const user = this.auth.usuarioAtual;
     if (!user) return;
 
+
     // GET /usuarios/{id}/jogos carrega jogos e status para a biblioteca.
     this.bibliotecaApi.listarBiblioteca(user.id).subscribe({
       next: (library) => {
@@ -151,6 +152,7 @@ export class ProfilePage {
   salvarPerfil(form: NgForm): void {
     form.control.markAllAsTouched();
     const user = this.auth.usuarioAtual;
+    const role = this.auth.usuarioAtual?.role;
     const bio = this.profileFormData.bio.trim();
     if (!user || form.invalid || (bio.length > 0 && (bio.length < 6 || bio.length > 100))) {
       this.profileError.set(
@@ -173,7 +175,14 @@ export class ProfilePage {
     this.usuarioApi.atualizar(user.id, request).subscribe({
       next: (profile) => {
         this.profile.set(profile);
-        this.auth.login({ id: user.id, nome: profile.nome, email: profile.email });
+
+        if(!role){
+          this.profileSaving.set(false);
+          this.profileError.set('A sessão não possui role. Entre novamente');
+          return
+        }
+
+        this.auth.login({ id: user.id, nome: profile.nome, email: profile.email, role });
         this.profileFormData.senha = '';
         this.profileSaving.set(false);
         this.profileFormOpen.set(false);

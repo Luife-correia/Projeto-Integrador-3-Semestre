@@ -6,6 +6,9 @@
   <nav class="main-nav" aria-label="Navegação principal">
     <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Explorar</a>
     <a routerLink="/profile" routerLinkActive="active">Meu perfil</a>
+    @if (auth.usuarioAtual?.role === 'ADMIN'){
+      <a [routerLink]="['/admin']" routerLinkActive="router-link-active">Gerenciar</a>
+    }
   </nav>
   @if (auth.usuarioAtual; as usuario) {
     <a class="profile-chip" routerLink="/profile"><span>{{ usuario.nome }}</span></a>

@@ -136,7 +136,11 @@
               <td>{{ usuario.dataCriacao || '—' }}</td>
               <td>
                 <!-- Tela: Painel administrativo > Usuários. Ação: inicia a exclusão deste usuário. -->
-                <button class="button-danger" (click)="excluirUsuario(usuario)">Excluir</button>
+                 @if(usuario.id === auth.usuarioAtual?.id){
+                  <span>Sua conta</span>
+                 }@else{
+                  <button class="button-danger" (click)="excluirUsuario(usuario)">Desativar</button>
+                 }
               </td>
             </tr>
           } @empty {

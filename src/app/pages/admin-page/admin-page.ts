@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { JogoService } from '../../../services/jogo.service';
 import { UsuarioService } from '../../../services/usuario.service';
 import { MetricasService } from '../../../services/metricas.service';
+import { AuthService } from '../../../services/auth.service';
 import {
   JogoRequest,
   JogoResponse,
@@ -22,6 +23,7 @@ export class AdminPage {
   private jogoApi = inject(JogoService);
   private userApi = inject(UsuarioService);
   private metricApi = inject(MetricasService);
+  readonly auth = inject(AuthService);
 
   // Guarda dados das tabelas, estado do painel e valores do formulário de jogo.
   tab = signal<'games' | 'users'>('games');
