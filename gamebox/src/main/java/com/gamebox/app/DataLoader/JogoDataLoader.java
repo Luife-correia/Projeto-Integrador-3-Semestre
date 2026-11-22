@@ -9,19 +9,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-/**
- * DataLoader para a entidade Jogo.
- *
- * EXPLICAÇÃO DE ESTUDO:
- * - O que faz?
- *   Cadastra um catálogo inicial de jogos reais com URLs de capas da web, plataformas,
- *   gêneros, desenvolvedoras, datas de lançamento e sinopses.
- * - Ordem (@Order(2)):
- *   Executa após os usuários, pois as listas de jogos (`ListaJogos`) e interações de usuário (`UsuarioJogo`)
- *   precisam referenciar estes jogos cadastrados.
- * - URLs de Jogos na Web:
- *   Contém links reais e estáveis de capas e metadados de jogos populares da indústria.
- */
+//Cadastra um catálogo inicial de jogos reais com URLs de capas da web, plataformas, gêneros, desenvolvedoras, datas de lançamento e sinopses.
 @Component
 @Order(2)
 public class JogoDataLoader implements CommandLineRunner {

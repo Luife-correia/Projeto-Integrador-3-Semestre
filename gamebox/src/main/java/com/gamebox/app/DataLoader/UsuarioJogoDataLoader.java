@@ -13,15 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * DataLoader para a entidade UsuarioJogo.
- *
- * EXPLICAÇÃO DE ESTUDO:
- * - O que faz?
- *   Associa usuários a jogos específicos definindo o status de gameplay de cada um (ex: JOGANDO, JOGADO, QUERO_JOGAR).
- * - Ordem (@Order(4)):
- *   Executa após usuários e jogos existirem.
- */
+//Associa usuários a jogos específicos definindo o status de gameplay de cada um (ex: JOGANDO, JOGADO, QUERO_JOGAR).
 @Component
 @Order(4)
 public class UsuarioJogoDataLoader implements CommandLineRunner {

@@ -13,17 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * DataLoader para a entidade Avaliacao.
- *
- * EXPLICAÇÃO DE ESTUDO:
- * - O que faz?
- *   Cria avaliações e comentários feitos por usuários sobre jogos do catálogo.
- * - Ordem (@Order(5)):
- *   Executa por último, pois depende diretamente de instâncias válidas de `Usuario` e `Jogo`.
- * - Atualização de nota do Jogo:
- *   Demonstra como avaliações podem influenciar a nota total dos jogos.
- */
+//Cria avaliações e comentários feitos por usuários sobre jogos do catálogo.
 @Component
 @Order(5)
 public class AvaliacaoDataLoader implements CommandLineRunner {
