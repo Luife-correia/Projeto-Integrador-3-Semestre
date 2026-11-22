@@ -22,6 +22,7 @@ export class AdminPage {
   private jogoApi = inject(JogoService);
   private userApi = inject(UsuarioService);
   private metricApi = inject(MetricasService);
+
   // Guarda dados das tabelas, estado do painel e valores do formulário de jogo.
   tab = signal<'games' | 'users'>('games');
   jogos = signal<JogoResponse[]>([]);
@@ -32,12 +33,21 @@ export class AdminPage {
   formOpen = signal(false);
   editId = signal<number | null>(null);
   form: JogoRequest = this.blank();
-  plataformas = '';
-  generos = '';
+
   constructor() {
     // Busca jogos, usuários e métricas ao abrir o painel.
     this.load();
   }
+
+// Lista de plataformas já usadas nos jogos do catálogo sem repetição
+  get opcaoPlataforma(): string[]{
+    return [...new Set(this.jogos().flatMap((jogo) => jogo.plataformas))].sort();
+  }
+
+  get opcaoGenero(): string[]{
+    return [...new Set(this.jogos().flatMap((jogo) => jogo.generos))].sort();
+  }
+
   // GET /jogos, /usuarios e /metricas carrega os dados do painel.
   private load() {
     this.loading.set(true);
@@ -63,6 +73,7 @@ export class AdminPage {
       },
     });
   }
+
   private blank(): JogoRequest {
     // Cria um formulário de jogo vazio para cadastro ou limpeza após edição.
     return {
@@ -75,50 +86,62 @@ export class AdminPage {
       sinopse: '',
     };
   }
+
   novo() {
     // Prepara o formulário vazio para cadastrar um jogo.
     this.form = this.blank();
-    this.plataformas = '';
-    this.generos = '';
     this.editId.set(null);
     this.formOpen.set(true);
   }
+
   editar(jogoParaEditar: JogoResponse) {
     // Copia os dados do jogo escolhido para o formulário.
     this.form = {
       nome: jogoParaEditar.nome,
       capa: jogoParaEditar.capa,
-      plataformas: jogoParaEditar.plataformas,
-      generos: jogoParaEditar.generos,
+      plataformas: [...jogoParaEditar.plataformas],
+      generos: [...jogoParaEditar.generos],
       desenvolvedora: jogoParaEditar.desenvolvedora,
       dataLancamento: jogoParaEditar.dataLancamento,
       sinopse: jogoParaEditar.sinopse,
     };
-    this.plataformas = jogoParaEditar.plataformas.join(', ');
-    this.generos = jogoParaEditar.generos.join(', ');
+
     this.editId.set(jogoParaEditar.id);
     this.formOpen.set(true);
   }
+
+
+  // Chamado ao marcar/desmarcar uma plataforma no formulário: adiciona ou remove ela da lista do jogo.
+  selecionarPlataforma(plataforma: string, selecionado: boolean){
+    if(selecionado){
+      this.form.plataformas.push(plataforma);
+    }else{
+      this.form.plataformas = this.form.plataformas.filter((item) => item !== plataforma);
+    }
+  }
+
+  selecionarGenero(genero: string, selecionado: boolean){
+    if(selecionado){
+      this.form.generos.push(genero);
+    }else{
+      this.form.generos = this.form.generos.filter((item) => item !== genero);
+    }
+  }
+
+
   // POST cria o jogo ou PUT /jogos/{id} atualiza; depois sincroniza a tabela.
   salvarJogo() {
-    const dadosJogo = {
-      ...this.form,
-      plataformas: this.plataformas
-        .split(',')
-        .map((plataforma) => plataforma.trim())
-        .filter(Boolean),
-      generos: this.generos
-        .split(',')
-        .map((genero) => genero.trim())
-        .filter(Boolean),
-    };
+    const dadosJogo = {...this.form};
+
     if (!dadosJogo.plataformas.length || !dadosJogo.generos.length) {
       this.error.set('Informe ao menos uma plataforma e um gênero.');
       return;
     }
+
     const req = this.editId()
       ? this.jogoApi.atualizar(this.editId()!, dadosJogo)
       : this.jogoApi.criar(dadosJogo);
+    
     req.subscribe({
       next: (jogoSalvo) => {
         this.jogos.update((listaDeJogos) =>
@@ -134,6 +157,7 @@ export class AdminPage {
       error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
   }
+
   // DELETE /jogos/{id} exclui o jogo e remove sua linha da tabela.
   excluirJogo(jogoParaExcluir: JogoResponse) {
     this.jogoApi.remover(jogoParaExcluir.id).subscribe({
@@ -144,6 +168,7 @@ export class AdminPage {
       error: (erro) => this.error.set(apiErrorMessage(erro)),
     });
   }
+
   // DELETE /usuarios/{id} exclui o usuário selecionado.
   excluirUsuario(usuarioParaExcluir: Usuario) {
     this.userApi.remover(usuarioParaExcluir.id).subscribe({
