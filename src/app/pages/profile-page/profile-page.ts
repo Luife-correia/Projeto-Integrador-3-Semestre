@@ -25,6 +25,7 @@ import { StatusBadgeComponent } from '../../components/status-badge/status-badge
   selector: 'app-profile-page',
   standalone: true,
   imports: [CommonModule, DatePipe, FormsModule, RouterLink, RatingComponent, StatusBadgeComponent],
+  styleUrl: './profile-page.css',
   templateUrl: './profile-page.html',
 })
 export class ProfilePage {

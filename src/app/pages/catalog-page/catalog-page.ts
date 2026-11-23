@@ -11,6 +11,7 @@ import { GameCardComponent } from '../../components/game-card/game-card';
   selector: 'app-catalog-page',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, GameCardComponent],
+  styleUrl: './catalog-page.css',
   templateUrl: './catalog-page.html',
 })
 export class CatalogPage {

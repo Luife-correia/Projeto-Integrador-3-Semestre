@@ -22,6 +22,7 @@ import { StatusBadgeComponent } from '../../components/status-badge/status-badge
   selector: 'app-game-detail-page',
   standalone: true,
   imports: [CommonModule, FormsModule, DatePipe, RouterLink, StatusBadgeComponent],
+  styleUrl: './game-detail-page.css',
   templateUrl: './game-detail-page.html',
 })
 export class GameDetailPage {
