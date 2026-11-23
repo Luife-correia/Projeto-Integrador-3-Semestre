@@ -26,9 +26,7 @@
         [class.active]="modo === 'login'"
         [attr.aria-pressed]="modo === 'login'"
         (click)="alternarModo('login', authForm)"
-      >
-        Entrar
-      </button>
+      > Entrar </button>
 
       <!-- Tela: Login/cadastro. Ação: seleciona o modo de criação de conta. -->
       <button
@@ -36,10 +34,9 @@
         [class.active]="modo === 'cadastro'"
         [attr.aria-pressed]="modo === 'cadastro'"
         (click)="alternarModo('cadastro', authForm)"
-      >
-        Criar conta
-      </button>
-    </div>
+      > Criar conta </button>
+    
+  </div>
 
     <h2 id="auth-title">
       {{ modo === 'login' ? 'Entre na sua conta' : 'Crie sua conta' }}
@@ -53,9 +50,12 @@
       }}
     </p>
 
+    <!-- Formuladrio cadastro -->
     <form #authForm="ngForm" (ngSubmit)="enviarFormulario(authForm)" novalidate>
       @if (modo === 'cadastro') {
+
         <label for="nome">Nome</label>
+
         <!-- Tela: Cadastro. Digite o nome que será usado na conta. -->
         <input
           id="nome"
@@ -77,6 +77,7 @@
       }
 
       <label for="email">E-mail</label>
+
       <!-- Tela: Login/cadastro. Digite o e-mail da conta; no cadastro, ele será registrado. -->
       <input
         id="email"
@@ -95,7 +96,9 @@
       }
 
       <label for="senha">Senha</label>
+
       <!-- Tela: Login/cadastro. Digite a senha da conta. -->
+       <!-- LOGIN -->
       <input
         id="senha"
         name="senha"
@@ -108,14 +111,10 @@
         minlength="6"
       />
 
-      @if (senha.invalid && senha.touched) {
-        <small class="field-error">
-          A senha deve ter pelo menos 6 caracteres.
-        </small>
-      }
 
       @if (modo === 'cadastro') {
         <label for="confirmacaoSenha">Confirme sua senha</label>
+
         <!-- Tela: Cadastro. Digite novamente a senha para confirmar. -->
         <input
           id="confirmacaoSenha"
@@ -129,19 +128,19 @@
         />
 
         @if (confirmacaoSenha.touched && dados.confirmacaoSenha !== dados.senha) {
+
           <small class="field-error">As senhas precisam ser iguais.</small>
+
         }
       }
 
-      @if (mensagem) {
+      @if (mensagem()) {
         <p
           class="form-message"
           [class.error]="tipoMensagem === 'erro'"
           [class.success]="tipoMensagem === 'sucesso'"
           aria-live="polite"
-        >
-          {{ mensagem }}
-        </p>
+        > {{ mensagem() }} </p>
       }
 
       <!-- Tela: Login/cadastro. Ação: envia os dados para entrar ou criar uma conta. -->
@@ -166,9 +165,8 @@
         type="button"
         class="text-button"
         (click)="alternarModo(modo === 'login' ? 'cadastro' : 'login', authForm)"
-      >
-        {{ modo === 'login' ? 'Criar conta' : 'Entrar' }}
-      </button>
+      > {{ modo === 'login' ? 'Criar conta' : 'Entrar' }} </button>
+
     </p>
   </section>
 </section>

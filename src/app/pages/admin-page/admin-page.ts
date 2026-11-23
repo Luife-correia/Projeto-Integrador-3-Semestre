@@ -5,13 +5,9 @@ import { JogoService } from '../../../services/jogo.service';
 import { UsuarioService } from '../../../services/usuario.service';
 import { MetricasService } from '../../../services/metricas.service';
 import { AuthService } from '../../../services/auth.service';
-import {
-  JogoRequest,
-  JogoResponse,
-  Usuario,
-  MetricaStatusResponse,
-} from '../../../model/api.model';
+import { JogoRequest, JogoResponse, Usuario,MetricaStatusResponse,} from '../../../model/api.model';
 import { apiErrorMessage } from '../../../services/api-error';
+
 @Component({
   selector: 'app-admin-page',
   standalone: true,
@@ -19,6 +15,7 @@ import { apiErrorMessage } from '../../../services/api-error';
   styleUrl: './admin-page.css',
   templateUrl: './admin-page.html',
 })
+
 export class AdminPage {
   private jogoApi = inject(JogoService);
   private userApi = inject(UsuarioService);
@@ -36,9 +33,33 @@ export class AdminPage {
   editId = signal<number | null>(null);
   form: JogoRequest = this.blank();
 
-  constructor() {
-    // Busca jogos, usuários e métricas ao abrir o painel.
-    this.load();
+  // Busca jogos, usuários e métricas ao abrir o painel.
+  // GET /jogos, /usuarios e /metricas carrega os dados do painel.
+  ngOnInit(): void{
+    
+    this.loading.set(true);
+    
+    // GET /jogos preenche a tabela de jogos.
+    this.jogoApi.listar().subscribe({
+      next: j => this.jogos.set(j), 
+      error: e => this.error.set(apiErrorMessage(e))
+    });
+
+    // GET /usuarios preenche a tabela de usuários.
+    this.userApi.listar().subscribe({
+      next: u => this.usuarios.set(u), 
+      error: e => this.error.set(apiErrorMessage(e))
+    });
+
+    // GET /metricas carrega os totais agrupados por status.
+    this.metricApi.listar().subscribe({next: m => {this.metricas.set(m)
+      this.loading.set(false);}, 
+      error: e => {
+        this.error.set(apiErrorMessage(e));
+        this.loading.set(false);
+      }
+    });
+
   }
 
 // Lista de plataformas já usadas nos jogos do catálogo sem repetição
@@ -50,31 +71,6 @@ export class AdminPage {
     return [...new Set(this.jogos().flatMap((jogo) => jogo.generos))].sort();
   }
 
-  // GET /jogos, /usuarios e /metricas carrega os dados do painel.
-  private load() {
-    this.loading.set(true);
-    // GET /jogos preenche a tabela de jogos.
-    this.jogoApi.listar().subscribe({
-      next: (jogosRecebidos) => this.jogos.set(jogosRecebidos),
-      error: (erro) => this.error.set(apiErrorMessage(erro)),
-    });
-    // GET /usuarios preenche a tabela de usuários.
-    this.userApi.listar().subscribe({
-      next: (usuariosRecebidos) => this.usuarios.set(usuariosRecebidos),
-      error: (erro) => this.error.set(apiErrorMessage(erro)),
-    });
-    // GET /metricas carrega os totais agrupados por status.
-    this.metricApi.listar().subscribe({
-      next: (metricasRecebidas) => {
-        this.metricas.set(metricasRecebidas);
-        this.loading.set(false);
-      },
-      error: (erro) => {
-        this.error.set(apiErrorMessage(erro));
-        this.loading.set(false);
-      },
-    });
-  }
 
   private blank(): JogoRequest {
     // Cria um formulário de jogo vazio para cadastro ou limpeza após edição.
